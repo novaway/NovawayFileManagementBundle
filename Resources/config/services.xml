@@ -1,0 +1,20 @@
+<?xml version="1.0" ?>
+
+<container xmlns="http://symfony.com/schema/dic/services"
+           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+           xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
+
+    <parameters>
+        <!-- MANAGERS -->
+        <parameter key="novaway.filemanagementbundle.manager.fileupload.class">Novaway\Bundle\FileManagementBundle\Manager\FileUploadManager</parameter>
+        <parameter key="novaway.filemanagementbundle.manager.imageupoad.class">Novaway\Bundle\FileManagementBundle\Manager\ImageUploadManager</parameter>
+    </parameters>
+
+    <services>
+        <service id="novaway.filemanagementbundle.manager.fileupload" class="novaway.filemanagementbundle.manager.fileupload.class">
+        </service>
+        <service id="novaway.filemanagementbundle.manager.imageupoad" class="novaway.filemanagementbundle.manager.imageupoad.class">
+        </service>
+    </services>
+
+</container>
