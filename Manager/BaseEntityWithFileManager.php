@@ -84,7 +84,7 @@ class BaseEntityWithFileManager
     {
         $getter = $this->getter($propertyName, true);
         return sprintf('%s%s', $this->arrayFilepath['bundle.root'],
-                $entity->$getter());
+            $entity->$getter());
     }
 
     /**
@@ -117,6 +117,19 @@ class BaseEntityWithFileManager
     }
 
     /**
+     * Remove and flush the entity
+     *
+     * @param   BaseEntityWithFile $entity The entity to delete
+     *
+     * @return  void
+     */
+    public function delete(BaseEntityWithFile $entity)
+    {
+        $this->entityManager->remove($entity);
+        $this->entityManager->flush();
+    }
+
+    /**
      * Saves an entity and manages its file storage
      *
      * @param   BaseEntityWithFile $entity The entity to save
@@ -145,6 +158,24 @@ class BaseEntityWithFileManager
     }
 
     /**
+     * Deletes an entity and manages its file storage
+     *
+     * @param   BaseEntityWithFile $entity The entity to delete
+     *
+     * @return  void
+     */
+    public function deleteWithFiles(BaseEntityWithFile $entity)
+    {
+        $managedProperties = $this->arrayFilepath;
+        unset($managedProperties['bundle.root']);
+        unset($managedProperties['bundle.web']);
+        $managedProperties = array_keys($managedProperties);
+
+        $this->removeFiles($entity, $managedProperties, true, false);
+        $this->delete($entity);
+    }
+
+    /**
      * Prepare the entity for file storage
      *
      * @param   BaseEntityWithFile  $entity         The entity owning the files
@@ -162,9 +193,9 @@ class BaseEntityWithFileManager
             $fileDestinationName = str_replace(
                 array('{-ext-}', '{-origin-}'),
                 array(
-                $entity->$propertyGetter()->guessExtension(),
-                $entity->$propertyGetter()->getClientOriginalName()
-                ), $this->arrayFilepath[$propertyName]);
+                    $entity->$propertyGetter()->guessExtension(),
+                    $entity->$propertyGetter()->getClientOriginalName()
+                    ), $this->arrayFilepath[$propertyName]);
 
             $fileDestinationName = preg_replace(
                 '#{([^}-]+)}#ie', '$entity->get("$1")', $fileDestinationName);
@@ -199,31 +230,32 @@ class BaseEntityWithFileManager
             sprintf('%s%s', $this->arrayFilepath['bundle.root'], $fileDestination),
             $destMatch
             )
-        ) {
+            ) {
             // move the file to the required directory
             $entity->$propertyGetter()->move(
                 $destMatch[1],
                 $destMatch[2].'.'.$destMatch[3]);
 
-            // clean up the file property as you won't need it anymore
-            $entity->$propertySetter(null);
+        // clean up the file property as you won't need it anymore
+        $entity->$propertySetter(null);
 
-            return true;
-        }
-
-        return false;
+        return true;
     }
+
+    return false;
+}
 
     /**
      * Removes one or several file from the entity
      *
      * @param  BaseEntityWithFile $entity       The entity from witch the file will be removed
      * @param  mixed              $properties   A file property name or an array containing file property names
-     * @param  boolean            $eraseFile    Set to False to keep file on the disk
+     * @param  boolean            $doEraseFiles Set to FALSE to keep file on the disk
+     * @param  boolean            $doSave       Set to FALSE if you don't want to save the entity while file are deleted
      *
      * @return BaseEntityWithFile               The saved entity
      */
-    public function removeFiles(BaseEntityWithFile $entity, $properties, $eraseFile = true)
+    public function removeFiles(BaseEntityWithFile $entity, $properties, $doEraseFiles = true, $doSave = true)
     {
         if(!is_array($properties)) {
             if(is_string($properties)){
@@ -236,7 +268,7 @@ class BaseEntityWithFileManager
         foreach ($properties as $propertyName) {
             $path = $this->getFileAbsolutePath($entity, $propertyName);
             if ($path) {
-                if($eraseFile){
+                if($doEraseFiles){
                     unlink($path);
                 }
                 $setter = $this->setter($propertyName, true);
@@ -244,7 +276,9 @@ class BaseEntityWithFileManager
             }
         }
 
-        $this->save($entity);
+        if($doSave) {
+            $this->save($entity);
+        }
     }
 
 }
