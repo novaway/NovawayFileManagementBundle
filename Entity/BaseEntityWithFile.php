@@ -6,7 +6,7 @@ use Doctrine\ORM\Mapping as ORM;
 
 /**
  * Novaway\Bundle\FileManagementBundle\Entity\BaseEntityWithFile
- * 
+ *
  * Extend your entities with this abstract class to add File management.
  */
 abstract class BaseEntityWithFile
@@ -19,9 +19,9 @@ abstract class BaseEntityWithFile
      *
      * @param  string $method     Name of the method to call
      * @param  array  $arguments  Array of parameters
-     * 
+     *
      * @return mixed  Property value in case of getter, void in case of setter
-     * 
+     *
      * @throws \InvalidArgumentException if wrong number of arguments
      * @throws \BadMethodCallException   if method is neither a getter nor a setter
      */

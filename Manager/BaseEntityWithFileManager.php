@@ -2,6 +2,7 @@
 
 namespace Novaway\Bundle\FileManagementBundle\Manager;
 
+use Symfony\Component\HttpFoundation\Request;
 use Novaway\Bundle\FileManagementBundle\Entity\BaseEntityWithFile;
 use Doctrine\ORM\EntityManager;
 
@@ -18,6 +19,21 @@ class BaseEntityWithFileManager
      * array $arrayFilepath
      */
     protected $arrayFilepath;
+
+    /**
+     * The absolute path to access files
+     *
+     * string $rootPath
+     */
+    protected $rootPath;
+
+    /**
+     * The relative path for web access to files
+     *
+     * string $webPath
+     */
+    protected $webPath;
+
 
     /**
      * The entity manager used to persist and flush entities
@@ -38,38 +54,47 @@ class BaseEntityWithFileManager
      */
     public function __construct($arrayFilepath, $entityManager)
     {
-        $this->arrayFilepath = $arrayFilepath;
         $this->entityManager = $entityManager;
+        $this->webPath = $arrayFilepath['bundle.web'];
+
+        unset($arrayFilepath['bundle.web']);
+        if(isset($arrayFilepath['bundle.root']) && $arrayFilepath['bundle.root'] != null){
+            $this->rootPath = $arrayFilepath['bundle.root'];
+            unset($arrayFilepath['bundle.root']);
+        } else {
+            $this->rootPath = __DIR__.'/../../../../../../web'.$this->webPath;
+        }
+        $this->arrayFilepath = $arrayFilepath;
     }
 
     /**
      * Build Getter string for a property
      *
      * @param   string  $propertyName   The property whose getter will bi return
-     * @param   boolean $onlyFilename   Set to TRUE to return the property filename getter
+     * @param   boolean $filenameOnly   Set to TRUE to return the property filename getter
      *                                  FALSE to return the getter for the property itself
      * @return  string  The getter method
      */
-    private function getter($propertyName, $onlyFilename = false)
+    private function getter($propertyName, $filenameOnly = false)
     {
         return sprintf('get%s%s',
             ucfirst($propertyName),
-            $onlyFilename ? 'Filename' : '');
+            $filenameOnly ? 'Filename' : '');
     }
 
     /**
      * Build Setter string for a property
      *
      * @param   string  $propertyName   The property whose setter will bi return
-     * @param   boolean $onlyFilename   Set to TRUE to return the property filename setter
+     * @param   boolean $filenameOnly   Set to TRUE to return the property filename setter
      *                                  FALSE to return the setter for the property itself
      * @return  string  The setter method
      */
-    private function setter($propertyName, $onlyFilename = false)
+    private function setter($propertyName, $filenameOnly = false)
     {
         return sprintf('set%s%s',
             ucfirst($propertyName),
-            $onlyFilename ? 'Filename' : '');
+            $filenameOnly ? 'Filename' : '');
     }
 
     /**
@@ -83,8 +108,10 @@ class BaseEntityWithFileManager
     public function getFileAbsolutePath(BaseEntityWithFile $entity, $propertyName)
     {
         $getter = $this->getter($propertyName, true);
-        return sprintf('%s%s', $this->arrayFilepath['bundle.root'],
+        $path = sprintf('%s%s', $this->rootPath,
             $entity->$getter());
+
+        return $path;
     }
 
     /**
@@ -98,7 +125,7 @@ class BaseEntityWithFileManager
     public function getFileWebPath(BaseEntityWithFile $entity, $propertyName)
     {
         $getter = $this->getter($propertyName, true);
-        return sprintf('%s%s', $this->arrayFilepath['bundle.web'], $entity->$getter());
+        return sprintf('%s%s', $this->webPath, $entity->$getter());
     }
 
     /**
@@ -139,8 +166,6 @@ class BaseEntityWithFileManager
     public function saveWithFiles(BaseEntityWithFile $entity)
     {
         $managedProperties = $this->arrayFilepath;
-        unset($managedProperties['bundle.root']);
-        unset($managedProperties['bundle.web']);
         $managedProperties = array_keys($managedProperties);
 
         $entity = $this->save($entity);
@@ -167,8 +192,6 @@ class BaseEntityWithFileManager
     public function deleteWithFiles(BaseEntityWithFile $entity)
     {
         $managedProperties = $this->arrayFilepath;
-        unset($managedProperties['bundle.root']);
-        unset($managedProperties['bundle.web']);
         $managedProperties = array_keys($managedProperties);
 
         $this->removeFiles($entity, $managedProperties, true, false);
@@ -227,7 +250,7 @@ class BaseEntityWithFileManager
 
         if(preg_match(
             '#(.+)/([^/.]+).([A-Z]{3,5})#i',
-            sprintf('%s%s', $this->arrayFilepath['bundle.root'], $fileDestination),
+            sprintf('%s%s', $this->rootPath, $fileDestination),
             $destMatch
             )
             ) {
@@ -235,6 +258,11 @@ class BaseEntityWithFileManager
             $entity->$propertyGetter()->move(
                 $destMatch[1],
                 $destMatch[2].'.'.$destMatch[3]);
+
+        if(property_exists($entity, $propertyName.'Size')){
+            $sizeSetter = sprintf('set%s%s', ucfirst($propertyName), 'Size');
+            $entity->$sizeSetter($entity->$propertyGetter()->getClientSize());
+        }
 
         // clean up the file property as you won't need it anymore
         $entity->$propertySetter(null);
