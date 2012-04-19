@@ -159,20 +159,27 @@ class BaseEntityWithFileManager
     /**
      * Saves an entity and manages its file storage
      *
-     * @param   BaseEntityWithFile $entity The entity to save
+     * @param   BaseEntityWithFile  $entity     The entity to save
+     * @param   array               $callback   A callback method. Ex : array(&$obj, 'somePublicMethod')
+     *                                          The callback may have 3 parameters : original filename, extension, file size
      *
      * @return  BaseEntityWithFile The saved entity
      */
-    public function saveWithFiles(BaseEntityWithFile $entity)
+    public function saveWithFiles(BaseEntityWithFile $entity, $callback = null)
     {
         $managedProperties = $this->arrayFilepath;
         $managedProperties = array_keys($managedProperties);
 
         $entity = $this->save($entity);
         $fileAdded = false;
+        $callbackElementArray = array();
         foreach ($managedProperties as $propertyName) {
-            $fileDestination = $this->prepareFileMove($entity, $propertyName);
+            $fileDestination = $this->prepareFileMove($entity, $propertyName, $callbackElementArray);
             $fileAdded = $fileAdded || $this->fileMove($entity, $propertyName, $fileDestination);
+        }
+
+        if (is_callable($callback)) {
+            call_user_func($callback, $entity, $callbackElementArray);
         }
 
         if($fileAdded){
@@ -201,12 +208,13 @@ class BaseEntityWithFileManager
     /**
      * Prepare the entity for file storage
      *
-     * @param   BaseEntityWithFile  $entity         The entity owning the files
-     * @param   string              $propertyName   The property linked to the file
+     * @param   BaseEntityWithFile  $entity                 The entity owning the files
+     * @param   string              $propertyName           The property linked to the file
+     * @param   array               $callbackElementArray   Values that will be used for callback
      *
      * @return  string              The file destination name
      */
-    protected function prepareFileMove(BaseEntityWithFile $entity, $propertyName)
+    protected function prepareFileMove(BaseEntityWithFile $entity, $propertyName, &$callbackElementArray)
     {
         $propertyGetter = $this->getter($propertyName);
         $propertyFileNameSetter = $this->setter($propertyName, true);
@@ -222,8 +230,12 @@ class BaseEntityWithFileManager
 
             $fileDestinationName = preg_replace(
                 '#{([^}-]+)}#ie', '$entity->get("$1")', $fileDestinationName);
-
             $entity->$propertyFileNameSetter($fileDestinationName);
+
+            $callbackElementArray[$propertyName]['extension'] = $entity->$propertyGetter()->guessExtension();
+            $callbackElementArray[$propertyName]['original'] = $entity->$propertyGetter()->getClientOriginalName();
+            $callbackElementArray[$propertyName]['size'] = $entity->$propertyGetter()->getClientSize();
+            $callbackElementArray[$propertyName]['mime'] = $entity->$propertyGetter()->getClientMimeType();
 
             return $fileDestinationName;
         }
@@ -236,6 +248,8 @@ class BaseEntityWithFileManager
      * @param  string               $propertyName       The property associated to the file
      * @param  string               $fileDestination    The relative directory where
      *                                                  the file will be stored
+     * @param   array               $callbackElementArray   Values that will be used for callback
+     *
      * @return boolean              TRUE if file move successfully, FALSE otherwise
      */
     protected function fileMove(BaseEntityWithFile $entity, $propertyName, $fileDestination)
@@ -258,11 +272,6 @@ class BaseEntityWithFileManager
             $entity->$propertyGetter()->move(
                 $destMatch[1],
                 $destMatch[2].'.'.$destMatch[3]);
-
-        if(property_exists($entity, $propertyName.'Size')){
-            $sizeSetter = sprintf('set%s%s', ucfirst($propertyName), 'Size');
-            $entity->$sizeSetter($entity->$propertyGetter()->getClientSize());
-        }
 
         // clean up the file property as you won't need it anymore
         $entity->$propertySetter(null);
