@@ -175,7 +175,7 @@ class BaseEntityWithFileManager
         $callbackElementArray = array();
         foreach ($managedProperties as $propertyName) {
             $fileDestination = $this->prepareFileMove($entity, $propertyName, $callbackElementArray);
-            $fileAdded = $fileAdded || $this->fileMove($entity, $propertyName, $fileDestination);
+            $fileAdded = $this->fileMove($entity, $propertyName, $fileDestination) || $fileAdded;
         }
 
         if (is_callable($callback)) {

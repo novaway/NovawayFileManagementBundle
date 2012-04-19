@@ -8,6 +8,8 @@ You are using it at your own risks.
 
 ### Latest updates
 
+**Version 0.1.2 - 2012-04-19**
+The saveWithFiles method in BaseEntityWithFileManager now accepts a callback method to get uploaded files info  
 **Version 0.1.1 - 2012-04-17**
 Root directory is not mandatory anymore in the filepath parameter  
 **Version 0.1 - 2012-03-29**
