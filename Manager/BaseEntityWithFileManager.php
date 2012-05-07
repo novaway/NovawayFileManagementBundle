@@ -148,12 +148,14 @@ class BaseEntityWithFileManager
      *
      * @param   BaseEntityWithFile $entity The entity to delete
      *
-     * @return  void
+     * @return  BaseEntityWithFile The deleted entity
      */
     public function delete(BaseEntityWithFile $entity)
     {
         $this->entityManager->remove($entity);
         $this->entityManager->flush();
+
+        return $entity;
     }
 
     /**
@@ -194,7 +196,7 @@ class BaseEntityWithFileManager
      *
      * @param   BaseEntityWithFile $entity The entity to delete
      *
-     * @return  void
+     * @return  BaseEntityWithFile The deleted entity
      */
     public function deleteWithFiles(BaseEntityWithFile $entity)
     {
@@ -202,7 +204,8 @@ class BaseEntityWithFileManager
         $managedProperties = array_keys($managedProperties);
 
         $this->removeFiles($entity, $managedProperties, true, false);
-        $this->delete($entity);
+
+        return $this->delete($entity);
     }
 
     /**
@@ -217,6 +220,7 @@ class BaseEntityWithFileManager
     protected function prepareFileMove(BaseEntityWithFile $entity, $propertyName, &$callbackElementArray)
     {
         $propertyGetter = $this->getter($propertyName);
+        $propertyFileNameGetter = $this->getter($propertyName, true);
         $propertyFileNameSetter = $this->setter($propertyName, true);
 
         if (null !== $entity->$propertyGetter() && $entity->$propertyGetter()->getError() === UPLOAD_ERR_OK) {
@@ -228,8 +232,17 @@ class BaseEntityWithFileManager
                     $entity->$propertyGetter()->getClientOriginalName()
                     ), $this->arrayFilepath[$propertyName]);
 
+            //Replace slugged placeholder
+            $fileDestinationName = preg_replace(
+                '#{slug::([^}-]+)}#ie', '$this->slug($entity->get("$1"))', $fileDestinationName);
+            //Replace date format placeholder
+            $fileDestinationName = preg_replace(
+                '#{date::([^}-]+)::([^}-]+)}#ie', '$entity->get("$2")->format("$1")', $fileDestinationName);
+            //Replace classic placeholder
             $fileDestinationName = preg_replace(
                 '#{([^}-]+)}#ie', '$entity->get("$1")', $fileDestinationName);
+
+            unlink($this->rootPath.$entity->$propertyFileNameGetter());
             $entity->$propertyFileNameSetter($fileDestinationName);
 
             $callbackElementArray[$propertyName]['extension'] = $entity->$propertyGetter()->guessExtension();
@@ -239,6 +252,21 @@ class BaseEntityWithFileManager
 
             return $fileDestinationName;
         }
+    }
+
+    /**
+     * Creates a slug from a string
+     *
+     * @param  string $str The string to slug
+     *
+     * @return string      The slugged string
+     */
+    function slug($str)
+    {
+        $str = strtolower(trim($str));
+        $str = preg_replace('/[^a-z0-9-]/', '-', $str);
+        $str = preg_replace('/-+/', "-", $str);
+        return $str;
     }
 
     /**
