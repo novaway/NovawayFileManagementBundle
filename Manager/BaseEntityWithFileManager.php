@@ -242,7 +242,9 @@ class BaseEntityWithFileManager
             $fileDestinationName = preg_replace(
                 '#{([^}-]+)}#ie', '$entity->get("$1")', $fileDestinationName);
 
-            unlink($this->rootPath.$entity->$propertyFileNameGetter());
+            if(is_file($this->rootPath.$entity->$propertyFileNameGetter())){
+                unlink($this->rootPath.$entity->$propertyFileNameGetter());
+            }
             $entity->$propertyFileNameSetter($fileDestinationName);
 
             $callbackElementArray[$propertyName]['extension'] = $entity->$propertyGetter()->guessExtension();
@@ -333,7 +335,7 @@ class BaseEntityWithFileManager
         foreach ($properties as $propertyName) {
             $path = $this->getFileAbsolutePath($entity, $propertyName);
             if ($path) {
-                if($doEraseFiles){
+                if($doEraseFiles && is_file($path)){
                     unlink($path);
                 }
                 $setter = $this->setter($propertyName, true);
