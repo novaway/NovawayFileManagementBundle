@@ -263,7 +263,7 @@ class BaseEntityWithFileManager
      *
      * @return string      The slugged string
      */
-    function slug($str)
+    public function slug($str)
     {
         $str = strtolower(trim($str));
         $str = preg_replace('/[^a-z0-9-]/', '-', $str);
@@ -346,6 +346,60 @@ class BaseEntityWithFileManager
         if($doSave) {
             $this->save($entity);
         }
+    }
+
+    /**
+     * Replace a property file by another, giver it's path
+     *
+     * @param BaseEntityWithFile $entity                 The entity owning the files
+     * @param string             $propertyName           The property linked to the file
+     * @param array              $callbackElementArray   Values that will be used for callback
+     *
+     * @return array An array containing informations about the copied file
+     */
+    public function replaceFile($entity, $propertyName, $sourceFilepath)
+    {
+        $propertyGetter = $this->getter($propertyName);
+        $propertyFileNameGetter = $this->getter($propertyName, true);
+        $propertyFileNameSetter = $this->setter($propertyName, true);
+
+        if (is_file($sourceFilepath)) {
+
+            $oldDestPath = $this->getFileAbsolutePath($entity, $propertyName);
+            if(is_file($oldDestPath)) {
+                unlink($oldDestPath);
+            }
+
+            $fileDestinationPath = str_replace(
+                array('{-ext-}', '{-origin-}'),
+                array(
+                    pathinfo($sourceFilepath, PATHINFO_EXTENSION),
+                    pathinfo($sourceFilepath, PATHINFO_FILENAME)
+                    ),
+                $this->arrayFilepath[$propertyName]);
+
+            //Replace slugged placeholder
+            $fileDestinationPath = preg_replace(
+                '#{slug::([^}-]+)}#ie', '$this->slug($entity->get("$1"))', $fileDestinationPath);
+            //Replace date format placeholder
+            $fileDestinationPath = preg_replace(
+                '#{date::([^}-]+)::([^}-]+)}#ie', '$entity->get("$2")->format("$1")', $fileDestinationPath);
+            //Replace classic placeholder
+            $fileDestinationPath = preg_replace(
+                '#{([^}-]+)}#ie', '$entity->get("$1")', $fileDestinationPath);
+
+            $entity->$propertyFileNameSetter($fileDestinationPath);
+            copy($sourceFilepath, $this->getFileAbsolutePath($entity, $propertyName));
+
+            $fileInfo['extension'] = pathinfo($sourceFilepath, PATHINFO_EXTENSION);
+            $fileInfo['original'] = pathinfo($sourceFilepath, PATHINFO_BASENAME);
+            $fileInfo['size'] = filesize($sourceFilepath);
+            $fileInfo['mime'] = mime_content_type($sourceFilepath);
+
+            return $fileInfo;
+        }
+
+        return null;
     }
 
 }
