@@ -351,13 +351,14 @@ class BaseEntityWithFileManager
     /**
      * Replace a property file by another, giver it's path
      *
-     * @param BaseEntityWithFile $entity                 The entity owning the files
-     * @param string             $propertyName           The property linked to the file
-     * @param array              $callbackElementArray   Values that will be used for callback
+     * @param BaseEntityWithFile $entity               The entity owning the files
+     * @param string             $propertyName         The property linked to the file
+     * @param array              $callbackElementArray Values that will be used for callback
+     * @param string             $operation            'copy' or 'rename'
      *
      * @return array An array containing informations about the copied file
      */
-    public function replaceFile($entity, $propertyName, $sourceFilepath)
+    public function replaceFile($entity, $propertyName, $sourceFilepath, $operation = 'copy')
     {
         $propertyGetter = $this->getter($propertyName);
         $propertyFileNameGetter = $this->getter($propertyName, true);
@@ -388,13 +389,14 @@ class BaseEntityWithFileManager
             $fileDestinationPath = preg_replace(
                 '#{([^}-]+)}#ie', '$entity->get("$1")', $fileDestinationPath);
 
-            $entity->$propertyFileNameSetter($fileDestinationPath);
-            copy($sourceFilepath, $this->getFileAbsolutePath($entity, $propertyName));
 
             $fileInfo['extension'] = pathinfo($sourceFilepath, PATHINFO_EXTENSION);
             $fileInfo['original'] = pathinfo($sourceFilepath, PATHINFO_BASENAME);
             $fileInfo['size'] = filesize($sourceFilepath);
             $fileInfo['mime'] = mime_content_type($sourceFilepath);
+
+            $entity->$propertyFileNameSetter($fileDestinationPath);
+            $operation($sourceFilepath, $this->getFileAbsolutePath($entity, $propertyName));
 
             return $fileInfo;
         }
