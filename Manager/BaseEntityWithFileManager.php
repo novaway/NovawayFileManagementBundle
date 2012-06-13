@@ -229,7 +229,7 @@ class BaseEntityWithFileManager
                 array('{-ext-}', '{-origin-}'),
                 array(
                     $entity->$propertyGetter()->guessExtension(),
-                    $entity->$propertyGetter()->getClientOriginalName()
+                    $this->slug($entity->$propertyGetter()->getClientOriginalName())
                     ), $this->arrayFilepath[$propertyName]);
 
             //Replace slugged placeholder
