@@ -21,6 +21,7 @@ class FileManagementExtension extends \Twig_Extension
     {
         return array(
             'filepath' => new \Twig_Filter_Method($this, 'filepath'),
+            'imagepath' => new \Twig_Filter_Method($this, 'imagepath'),
             'fileUrl' => new \Twig_Filter_Method($this, 'fileUrl'),
         );
     }
@@ -33,6 +34,12 @@ class FileManagementExtension extends \Twig_Extension
             return null;
         }
         return $this->webDirectory.$entity->$getter();
+    }
+
+    public function imagepath($entity, $propertyName, $format)
+    {
+        $pathTemplate = $this->filepath($entity, $propertyName);
+        return str_replace('{-imgformat-}', $format, $pathTemplate);
     }
 
     public function fileUrl($entity, $propertyName)

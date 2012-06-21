@@ -75,7 +75,7 @@ class BaseEntityWithFileManager
      *                                  FALSE to return the getter for the property itself
      * @return  string  The getter method
      */
-    private function getter($propertyName, $filenameOnly = false)
+    protected function getter($propertyName, $filenameOnly = false)
     {
         return sprintf('get%s%s',
             ucfirst($propertyName),
@@ -90,7 +90,7 @@ class BaseEntityWithFileManager
      *                                  FALSE to return the setter for the property itself
      * @return  string  The setter method
      */
-    private function setter($propertyName, $filenameOnly = false)
+    protected function setter($propertyName, $filenameOnly = false)
     {
         return sprintf('set%s%s',
             ucfirst($propertyName),
@@ -358,7 +358,7 @@ class BaseEntityWithFileManager
      *
      * @return array An array containing informations about the copied file
      */
-    public function replaceFile($entity, $propertyName, $sourceFilepath, $operation = 'copy')
+    public function replaceFile(BaseEntityWithFile $entity, $propertyName, $sourceFilepath, $operation = 'copy')
     {
         $propertyGetter = $this->getter($propertyName);
         $propertyFileNameGetter = $this->getter($propertyName, true);
