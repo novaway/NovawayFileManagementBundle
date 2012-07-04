@@ -129,6 +129,16 @@ class BaseEntityWithFileManager
     }
 
     /**
+     * Returns all the document properties names for the managed entity
+     *
+     * @return array An array of the property names
+     */
+    public function getFileProperties()
+    {
+        return array_keys($this->arrayFilepath);
+    }
+
+    /**
      * Persist and flush the entity
      *
      * @param   BaseEntityWithFile $entity The entity to save
@@ -209,6 +219,47 @@ class BaseEntityWithFileManager
     }
 
     /**
+     * Builds the destination path for a file
+     *
+     * @param  BaseEntityWithFile $entity       The entity of the file
+     * @param  string             $propertyName The file property
+     *
+     * @return string The complete file path
+     */
+    protected function buildDestination(BaseEntityWithFile $entity, $propertyName, $sourceFilepath = null)
+    {
+        $propertyGetter = $this->getter($propertyName);
+
+        if($sourceFilepath) {
+            $fileDestinationName = str_replace(
+                array('{-ext-}', '{-origin-}'),
+                array(
+                    pathinfo($sourceFilepath, PATHINFO_EXTENSION),
+                    pathinfo($sourceFilepath, PATHINFO_FILENAME)
+                    ), $this->arrayFilepath[$propertyName]);
+        } else {
+            $fileDestinationName = str_replace(
+                array('{-ext-}', '{-origin-}'),
+                array(
+                    $entity->$propertyGetter()->guessExtension(),
+                    $this->slug($entity->$propertyGetter()->getClientOriginalName())
+                    ), $this->arrayFilepath[$propertyName]);
+        }
+
+        //Replace slugged placeholder
+        $fileDestinationName = preg_replace(
+            '#{slug::([^}-]+)}#ie', '$this->slug($entity->get("$1"))', $fileDestinationName);
+        //Replace date format placeholder
+        $fileDestinationName = preg_replace(
+            '#{date::([^}-]+)::([^}-]+)}#ie', '$entity->get("$2")->format("$1")', $fileDestinationName);
+        //Replace classic placeholder
+        $fileDestinationName = preg_replace(
+            '#{([^}-]+)}#ie', '$entity->get("$1")', $fileDestinationName);
+
+        return $fileDestinationName;
+    }
+
+    /**
      * Prepare the entity for file storage
      *
      * @param   BaseEntityWithFile  $entity                 The entity owning the files
@@ -225,22 +276,7 @@ class BaseEntityWithFileManager
 
         if (null !== $entity->$propertyGetter() && $entity->$propertyGetter()->getError() === UPLOAD_ERR_OK) {
 
-            $fileDestinationName = str_replace(
-                array('{-ext-}', '{-origin-}'),
-                array(
-                    $entity->$propertyGetter()->guessExtension(),
-                    $this->slug($entity->$propertyGetter()->getClientOriginalName())
-                    ), $this->arrayFilepath[$propertyName]);
-
-            //Replace slugged placeholder
-            $fileDestinationName = preg_replace(
-                '#{slug::([^}-]+)}#ie', '$this->slug($entity->get("$1"))', $fileDestinationName);
-            //Replace date format placeholder
-            $fileDestinationName = preg_replace(
-                '#{date::([^}-]+)::([^}-]+)}#ie', '$entity->get("$2")->format("$1")', $fileDestinationName);
-            //Replace classic placeholder
-            $fileDestinationName = preg_replace(
-                '#{([^}-]+)}#ie', '$entity->get("$1")', $fileDestinationName);
+            $fileDestinationName = $this->buildDestination($entity, $propertyName);
 
             if(is_file($this->rootPath.$entity->$propertyFileNameGetter())){
                 unlink($this->rootPath.$entity->$propertyFileNameGetter());
@@ -358,7 +394,7 @@ class BaseEntityWithFileManager
      *
      * @return array An array containing informations about the copied file
      */
-    public function replaceFile(BaseEntityWithFile $entity, $propertyName, $sourceFilepath, $operation = 'copy')
+    public function replaceFile(BaseEntityWithFile $entity, $propertyName, $sourceFilepath, $destFilepath = null, $operation = 'copy')
     {
         $propertyGetter = $this->getter($propertyName);
         $propertyFileNameGetter = $this->getter($propertyName, true);
@@ -371,32 +407,22 @@ class BaseEntityWithFileManager
                 unlink($oldDestPath);
             }
 
-            $fileDestinationPath = str_replace(
-                array('{-ext-}', '{-origin-}'),
-                array(
-                    pathinfo($sourceFilepath, PATHINFO_EXTENSION),
-                    pathinfo($sourceFilepath, PATHINFO_FILENAME)
-                    ),
-                $this->arrayFilepath[$propertyName]);
-
-            //Replace slugged placeholder
-            $fileDestinationPath = preg_replace(
-                '#{slug::([^}-]+)}#ie', '$this->slug($entity->get("$1"))', $fileDestinationPath);
-            //Replace date format placeholder
-            $fileDestinationPath = preg_replace(
-                '#{date::([^}-]+)::([^}-]+)}#ie', '$entity->get("$2")->format("$1")', $fileDestinationPath);
-            //Replace classic placeholder
-            $fileDestinationPath = preg_replace(
-                '#{([^}-]+)}#ie', '$entity->get("$1")', $fileDestinationPath);
-
+            if(!$destFilepath) {
+                $destFilepath = $this->buildDestination($entity, $propertyName, $sourceFilepath);
+            }
 
             $fileInfo['extension'] = pathinfo($sourceFilepath, PATHINFO_EXTENSION);
             $fileInfo['original'] = pathinfo($sourceFilepath, PATHINFO_BASENAME);
             $fileInfo['size'] = filesize($sourceFilepath);
             $fileInfo['mime'] = mime_content_type($sourceFilepath);
 
-            $entity->$propertyFileNameSetter($fileDestinationPath);
-            $operation($sourceFilepath, $this->getFileAbsolutePath($entity, $propertyName));
+            $entity->$propertyFileNameSetter($destFilepath);
+            $absoluteDestFilepath = $this->getFileAbsolutePath($entity, $propertyName);
+            $absoluteDestDir = substr($absoluteDestFilepath, 0, strrpos($absoluteDestFilepath, '/'));
+            if(!is_dir($absoluteDestDir)){
+                mkdir($absoluteDestDir, 0777, true);
+            }
+            $operation($sourceFilepath, $absoluteDestFilepath);
 
             return $fileInfo;
         }
