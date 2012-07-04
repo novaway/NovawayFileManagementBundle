@@ -189,7 +189,7 @@ class BaseEntityWithImageManager extends BaseEntityWithFileManager
      *
      * @return BaseEntityWithFile               The saved entity
      */
-    public function removeFiles(BaseEntityWithFile $entity, $properties, $doEraseFiles = true, $doSave = true)
+    public function removeFiles(BaseEntityWithFile $entity, $properties = array(), $doEraseFiles = true, $doSave = true)
     {
         parent::removeFiles($entity, $properties, $doEraseFiles, $doSave);
     }
