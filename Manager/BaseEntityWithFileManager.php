@@ -204,16 +204,21 @@ class BaseEntityWithFileManager
     /**
      * Deletes an entity and manages its file storage
      *
-     * @param   BaseEntityWithFile $entity The entity to delete
+     * @param   BaseEntityWithFile $entity          The entity to delete
+     * @param   boolean            $onlyDeleteFiles Keep the entity, only delete the files
      *
      * @return  BaseEntityWithFile The deleted entity
      */
-    public function deleteWithFiles(BaseEntityWithFile $entity)
+    public function deleteWithFiles(BaseEntityWithFile $entity, $onlyDeleteFiles = false)
     {
         $managedProperties = $this->arrayFilepath;
         $managedProperties = array_keys($managedProperties);
 
         $this->removeFiles($entity, $managedProperties, true, false);
+
+        if($onlyDeleteFiles){
+            return $entity;
+        }
 
         return $this->delete($entity);
     }
