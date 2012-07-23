@@ -8,6 +8,10 @@ You are using it at your own risks.
 
 ### Latest updates
 
+
+
+**Version 0.1.3 - 2012-07-23**
+Ability to use custom path
 **Version 0.1.2 - 2012-04-19**
 The saveWithFiles method in BaseEntityWithFileManager now accepts a callback method to get uploaded files info  
 **Version 0.1.1 - 2012-04-17**
