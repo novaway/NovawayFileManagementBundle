@@ -37,7 +37,7 @@ class BaseEntityWithImageManager extends BaseEntityWithFileManager
      $this->imageFormatDefinition = $imageFormatDefinition;
      $this->imageFormatChoices = $imageFormatChoices;
      $this->defaultConf = array(
-        'fallback' => array('size' => 0, 'width' => null, 'height' => null, 'crop' => false, 'quality' => 75),
+        'fallback' => array('size' => 0, 'width' => null, 'height' => null, 'crop' => false, 'quality' => 75, 'enlarge' => false),
         'original' => array('quality' => 95),
         'thumbnail' => array('size' => 100, 'crop' => true),
         );
@@ -151,9 +151,18 @@ class BaseEntityWithImageManager extends BaseEntityWithFileManager
                 }
 
                 if($dim['size'] > 0){
-                    $layer->resizeByNarrowSideInPixel($dim['size'], true);
+                    if($dim['enlarge'] || $layer->getWidth() > $dim['size'] || $layer->getHeight() > $dim['size']) {
+                        if($dim['crop']) {
+                            $layer->resizeByNarrowSideInPixel($dim['size'], true);
+                        }
+                        else {
+                            $layer->resizeByLargestSideInPixel($dim['size'], true);
+                        }
+                    }
                 } elseif($dim['width'] != null || $dim['height'] != null) {
-                    $layer->resizeInPixel($dim['width'], $dim['height'], true);
+                    if($dim['enlarge'] || $layer->getWidth() > $dim['width'] || $layer->getHeight() > $dim['height']) {
+                        $layer->resizeInPixel($dim['width'], $dim['height'], true);
+                    }
                 }
 
                 if($dim['crop']) {
