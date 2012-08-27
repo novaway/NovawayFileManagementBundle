@@ -33,17 +33,17 @@ class BaseEntityWithImageManager extends BaseEntityWithFileManager
      */
     public function __construct($arrayFilepath, $entityManager, $imageFormatDefinition, $imageFormatChoices)
     {
-     parent::__construct($arrayFilepath, $entityManager);
-     $this->imageFormatDefinition = $imageFormatDefinition;
-     $this->imageFormatChoices = $imageFormatChoices;
-     $this->defaultConf = array(
+       parent::__construct($arrayFilepath, $entityManager);
+       $this->imageFormatDefinition = $imageFormatDefinition;
+       $this->imageFormatChoices = $imageFormatChoices;
+       $this->defaultConf = array(
         'fallback' => array('size' => 0, 'width' => null, 'height' => null, 'crop' => false, 'quality' => 75),
         'original' => array('quality' => 95),
         'thumbnail' => array('size' => 100, 'crop' => true),
         );
- }
+   }
 
- private function transformPathWithFormat($path, $format){
+   private function transformPathWithFormat($path, $format){
     return str_replace('{-imgformat-}', $format, $path);
 }
 
@@ -137,39 +137,9 @@ class BaseEntityWithImageManager extends BaseEntityWithFileManager
             $entity->$propertyGetter()->move($tmpDir,$tmpName);
 
             foreach ($this->imageFormatChoices[$propertyName] as $format) {
-                $layer = new ImageWorkshop(array('imageFromPath' => $tmpPath));
-                $confPerso = isset($this->imageFormatDefinition[$format]) ? $this->imageFormatDefinition[$format] : null;
-                $confDefault = isset($this->defaultConf[$format]) ? $this->defaultConf[$format] : null;
-                $confFallback = $this->defaultConf['fallback'];
-                $destPathWithFormat = $this->transformPathWithFormat($fileDestinationAbsolute, $format);
-                $dim = array();
-
-                foreach (array_keys($confFallback) as $key) {
-                    $dim[$key] = ($confPerso && isset($confPerso[$key])) ?
-                    $confPerso[$key] :
-                    (($confDefault && isset($confDefault[$key])) ? $confDefault[$key] : $confFallback[$key]);
-                }
-
-                if($dim['size'] > 0){
-                    $layer->resizeByNarrowSideInPixel($dim['size'], true);
-                } elseif($dim['width'] != null || $dim['height'] != null) {
-                    $layer->resizeInPixel($dim['width'], $dim['height'], true);
-                }
-
-                if($dim['crop']) {
-                    $layer->cropMaximumInPixel(0, 0, "MM");
-                }
-
-                $layer->save(
-                    substr($destPathWithFormat, 0, strrpos($destPathWithFormat, '/')),
-                    substr($destPathWithFormat, strrpos($destPathWithFormat, '/') + 1),
-                    true,
-                    null,
-                    $dim['quality']
-                    );
-
-                $layer = null;
+                $this->imageManipulation($tmpPath, $fileDestinationAbsolute, $format);
             }
+
             unlink($tmpPath);
             $entity->$propertySetter(null);
 
@@ -177,6 +147,46 @@ class BaseEntityWithImageManager extends BaseEntityWithFileManager
         }
 
         return false;
+    }
+
+    private function imageManipulation($sourcePath, $fileDestinationAbsolute, $format)
+    {
+        $layer = new ImageWorkshop(array('imageFromPath' => $sourcePath));
+        $confPerso = isset($this->imageFormatDefinition[$format]) ? $this->imageFormatDefinition[$format] : null;
+        $confDefault = isset($this->defaultConf[$format]) ? $this->defaultConf[$format] : null;
+        $confFallback = $this->defaultConf['fallback'];
+        $destPathWithFormat = $this->transformPathWithFormat($fileDestinationAbsolute, $format);
+        $dim = array();
+
+        foreach (array_keys($confFallback) as $key) {
+            $dim[$key] = ($confPerso && isset($confPerso[$key])) ?
+            $confPerso[$key] :
+            (($confDefault && isset($confDefault[$key])) ? $confDefault[$key] : $confFallback[$key]);
+        }
+
+        if($dim['size'] > 0){
+            $layer->resizeByNarrowSideInPixel($dim['size'], true);
+        }
+        elseif($dim['width'] != null && $dim['height'] != null) {
+            $layer->resizeInPixel($dim['width'], $dim['height'], false);
+        }
+        elseif($dim['width'] != null || $dim['height'] != null) {
+            $layer->resizeInPixel($dim['width'], $dim['height'], true);
+        }
+
+        if($dim['crop']) {
+            $layer->cropMaximumInPixel(0, 0, "MM");
+        }
+
+        $layer->save(
+            substr($destPathWithFormat, 0, strrpos($destPathWithFormat, '/')),
+            substr($destPathWithFormat, strrpos($destPathWithFormat, '/') + 1),
+            true,
+            null,
+            $dim['quality']
+            );
+
+        $layer = null;
     }
 
     /**
@@ -206,18 +216,43 @@ class BaseEntityWithImageManager extends BaseEntityWithFileManager
      */
     public function replaceFile(BaseEntityWithFile $entity, $propertyName, $sourceFilepath, $destFilepath = null, $operation = 'copy')
     {
-        foreach ($this->imageFormatChoices[$propertyName] as $format) {
-            parent::replaceFile(
-                $entity,
-                $propertyName,
-                $this->transformPathWithFormat($sourceFilepath, $format),
-                $destFilepath ? $destFilepath : $this->buildDestination($entity, $propertyName, $sourceFilepath, $format),
-                $operation);
-        }
-
-
+        $propertyGetter = $this->getter($propertyName);
+        $propertyFileNameGetter = $this->getter($propertyName, true);
         $propertyFileNameSetter = $this->setter($propertyName, true);
-        $entity->$propertyFileNameSetter($this->buildDestination($entity, $propertyName, $sourceFilepath));
+
+       if (is_file($sourceFilepath)) {
+
+            if($destFilepath) {
+                $entity->$propertyFileNameSetter($destFilepath);
+            }
+            else {
+                $entity->$propertyFileNameSetter($this->buildDestination($entity, $propertyName, $sourceFilepath, null));
+            }
+
+            foreach ($this->imageFormatChoices[$propertyName] as $format) {
+
+                $oldDestPath = $this->getFileAbsolutePath($entity, $propertyName, $format);
+                if(is_file($oldDestPath)) {
+                    unlink($oldDestPath);
+                }
+
+                $absoluteDestFilepath = $this->getFileAbsolutePath($entity, $propertyName, $format);
+                $absoluteDestDir = substr($absoluteDestFilepath, 0, strrpos($absoluteDestFilepath, '/'));
+                if(!is_dir($absoluteDestDir)){
+                    mkdir($absoluteDestDir, 0777, true);
+                }
+
+                // $operation($sourceFilepath, $absoluteDestFilepath);
+                $this->imageManipulation($sourceFilepath, $absoluteDestFilepath, $format);
+            }
+
+            $fileInfo['extension'] = pathinfo($sourceFilepath, PATHINFO_EXTENSION);
+            $fileInfo['original'] = pathinfo($sourceFilepath, PATHINFO_BASENAME);
+            $fileInfo['size'] = filesize($sourceFilepath);
+            $fileInfo['mime'] = mime_content_type($sourceFilepath);
+
+            return $fileInfo;
+        }
 
         return null;
     }
