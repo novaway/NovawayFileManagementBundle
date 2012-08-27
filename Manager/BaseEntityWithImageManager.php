@@ -149,6 +149,15 @@ class BaseEntityWithImageManager extends BaseEntityWithFileManager
         return false;
     }
 
+    /**
+     * Manipulates image according to image format definitons
+     *
+     * @param  string $sourcePath              The source image path
+     * @param  string $fileDestinationAbsolute The destination path ({-img-format-} placeholder will be updated if neeeded)
+     * @param  string $format                  The desired image format
+     *
+     * @return void
+     */
     private function imageManipulation($sourcePath, $fileDestinationAbsolute, $format)
     {
         $layer = new ImageWorkshop(array('imageFromPath' => $sourcePath));
