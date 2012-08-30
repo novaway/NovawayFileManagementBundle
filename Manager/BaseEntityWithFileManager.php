@@ -108,6 +108,7 @@ class BaseEntityWithFileManager
     public function getFileAbsolutePath(BaseEntityWithFile $entity, $propertyName)
     {
         $getter = $this->getter($propertyName, true);
+        $entity->$getter();
         $path = sprintf('%s%s', $this->rootPath,
             $entity->$getter());
 
@@ -231,20 +232,25 @@ class BaseEntityWithFileManager
         $propertyGetter = $this->getter($propertyName);
 
         if($sourceFilepath) {
-            $fileDestinationName = str_replace(
-                array('{-ext-}', '{-origin-}'),
-                array(
-                    pathinfo($sourceFilepath, PATHINFO_EXTENSION),
-                    pathinfo($sourceFilepath, PATHINFO_FILENAME)
-                    ), $this->arrayFilepath[$propertyName]);
+            $arrReplacement =  array(
+                    '{-ext-}' => pathinfo($sourceFilepath, PATHINFO_EXTENSION),
+                    '{-origin-}' => pathinfo($sourceFilepath, PATHINFO_FILENAME)
+                    );
         } else {
-            $fileDestinationName = str_replace(
-                array('{-ext-}', '{-origin-}'),
-                array(
-                    $entity->$propertyGetter()->guessExtension(),
-                    $this->slug($entity->$propertyGetter()->getClientOriginalName())
-                    ), $this->arrayFilepath[$propertyName]);
+            $arrReplacement = array(
+                    '{-ext-}' => $entity->$propertyGetter()->guessExtension(),
+                    '{-origin-}' => $this->slug($entity->$propertyGetter()->getClientOriginalName())
+                    );
         }
+
+        if(method_exists($entity, 'getCustomPath')) {
+            $arrReplacement['{-custom-}'] = $entity->getCustomPath($propertyName);
+        }
+
+        $fileDestinationName = str_replace(
+            array_keys($arrReplacement),
+            $arrReplacement,
+            $this->arrayFilepath[$propertyName]);
 
         //Replace slugged placeholder
         $fileDestinationName = preg_replace(
@@ -393,7 +399,8 @@ class BaseEntityWithFileManager
      *
      * @param BaseEntityWithFile $entity               The entity owning the files
      * @param string             $propertyName         The property linked to the file
-     * @param array              $callbackElementArray Values that will be used for callback
+     * @param  [type]             $sourceFilepath [description]
+     * @param  [type]             $destFilepath   [description]
      * @param string             $operation            'copy' or 'rename'
      *
      * @return array An array containing informations about the copied file
