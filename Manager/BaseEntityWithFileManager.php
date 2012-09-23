@@ -239,7 +239,7 @@ class BaseEntityWithFileManager
         } else {
             $arrReplacement = array(
                     '{-ext-}' => $entity->$propertyGetter()->guessExtension(),
-                    '{-origin-}' => $this->slug($entity->$propertyGetter()->getClientOriginalName())
+                    '{-origin-}' => $this->slug(pathinfo($entity->$propertyGetter()->getClientOriginalName(), PATHINFO_FILENAME))
                     );
         }
 
