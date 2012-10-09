@@ -1,5 +1,5 @@
 {
-    "name": "novaway/novawayfilemanagementbundle",
+    "name": "novaway/filemanagementbundle",
     "type": "symfony-bundle",
     "description": "Bundle for File and Image management in Symfony 2",
     "keywords": ["file", "image", "bundle", "symfony"],
