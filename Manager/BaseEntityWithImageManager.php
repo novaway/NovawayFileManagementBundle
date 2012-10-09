@@ -33,11 +33,11 @@ class BaseEntityWithImageManager extends BaseEntityWithFileManager
      */
     public function __construct($arrayFilepath, $entityManager, $imageFormatDefinition, $imageFormatChoices)
     {
-       parent::__construct($arrayFilepath, $entityManager);
-       $this->imageFormatDefinition = $imageFormatDefinition;
-       $this->imageFormatChoices = $imageFormatChoices;
-       $this->defaultConf = array(
-        'fallback' => array('size' => 0, 'width' => null, 'height' => null, 'crop' => false, 'quality' => 75),
+     parent::__construct($arrayFilepath, $entityManager);
+     $this->imageFormatDefinition = $imageFormatDefinition;
+     $this->imageFormatChoices = $imageFormatChoices;
+     $this->defaultConf = array(
+        'fallback' => array('size' => 0, 'width' => null, 'height' => null, 'crop' => false, 'quality' => 75, 'enlarge' => false),
         'original' => array('quality' => 95),
         'thumbnail' => array('size' => 100, 'crop' => true),
         );
@@ -174,13 +174,45 @@ class BaseEntityWithImageManager extends BaseEntityWithFileManager
         }
 
         if($dim['size'] > 0){
-            $layer->resizeByNarrowSideInPixel($dim['size'], true);
+            //$layer->resizeByNarrowSideInPixel($dim['size'], true);
+            $layer->resizeInPixel($dim['size'], $dim['size'], true, 0, 0, 'MM');
         }
         elseif($dim['width'] != null && $dim['height'] != null) {
-            $layer->resizeInPixel($dim['width'], $dim['height'], false);
+            //$layer->resizeInPixel($dim['width'], $dim['height'], true, 0, 0, 'MM');
+            if ($layer->getWidth() <= $dim['width'] && $layer->getHeight() <= $dim['height']) { // cas 1: layer strictement plus petit que le thumb voulu
+    
+                $boxLayer = new ImageWorkshop(array(
+                    "width" => $dim['width'],
+                    "height" => $dim['height'],
+                    "backgroundColor" => "FFFFFF", // Fill blanc
+                ));
+                
+                $boxLayer->addLayerOnTop($layer, 0, 0, 'MM'); // Superpose $layer au dessus de $boxLayer dans son milieu
+                $layer = $boxLayer;
+                
+            } elseif ($layer->getWidth() > $dim['width'] && $layer->getHeight() > $dim['height']) { // cas 2: layer plus grand que le thumb voulu
+                
+                $largestSide = ($dim['width'] > $dim['height']) ?  $dim['width'] : $dim['height'];
+                $layer->cropMaximumInPixel(0, 0, "MM");
+                $layer->resizeInPixel($largestSide, $largestSide);
+                $layer->cropInPixel($dim['width'], $dim['height'], 0, 0, 'MM');
+                
+            } else { // cas 3: largeur ou hauteur plus grande que celle du thumb
+                
+                if ($layer->getWidth() > $dim['width']) {
+                    $layer->resizeInPixel($dim['width']);
+                    $layer->cropInPixel($dim['width'], $layer->getHeight(), 0, 0, 'MM');
+                    
+                } else {
+                    $layer->resizeInPixel(null, $dim['height']);
+                    $layer->cropInPixel($layer->getWidth(), $dim['height'], 0, 0, 'MM');
+                }
+                
+                $layer->resizeInPixel($dim['width'], $dim['height'], true);
+            }
         }
         elseif($dim['width'] != null || $dim['height'] != null) {
-            $layer->resizeInPixel($dim['width'], $dim['height'], true);
+            $layer->resizeInPixel($dim['width'], $dim['height'], true, 0, 0, 'MM');
         }
 
         if($dim['crop']) {
