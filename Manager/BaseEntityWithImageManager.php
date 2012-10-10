@@ -37,7 +37,15 @@ class BaseEntityWithImageManager extends BaseEntityWithFileManager
      $this->imageFormatDefinition = $imageFormatDefinition;
      $this->imageFormatChoices = $imageFormatChoices;
      $this->defaultConf = array(
-        'fallback' => array('size' => 0, 'width' => null, 'height' => null, 'crop' => false, 'quality' => 75, 'enlarge' => false),
+        'fallback' => array(                // -- Default options when not overriden --
+            'size' => 0,                    // Square size (set to 0 if not square)
+            'width' => null,                // Width (if not square)
+            'height' => null,               // Height (if not square)
+            'crop' => false,                // Crop image
+            'quality' => 75,                // Output image quality (from 0 to 100)
+            'enlarge' => false,             // Enlarge image when source is smaller than output. Fill with bg_color when false
+            'keep_proportions' => true,     // Keep source image proportions (and fill with blank if needed)
+            'bg_color' => '#FFFFFF'),       // Background color when image does not fill expected output size
         'original' => array('quality' => 95),
         'thumbnail' => array('size' => 100, 'crop' => true),
         );
@@ -174,50 +182,45 @@ class BaseEntityWithImageManager extends BaseEntityWithFileManager
         }
 
         if($dim['size'] > 0){
-            //$layer->resizeByNarrowSideInPixel($dim['size'], true);
-            $layer->resizeInPixel($dim['size'], $dim['size'], true, 0, 0, 'MM');
-        }
-        elseif($dim['width'] != null && $dim['height'] != null) {
-            //$layer->resizeInPixel($dim['width'], $dim['height'], true, 0, 0, 'MM');
-            if ($layer->getWidth() <= $dim['width'] && $layer->getHeight() <= $dim['height']) { // cas 1: layer strictement plus petit que le thumb voulu
-    
-                $boxLayer = new ImageWorkshop(array(
-                    "width" => $dim['width'],
-                    "height" => $dim['height'],
-                    "backgroundColor" => "FFFFFF", // Fill blanc
-                ));
-                
-                $boxLayer->addLayerOnTop($layer, 0, 0, 'MM'); // Superpose $layer au dessus de $boxLayer dans son milieu
-                $layer = $boxLayer;
-                
-            } elseif ($layer->getWidth() > $dim['width'] && $layer->getHeight() > $dim['height']) { // cas 2: layer plus grand que le thumb voulu
-                
-                $largestSide = ($dim['width'] > $dim['height']) ?  $dim['width'] : $dim['height'];
-                $layer->cropMaximumInPixel(0, 0, "MM");
-                $layer->resizeInPixel($largestSide, $largestSide);
-                $layer->cropInPixel($dim['width'], $dim['height'], 0, 0, 'MM');
-                
-            } else { // cas 3: largeur ou hauteur plus grande que celle du thumb
-                
-                if ($layer->getWidth() > $dim['width']) {
-                    $layer->resizeInPixel($dim['width']);
-                    $layer->cropInPixel($dim['width'], $layer->getHeight(), 0, 0, 'MM');
-                    
-                } else {
-                    $layer->resizeInPixel(null, $dim['height']);
-                    $layer->cropInPixel($layer->getWidth(), $dim['height'], 0, 0, 'MM');
-                }
-                
-                $layer->resizeInPixel($dim['width'], $dim['height'], true);
+            if($dim['crop']){
+                $layer->cropMaximumInPixel(0, 0, 'MM');
+                $layer->resizeInPixel($dim['size'], $dim['size']);
+            }
+            else {
+                $layer->resizeInPixel($dim['size'], $dim['size'], $dim['keep_proportions'], 0, 0, 'MM');
             }
         }
         elseif($dim['width'] != null || $dim['height'] != null) {
-            $layer->resizeInPixel($dim['width'], $dim['height'], true, 0, 0, 'MM');
+            //First case Scenario: Source image is smaller than expected output
+            if ($layer->getWidth() <= $dim['width'] && $layer->getHeight() <= $dim['height']) {
+
+                if($dim['enlarge']){
+                    $layer->resizeInPixel($dim['width'], $dim['height']);
+                }
+                else {
+                    $boxLayer = new ImageWorkshop(array(
+                        'width' => $dim['width'],
+                        'height' => $dim['height'],
+                        'backgroundColor' => $dim['bg_color'],
+                    ));
+
+                     //Stack source image on top of box layer (middle position)
+                    $boxLayer->addLayerOnTop($layer, 0, 0, 'MM');
+                    $layer = $boxLayer;
+                }
+
+            //Second case scenario: Source image is bigger than expected output
+            } else{
+                if($dim['crop']) {
+                    $layer->cropMaximumInPixel(0, 0, 'MM');
+                    $layer->resizeInPixel($dim['width'], $dim['height']);
+                } else {
+                    $layer->resizeInPixel($dim['width'], $dim['height'], $dim['keep_proportions'], 0, 0, 'MM');
+                }
+
+            }
         }
 
-        if($dim['crop']) {
-            $layer->cropMaximumInPixel(0, 0, "MM");
-        }
 
         $layer->save(
             substr($destPathWithFormat, 0, strrpos($destPathWithFormat, '/')),
