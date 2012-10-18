@@ -42,6 +42,7 @@ class BaseEntityWithImageManager extends BaseEntityWithFileManager
             'width' => null,                // Width (if not square)
             'height' => null,               // Height (if not square)
             'crop' => false,                // Crop image
+            'crop_position' => 'MM',        // Crop image position (L = left, T = top, M = middle, B = bottom, R = right)
             'quality' => 75,                // Output image quality (from 0 to 100)
             'enlarge' => false,             // Enlarge image when source is smaller than output. Fill with bg_color when false
             'keep_proportions' => true,     // Keep source image proportions (and fill with blank if needed)
@@ -183,7 +184,7 @@ class BaseEntityWithImageManager extends BaseEntityWithFileManager
 
         if($dim['size'] > 0){
             if($dim['crop']){
-                $layer->cropMaximumInPixel(0, 0, 'MM');
+                $layer->cropMaximumInPixel(0, 0, $dim['crop_position']);
                 $layer->resizeInPixel($dim['size'], $dim['size']);
             }
             else {
@@ -212,8 +213,19 @@ class BaseEntityWithImageManager extends BaseEntityWithFileManager
             //Second case scenario: Source image is bigger than expected output
             } else{
                 if($dim['crop']) {
-                    $layer->cropMaximumInPixel(0, 0, 'MM');
-                    $layer->resizeInPixel($dim['width'], $dim['height']);
+                    if($dim['keep_proportions']){
+                        if($layer->getWidth() / $dim['width'] > $layer->getHeight() / $dim['height'] )
+                        {
+                            $layer->resizeInPixel(null, $dim['height'], true, 0, 0, 'MM');
+                        } else {
+                            $layer->resizeInPixel($dim['width'], null, true, 0, 0, 'MM');
+                        }
+                            $layer->cropInPixel($dim['width'], $dim['height'], 0, 0, $dim['crop_position']);
+
+                    } else {
+                        $layer->resizeInPixel($dim['width'], $dim['height']);
+                        $layer->cropInPixel($dim['width'], $dim['height'], 0, 0, $dim['crop_position']);
+                    }
                 } else {
                     $layer->resizeInPixel($dim['width'], $dim['height'], $dim['keep_proportions'], 0, 0, 'MM');
                 }
