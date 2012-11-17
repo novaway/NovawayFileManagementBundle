@@ -238,7 +238,7 @@ class BaseEntityWithFileManager
                     );
         } else {
             $arrReplacement = array(
-                    '{-ext-}' => $entity->$propertyGetter()->guessExtension(),
+                    '{-ext-}'    => pathinfo($entity->$propertyGetter()->getClientOriginalName(), PATHINFO_EXTENSION),
                     '{-origin-}' => $this->slug(pathinfo($entity->$propertyGetter()->getClientOriginalName(), PATHINFO_FILENAME))
                     );
         }
@@ -289,7 +289,7 @@ class BaseEntityWithFileManager
             }
             $entity->$propertyFileNameSetter($fileDestinationName);
 
-            $callbackElementArray[$propertyName]['extension'] = $entity->$propertyGetter()->guessExtension();
+            $callbackElementArray[$propertyName]['extension'] = pathinfo($entity->$propertyGetter()->getClientOriginalName(), PATHINFO_EXTENSION);
             $callbackElementArray[$propertyName]['original'] = $entity->$propertyGetter()->getClientOriginalName();
             $callbackElementArray[$propertyName]['size'] = $entity->$propertyGetter()->getClientSize();
             $callbackElementArray[$propertyName]['mime'] = $entity->$propertyGetter()->getClientMimeType();
