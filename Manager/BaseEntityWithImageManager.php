@@ -169,7 +169,7 @@ class BaseEntityWithImageManager extends BaseEntityWithFileManager
      */
     private function imageManipulation($sourcePath, $fileDestinationAbsolute, $format)
     {
-        $layer = new ImageWorkshop(array('imageFromPath' => $sourcePath));
+        $layer = ImageWorkshop::initFromPath($sourcePath);
         $confPerso = isset($this->imageFormatDefinition[$format]) ? $this->imageFormatDefinition[$format] : null;
         $confDefault = isset($this->defaultConf[$format]) ? $this->defaultConf[$format] : null;
         $confFallback = $this->defaultConf['fallback'];
