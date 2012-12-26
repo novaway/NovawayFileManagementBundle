@@ -2,8 +2,6 @@
 
 namespace Novaway\Bundle\FileManagementBundle\Twig\Extension;
 
-use Symfony\Component\HttpKernel\KernelInterface;
-use Symfony\Bundle\TwigBundle\Loader\FilesystemLoader;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 class FileManagementExtension extends \Twig_Extension
@@ -30,15 +28,17 @@ class FileManagementExtension extends \Twig_Extension
     {
         //TODO : Gestion de l'absence de la propriété
         $getter = 'get'.ucfirst($propertyName).'Filename';
-        if(!$entity->$getter()){
+        if (!$entity->$getter()) {
             return null;
         }
+
         return $this->webDirectory.$entity->$getter();
     }
 
     public function imagepath($entity, $propertyName, $format)
     {
         $pathTemplate = $this->filepath($entity, $propertyName);
+
         return str_replace('{-imgformat-}', $format, $pathTemplate);
     }
 
