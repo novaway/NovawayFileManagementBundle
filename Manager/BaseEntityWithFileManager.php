@@ -334,9 +334,10 @@ class BaseEntityWithFileManager
             return false;
         }
 
+        $destFullPath = sprintf('%s%s', $this->rootPath, $fileDestination);
         if(preg_match(
             '#(.+)/([^/.]+).([A-Z]{3,5})#i',
-            sprintf('%s%s', $this->rootPath, $fileDestination),
+            $destFullPath,
             $destMatch
             )
             ) {
@@ -344,6 +345,8 @@ class BaseEntityWithFileManager
             $entity->$propertyGetter()->move(
                 $destMatch[1],
                 $destMatch[2].'.'.$destMatch[3]);
+
+        chmod($destFullPath, 0755);
 
         // clean up the file property as you won't need it anymore
         $entity->$propertySetter(null);

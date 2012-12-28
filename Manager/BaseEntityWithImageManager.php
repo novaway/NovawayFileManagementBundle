@@ -5,7 +5,7 @@ namespace Novaway\Bundle\FileManagementBundle\Manager;
 use Symfony\Component\HttpFoundation\Request;
 use Novaway\Bundle\FileManagementBundle\Entity\BaseEntityWithFile;
 
-use PHPImageWorkshop\ImageWorkshop;
+//use PHPImageWorkshop\ImageWorkshop;
 
 
 /**
@@ -33,14 +33,17 @@ class BaseEntityWithImageManager extends BaseEntityWithFileManager
      */
     public function __construct($arrayFilepath, $entityManager, $imageFormatDefinition, $imageFormatChoices)
     {
-     parent::__construct($arrayFilepath, $entityManager);
-     $this->imageFormatDefinition = $imageFormatDefinition;
-     $this->imageFormatChoices = $imageFormatChoices;
-     $this->defaultConf = array(
+       parent::__construct($arrayFilepath, $entityManager);
+       $this->imageFormatDefinition = $imageFormatDefinition;
+       $this->imageFormatChoices = $imageFormatChoices;
+       $this->defaultConf = array(
         'fallback' => array(                // -- Default options when not overriden --
             'size' => 0,                    // Square size (set to 0 if not square)
-            'width' => null,                // Width (if not square)
-            'height' => null,               // Height (if not square)
+            'max_size' => 0,                    // Resize to fit square at maximum
+            'width' => 0,                // Width (if not square)
+            'height' => 0,               // Height (if not square)
+            'max_width' => 0,                    // Resize to fit width at maximum
+            'max_height' => 0,                    // Resize to fit height at maximum
             'crop' => false,                // Crop image
             'crop_position' => 'MM',        // Crop image position (L = left, T = top, M = middle, B = bottom, R = right)
             'quality' => 75,                // Output image quality (from 0 to 100)
@@ -50,9 +53,9 @@ class BaseEntityWithImageManager extends BaseEntityWithFileManager
         'original' => array('quality' => 95),
         'thumbnail' => array('size' => 100, 'crop' => true),
         );
-   }
+}
 
-   private function transformPathWithFormat($path, $format){
+private function transformPathWithFormat($path, $format){
     return str_replace('{-imgformat-}', $format, $path);
 }
 
@@ -128,6 +131,10 @@ class BaseEntityWithImageManager extends BaseEntityWithFileManager
      */
     protected function fileMove(BaseEntityWithFile $entity, $propertyName, $fileDestination)
     {
+        if (!isset($this->imageFormatChoices[$propertyName])){
+            return parent::fileMove($entity, $propertyName, $fileDestination);
+        }
+
         $propertyGetter = $this->getter($propertyName);
         $propertySetter = $this->setter($propertyName);
 
@@ -169,7 +176,6 @@ class BaseEntityWithImageManager extends BaseEntityWithFileManager
      */
     private function imageManipulation($sourcePath, $fileDestinationAbsolute, $format)
     {
-        $layer = ImageWorkshop::initFromPath($sourcePath);
         $confPerso = isset($this->imageFormatDefinition[$format]) ? $this->imageFormatDefinition[$format] : null;
         $confDefault = isset($this->defaultConf[$format]) ? $this->defaultConf[$format] : null;
         $confFallback = $this->defaultConf['fallback'];
@@ -182,67 +188,13 @@ class BaseEntityWithImageManager extends BaseEntityWithFileManager
             (($confDefault && isset($confDefault[$key])) ? $confDefault[$key] : $confFallback[$key]);
         }
 
-        if($dim['size'] > 0){
-            if($dim['crop']){
-                $layer->cropMaximumInPixel(0, 0, $dim['crop_position']);
-                $layer->resizeInPixel($dim['size'], $dim['size']);
-            }
-            else {
-                $layer->resizeInPixel($dim['size'], $dim['size'], $dim['keep_proportions'], 0, 0, 'MM');
-            }
-        }
-        elseif($dim['width'] != null || $dim['height'] != null) {
-            //First case Scenario: Source image is smaller than expected output
-            if ($layer->getWidth() <= $dim['width'] && $layer->getHeight() <= $dim['height']) {
-
-                if($dim['enlarge']){
-                    $layer->resizeInPixel($dim['width'], $dim['height']);
-                }
-                else {
-                    $boxLayer = new ImageWorkshop(array(
-                        'width' => $dim['width'],
-                        'height' => $dim['height'],
-                        'backgroundColor' => $dim['bg_color'],
-                    ));
-
-                     //Stack source image on top of box layer (middle position)
-                    $boxLayer->addLayerOnTop($layer, 0, 0, 'MM');
-                    $layer = $boxLayer;
-                }
-
-            //Second case scenario: Source image is bigger than expected output
-            } else{
-                if($dim['crop']) {
-                    if($dim['keep_proportions']){
-                        if($layer->getWidth() / $dim['width'] > $layer->getHeight() / $dim['height'] )
-                        {
-                            $layer->resizeInPixel(null, $dim['height'], true, 0, 0, 'MM');
-                        } else {
-                            $layer->resizeInPixel($dim['width'], null, true, 0, 0, 'MM');
-                        }
-                            $layer->cropInPixel($dim['width'], $dim['height'], 0, 0, $dim['crop_position']);
-
-                    } else {
-                        $layer->resizeInPixel($dim['width'], $dim['height']);
-                        $layer->cropInPixel($dim['width'], $dim['height'], 0, 0, $dim['crop_position']);
-                    }
-                } else {
-                    $layer->resizeInPixel($dim['width'], $dim['height'], $dim['keep_proportions'], 0, 0, 'MM');
-                }
-
-            }
+        if(strpos($dim['bg_color'], '#') === 0) {
+            $dim['bg_color'] = substr($dim['bg_color'],1);
         }
 
+        ResizeManager::resize($sourcePath, $destPathWithFormat, $dim);
 
-        $layer->save(
-            substr($destPathWithFormat, 0, strrpos($destPathWithFormat, '/')),
-            substr($destPathWithFormat, strrpos($destPathWithFormat, '/') + 1),
-            true,
-            null,
-            $dim['quality']
-            );
 
-        $layer = null;
     }
 
     /**
@@ -276,7 +228,7 @@ class BaseEntityWithImageManager extends BaseEntityWithFileManager
         $propertyFileNameGetter = $this->getter($propertyName, true);
         $propertyFileNameSetter = $this->setter($propertyName, true);
 
-       if (is_file($sourceFilepath)) {
+        if (is_file($sourceFilepath)) {
 
             if($destFilepath) {
                 $entity->$propertyFileNameSetter($destFilepath);
