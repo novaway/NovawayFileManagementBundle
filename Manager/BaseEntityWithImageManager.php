@@ -42,12 +42,11 @@ class BaseEntityWithImageManager extends BaseEntityWithFileManager
             'max_size' => 0,                    // Resize to fit square at maximum
             'width' => 0,                // Width (if not square)
             'height' => 0,               // Height (if not square)
-            'max_width' => 0,                    // Resize to fit width at maximum
-            'max_height' => 0,                    // Resize to fit height at maximum
             'crop' => false,                // Crop image
             'crop_position' => 'MM',        // Crop image position (L = left, T = top, M = middle, B = bottom, R = right)
             'quality' => 75,                // Output image quality (from 0 to 100)
             'enlarge' => false,             // Enlarge image when source is smaller than output. Fill with bg_color when false
+            'trim_bg' => false,             // Remove the background color when not enlarging
             'keep_proportions' => true,     // Keep source image proportions (and fill with blank if needed)
             'bg_color' => '#FFFFFF'),       // Background color when image does not fill expected output size
         'original' => array('quality' => 95),
@@ -180,7 +179,7 @@ private function transformPathWithFormat($path, $format){
         $confDefault = isset($this->defaultConf[$format]) ? $this->defaultConf[$format] : null;
         $confFallback = $this->defaultConf['fallback'];
         $destPathWithFormat = $this->transformPathWithFormat($fileDestinationAbsolute, $format);
-        $dim = array();
+        $dim = array('format_name' => $format);
 
         foreach (array_keys($confFallback) as $key) {
             $dim[$key] = ($confPerso && isset($confPerso[$key])) ?
