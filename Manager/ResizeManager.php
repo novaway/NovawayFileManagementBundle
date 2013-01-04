@@ -24,7 +24,18 @@ class ResizeManager
         if($dim['width'] > 0 || $dim['height'] > 0) {
 
             if($dim['crop']){
-                $layer->cropMaximumInPixel(0, 0, $dim['crop_position']);
+                if($dim['keep_proportions']){
+                    if($layer->getWidth() / $dim['width'] > $layer->getHeight() / $dim['height'] )
+                    {
+                        $layer->resizeInPixel(null, $dim['height'], true, 0, 0, 'MM');
+                    } else {
+                        $layer->resizeInPixel($dim['width'], null, true, 0, 0, 'MM');
+                    }
+                    $layer->cropInPixel($dim['width'], $dim['height'], 0, 0, $dim['crop_position']);
+                } else {
+                    $layer->resizeInPixel($dim['width'], $dim['height']);
+                    $layer->cropInPixel($dim['width'], $dim['height'], 0, 0, $dim['crop_position']);
+                }
             }
 
             if(!$dim['enlarge'] && $dim['trim_bg'])
