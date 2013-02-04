@@ -1,6 +1,6 @@
 # Novaway FileManagementBundle
 
-[![Dependencies](http://dependency.me/repository/image/skwi69/NovawayFileManagementBundle/BRANCHE_NAME)](http://dependency.me/repository/branche/skwi69/NovawayFileManagementBundle/BRANCHE_NAME)
+[![Dependencies](http://dependency.me/repository/image/skwi69/NovawayFileManagementBundle/master)](http://dependency.me/repository/branche/skwi69/NovawayFileManagementBundle/master)
 
 ### Warning
 
