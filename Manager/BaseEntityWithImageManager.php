@@ -208,7 +208,34 @@ private function transformPathWithFormat($path, $format){
      */
     public function removeFiles(BaseEntityWithFile $entity, $properties = array(), $doEraseFiles = true, $doSave = true)
     {
-        parent::removeFiles($entity, $properties, $doEraseFiles, $doSave);
+        if(!is_array($properties)) {
+            if(is_string($properties)){
+                $properties = array($properties);
+            } else {
+                throw new \InvalidArgumentException();
+            }
+        }
+
+        if(count($properties) == 0) {
+            $properties = $this->getFileProperties();
+        }
+
+        foreach ($properties as $propertyName) {
+            foreach ($this->imageFormatChoices[$propertyName] as $format) {
+                $path = $this->getFileAbsolutePath($entity, $propertyName, $format);
+                if ($path) {
+                    if($doEraseFiles && is_file($path)){
+                        unlink($path);
+                    }
+                }
+            }
+            $setter = $this->setter($propertyName, true);
+            $entity->$setter(null);
+        }
+
+        if($doSave) {
+            $this->save($entity);
+        }
     }
 
     /**
