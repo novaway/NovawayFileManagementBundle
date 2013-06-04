@@ -1,5 +1,7 @@
 # Novaway FileManagementBundle
 
+[![Dependencies](http://dependency.me/repository/image/skwi69/NovawayFileManagementBundle/master)](http://dependency.me/repository/branche/skwi69/NovawayFileManagementBundle/master)
+
 ### Warning
 
 This Bundle is still in an early developpement stage. It is not yet stable.
