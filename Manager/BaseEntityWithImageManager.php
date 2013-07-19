@@ -33,30 +33,37 @@ class BaseEntityWithImageManager extends BaseEntityWithFileManager
      */
     public function __construct($arrayFilepath, $entityManager, $imageFormatDefinition, $imageFormatChoices)
     {
-       parent::__construct($arrayFilepath, $entityManager);
-       $this->imageFormatDefinition = $imageFormatDefinition;
-       $this->imageFormatChoices = $imageFormatChoices;
-       $this->defaultConf = array(
-        'fallback' => array(                // -- Default options when not overriden --
-            'size' => 0,                    // Square size (set to 0 if not square)
-            'max_size' => 0,                    // Resize to fit square at maximum
-            'width' => 0,                // Width (if not square)
-            'height' => 0,               // Height (if not square)
-            'crop' => false,                // Crop image
-            'crop_position' => 'MM',        // Crop image position (L = left, T = top, M = middle, B = bottom, R = right)
-            'quality' => 75,                // Output image quality (from 0 to 100)
-            'enlarge' => false,             // Enlarge image when source is smaller than output. Fill with bg_color when false
-            'trim_bg' => false,             // Remove the background color when not enlarging
-            'keep_proportions' => true,     // Keep source image proportions (and fill with blank if needed)
-            'bg_color' => '#FFFFFF'),       // Background color when image does not fill expected output size
-        'original' => array('quality' => 95),
+        parent::__construct($arrayFilepath, $entityManager);
+        $this->imageFormatDefinition = $imageFormatDefinition;
+        $this->imageFormatChoices = $imageFormatChoices;
+        $this->defaultConf = array(
+        'fallback' => array(                    // -- Default options when not overriden --
+            'size'             => 0,            // Square size (set to 0 if not square)
+            'width'            => 0,            // Width (if not square)
+            'height'           => 0,            // Height (if not square)
+            'max_size'         => 0,            // Resize to fit square at maximum
+            'crop'             => false,        // Crop image
+            'crop_position'    => 'MM',         // Crop image position (L = left, T = top, M = middle, B = bottom, R = right)
+            'quality'          => 75,           // Output image quality (from 0 to 100)
+            'enlarge'          => false,        // Enlarge image when source is smaller than output. Fill with bg_color when false
+            'trim_bg'          => false,        // Remove the background color when not enlarging
+            'keep_proportions' => true,         // Keep source image proportions (and fill with blank if needed)
+            'bg_color'         => '#FFFFFF',    // Background color when image does not fill expected output size
+        ),
+        'original'  => array('quality' => 95),
         'thumbnail' => array('size' => 100, 'crop' => true),
         );
-}
+    }
 
-private function transformPathWithFormat($path, $format){
-    return str_replace('{-imgformat-}', $format, $path);
-}
+    /**
+     * Transform a path string with format placeholder to the right path string
+     * @param  string $path   The path string with placeholder
+     * @param  string $format The required format
+     * @return string         The format path string
+     */
+    private function transformPathWithFormat($path, $format){
+        return str_replace('{-imgformat-}', $format, $path);
+    }
 
 
     /**

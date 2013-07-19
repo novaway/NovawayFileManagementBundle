@@ -64,6 +64,8 @@ class ResizeManager
 
                         $layer->resizeInPixel($w, $h, $dim['keep_proportions'], 0, 0, 'MM');
                     } else {
+                        $dim['width'] = $dim['width'] > 0 ? $dim['width'] : null;
+                        $dim['height'] = $dim['height'] > 0 ? $dim['height'] : null;
                         $layer->resizeInPixel($dim['width'], $dim['height'], $dim['keep_proportions'], 0, 0, 'MM');
                     }
                 }
