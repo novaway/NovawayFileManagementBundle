@@ -2,11 +2,9 @@
 
 namespace Novaway\Bundle\FileManagementBundle\Manager;
 
-use Symfony\Component\HttpFoundation\Request;
 use Novaway\Bundle\FileManagementBundle\Entity\BaseEntityWithFile;
 
 //use PHPImageWorkshop\ImageWorkshop;
-
 
 /**
  * Novaway\Bundle\FileManagementBundle\Manager\BaseEntityWithFileManager
@@ -24,11 +22,11 @@ class BaseEntityWithImageManager extends BaseEntityWithFileManager
     /**
      * The manager constructor
      *
-     * @param array  $arrayFilepath  Associative array containing the file
+     * @param array $arrayFilepath Associative array containing the file
      *                               path for each property of the managed
      *                               entity. This array must also contain a
      *                               'root' and a 'web' path.
-     * @param mixed  $entityManager  The entity manager used to persist
+     * @param mixed $entityManager The entity manager used to persist
      *                               and save data.
      */
     public function __construct($arrayFilepath, $entityManager, $imageFormatDefinition, $imageFormatChoices)
@@ -59,24 +57,24 @@ class BaseEntityWithImageManager extends BaseEntityWithFileManager
      * Transform a path string with format placeholder to the right path string
      * @param  string $path   The path string with placeholder
      * @param  string $format The required format
-     * @return string         The format path string
+     * @return string The format path string
      */
-    private function transformPathWithFormat($path, $format){
+    private function transformPathWithFormat($path, $format)
+    {
         return str_replace('{-imgformat-}', $format, $path);
     }
-
 
     /**
      * Returns the absolute (root) filepath of a property for a specific entity
      *
-     * @param  mixed   $entity        The current entity
-     * @param  string  $propertyName  The property matching the file
+     * @param mixed  $entity       The current entity
+     * @param string $propertyName The property matching the file
      *
-     * @return string  The absolute filepath
+     * @return string The absolute filepath
      */
     public function getFileAbsolutePath(BaseEntityWithFile $entity, $propertyName, $format = null)
     {
-        if($format){
+        if ($format) {
             return $this->transformPathWithFormat(
                 parent::getFileAbsolutePath($entity, $propertyName),
                 $format);
@@ -88,14 +86,14 @@ class BaseEntityWithImageManager extends BaseEntityWithFileManager
     /**
      * Returns the relative (web) filepath of a property for a specific entity
      *
-     * @param  mixed   $entity        The current entity
-     * @param  string  $propertyName  The property matching the file
+     * @param mixed  $entity       The current entity
+     * @param string $propertyName The property matching the file
      *
-     * @return string  The relative filepath
+     * @return string The relative filepath
      */
     public function getFileWebPath(BaseEntityWithFile $entity, $propertyName, $format = null)
     {
-        if($format){
+        if ($format) {
             return $this->transformPathWithFormat(
                 parent::getFileWebPath($entity, $propertyName),
                 $format);
@@ -107,15 +105,15 @@ class BaseEntityWithImageManager extends BaseEntityWithFileManager
     /**
      * Builds the destination path for a file
      *
-     * @param  BaseEntityWithFile $entity       The entity of the file
-     * @param  string             $propertyName The file property
-     * @param  string             $format       The image format
+     * @param BaseEntityWithFile $entity       The entity of the file
+     * @param string             $propertyName The file property
+     * @param string             $format       The image format
      *
      * @return string The complete file path
      */
     protected function buildDestination(BaseEntityWithFile $entity, $propertyName, $sourceFilepath = null, $format = null)
     {
-        if($format){
+        if ($format) {
             return $this->transformPathWithFormat(
                 parent::buildDestination($entity, $propertyName, $sourceFilepath),
                 $format);
@@ -127,17 +125,17 @@ class BaseEntityWithImageManager extends BaseEntityWithFileManager
     /**
      * Move the file from temp upload to expected path.
      *
-     * @param  BaseEntityWithFile   $entity             The entity associated to the file
-     * @param  string               $propertyName       The property associated to the file
-     * @param  string               $fileDestination    The relative directory where
+     * @param BaseEntityWithFile $entity          The entity associated to the file
+     * @param string             $propertyName    The property associated to the file
+     * @param string             $fileDestination The relative directory where
      *                                                  the file will be stored
-     * @param   array               $callbackElementArray   Values that will be used for callback
+     * @param array $callbackElementArray Values that will be used for callback
      *
-     * @return boolean              TRUE if file move successfully, FALSE otherwise
+     * @return boolean TRUE if file move successfully, FALSE otherwise
      */
     protected function fileMove(BaseEntityWithFile $entity, $propertyName, $fileDestination)
     {
-        if (!isset($this->imageFormatChoices[$propertyName])){
+        if (!isset($this->imageFormatChoices[$propertyName])) {
             return parent::fileMove($entity, $propertyName, $fileDestination);
         }
 
@@ -150,7 +148,7 @@ class BaseEntityWithImageManager extends BaseEntityWithFileManager
         }
 
         $fileDestinationAbsolute = sprintf('%s%s', $this->rootPath, $fileDestination);
-        if(preg_match('#(.+)/([^/.]+).([A-Z]{3,5})#i', $fileDestinationAbsolute, $destMatch)) {
+        if (preg_match('#(.+)/([^/.]+).([A-Z]{3,5})#i', $fileDestinationAbsolute, $destMatch)) {
 
             $tmpDir = sprintf('%s%s', $this->rootPath, 'tmp');
             $tmpName = uniqid().rand(0,999).'.'.$destMatch[3];
@@ -174,9 +172,9 @@ class BaseEntityWithImageManager extends BaseEntityWithFileManager
     /**
      * Manipulates image according to image format definitons
      *
-     * @param  string $sourcePath              The source image path
-     * @param  string $fileDestinationAbsolute The destination path ({-img-format-} placeholder will be updated if neeeded)
-     * @param  string $format                  The desired image format
+     * @param string $sourcePath              The source image path
+     * @param string $fileDestinationAbsolute The destination path ({-img-format-} placeholder will be updated if neeeded)
+     * @param string $format                  The desired image format
      *
      * @return void
      */
@@ -194,36 +192,35 @@ class BaseEntityWithImageManager extends BaseEntityWithFileManager
             (($confDefault && isset($confDefault[$key])) ? $confDefault[$key] : $confFallback[$key]);
         }
 
-        if(strpos($dim['bg_color'], '#') === 0) {
+        if (strpos($dim['bg_color'], '#') === 0) {
             $dim['bg_color'] = substr($dim['bg_color'],1);
         }
 
         ResizeManager::resize($sourcePath, $destPathWithFormat, $dim);
-
 
     }
 
     /**
      * Removes one or several file from the entity
      *
-     * @param  BaseEntityWithFile $entity       The entity from witch the file will be removed
-     * @param  mixed              $properties   A file property name or an array containing file property names
-     * @param  boolean            $doEraseFiles Set to FALSE to keep file on the disk
-     * @param  boolean            $doSave       Set to FALSE if you don't want to save the entity while file are deleted
+     * @param BaseEntityWithFile $entity       The entity from witch the file will be removed
+     * @param mixed              $properties   A file property name or an array containing file property names
+     * @param boolean            $doEraseFiles Set to FALSE to keep file on the disk
+     * @param boolean            $doSave       Set to FALSE if you don't want to save the entity while file are deleted
      *
-     * @return BaseEntityWithFile               The saved entity
+     * @return BaseEntityWithFile The saved entity
      */
     public function removeFiles(BaseEntityWithFile $entity, $properties = array(), $doEraseFiles = true, $doSave = true)
     {
-        if(!is_array($properties)) {
-            if(is_string($properties)){
+        if (!is_array($properties)) {
+            if (is_string($properties)) {
                 $properties = array($properties);
             } else {
                 throw new \InvalidArgumentException();
             }
         }
 
-        if(count($properties) == 0) {
+        if (count($properties) == 0) {
             $properties = $this->getFileProperties();
         }
 
@@ -231,7 +228,7 @@ class BaseEntityWithImageManager extends BaseEntityWithFileManager
             foreach ($this->imageFormatChoices[$propertyName] as $format) {
                 $path = $this->getFileAbsolutePath($entity, $propertyName, $format);
                 if ($path) {
-                    if($doEraseFiles && is_file($path)){
+                    if ($doEraseFiles && is_file($path)) {
                         unlink($path);
                     }
                 }
@@ -240,7 +237,7 @@ class BaseEntityWithImageManager extends BaseEntityWithFileManager
             $entity->$setter(null);
         }
 
-        if($doSave) {
+        if ($doSave) {
             $this->save($entity);
         }
     }
@@ -263,23 +260,22 @@ class BaseEntityWithImageManager extends BaseEntityWithFileManager
 
         if (is_file($sourceFilepath)) {
 
-            if($destFilepath) {
+            if ($destFilepath) {
                 $entity->$propertyFileNameSetter($destFilepath);
-            }
-            else {
+            } else {
                 $entity->$propertyFileNameSetter($this->buildDestination($entity, $propertyName, $sourceFilepath, null));
             }
 
             foreach ($this->imageFormatChoices[$propertyName] as $format) {
 
                 $oldDestPath = $this->getFileAbsolutePath($entity, $propertyName, $format);
-                if(is_file($oldDestPath)) {
+                if (is_file($oldDestPath)) {
                     unlink($oldDestPath);
                 }
 
                 $absoluteDestFilepath = $this->getFileAbsolutePath($entity, $propertyName, $format);
                 $absoluteDestDir = substr($absoluteDestFilepath, 0, strrpos($absoluteDestFilepath, '/'));
-                if(!is_dir($absoluteDestDir)){
+                if (!is_dir($absoluteDestDir)) {
                     mkdir($absoluteDestDir, 0777, true);
                 }
 
