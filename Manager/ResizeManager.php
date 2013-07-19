@@ -16,17 +16,16 @@ class ResizeManager
             'wh_ratio' => $layer->getWidth() / $layer->getHeight(),
             );
 
-        if($dim['size'] > 0){
+        if ($dim['size'] > 0) {
             $dim['width'] = $dim['size'];
             $dim['height'] = $dim['size'];
         }
 
-        if($dim['width'] > 0 || $dim['height'] > 0) {
+        if ($dim['width'] > 0 || $dim['height'] > 0) {
 
-            if($dim['crop']){
-                if($dim['keep_proportions']){
-                    if($layer->getWidth() / $dim['width'] > $layer->getHeight() / $dim['height'] )
-                    {
+            if ($dim['crop']) {
+                if ($dim['keep_proportions']) {
+                    if ($layer->getWidth() / $dim['width'] > $layer->getHeight() / $dim['height'] ) {
                         $layer->resizeInPixel(null, $dim['height'], true, 0, 0, 'MM');
                     } else {
                         $layer->resizeInPixel($dim['width'], null, true, 0, 0, 'MM');
@@ -38,13 +37,12 @@ class ResizeManager
                 }
             }
 
-            if(!$dim['enlarge'] && $dim['trim_bg'])
-            {
+            if (!$dim['enlarge'] && $dim['trim_bg']) {
 
-                if ($layer->getWidth() > $dim['width']){
+                if ($layer->getWidth() > $dim['width']) {
                     $layer->resizeInPixel($dim['width'], 0, true, 0, 0, 'MM');
                 }
-                if($layer->getHeight() > $dim['height']) {
+                if ($layer->getHeight() > $dim['height']) {
                     $layer->resizeInPixel(0, $dim['height'], true, 0, 0, 'MM');
                 }
 
@@ -54,8 +52,8 @@ class ResizeManager
                         $boxLayer = ImageWorkshop::initVirginLayer($dim['width'], $dim['height'], $dim['bg_color']);
                         $boxLayer->addLayer(1, $layer, 0, 0, 'MM');
                         $layer = $boxLayer;
-                } else{
-                    if($dim['trim_bg']){
+                } else {
+                    if ($dim['trim_bg']) {
                         $hratio = $dim['height'] / $layer->getHeight();
                         $wratio = $dim['width'] / $layer->getWidth();
 
@@ -64,6 +62,8 @@ class ResizeManager
 
                         $layer->resizeInPixel($w, $h, $dim['keep_proportions'], 0, 0, 'MM');
                     } else {
+                        $dim['width'] = $dim['width'] > 0 ? $dim['width'] : null;
+                        $dim['height'] = $dim['height'] > 0 ? $dim['height'] : null;
                         $layer->resizeInPixel($dim['width'], $dim['height'], $dim['keep_proportions'], 0, 0, 'MM');
                     }
                 }

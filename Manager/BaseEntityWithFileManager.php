@@ -2,7 +2,6 @@
 
 namespace Novaway\Bundle\FileManagementBundle\Manager;
 
-use Symfony\Component\HttpFoundation\Request;
 use Novaway\Bundle\FileManagementBundle\Entity\BaseEntityWithFile;
 use Doctrine\ORM\EntityManager;
 
@@ -34,7 +33,6 @@ class BaseEntityWithFileManager
      */
     protected $webPath;
 
-
     /**
      * The entity manager used to persist and flush entities
      * Doctrine\ORM\EntityManager by default, but it can be replaced
@@ -45,11 +43,11 @@ class BaseEntityWithFileManager
     /**
      * The manager constructor
      *
-     * @param array  $arrayFilepath  Associative array containing the file
+     * @param array $arrayFilepath Associative array containing the file
      *                               path for each property of the managed
      *                               entity. This array must also contain a
      *                               'root' and a 'web' path.
-     * @param mixed  $entityManager  The entity manager used to persist
+     * @param mixed $entityManager The entity manager used to persist
      *                               and save data.
      */
     public function __construct($arrayFilepath, $entityManager)
@@ -58,7 +56,7 @@ class BaseEntityWithFileManager
         $this->webPath = $arrayFilepath['bundle.web'];
 
         unset($arrayFilepath['bundle.web']);
-        if(isset($arrayFilepath['bundle.root']) && $arrayFilepath['bundle.root'] != null){
+        if (isset($arrayFilepath['bundle.root']) && $arrayFilepath['bundle.root'] != null) {
             $this->rootPath = $arrayFilepath['bundle.root'];
             unset($arrayFilepath['bundle.root']);
         } else {
@@ -70,10 +68,10 @@ class BaseEntityWithFileManager
     /**
      * Build Getter string for a property
      *
-     * @param   string  $propertyName   The property whose getter will bi return
-     * @param   boolean $filenameOnly   Set to TRUE to return the property filename getter
+     * @param string  $propertyName The property whose getter will bi return
+     * @param boolean $filenameOnly Set to TRUE to return the property filename getter
      *                                  FALSE to return the getter for the property itself
-     * @return  string  The getter method
+     * @return string The getter method
      */
     protected function getter($propertyName, $filenameOnly = false)
     {
@@ -85,10 +83,10 @@ class BaseEntityWithFileManager
     /**
      * Build Setter string for a property
      *
-     * @param   string  $propertyName   The property whose setter will bi return
-     * @param   boolean $filenameOnly   Set to TRUE to return the property filename setter
+     * @param string  $propertyName The property whose setter will bi return
+     * @param boolean $filenameOnly Set to TRUE to return the property filename setter
      *                                  FALSE to return the setter for the property itself
-     * @return  string  The setter method
+     * @return string The setter method
      */
     protected function setter($propertyName, $filenameOnly = false)
     {
@@ -100,10 +98,10 @@ class BaseEntityWithFileManager
     /**
      * Returns the absolute (root) filepath of a property for a specific entity
      *
-     * @param  mixed   $entity        The current entity
-     * @param  string  $propertyName  The property matching the file
+     * @param mixed  $entity       The current entity
+     * @param string $propertyName The property matching the file
      *
-     * @return string  The absolute filepath
+     * @return string The absolute filepath
      */
     public function getFileAbsolutePath(BaseEntityWithFile $entity, $propertyName)
     {
@@ -118,14 +116,15 @@ class BaseEntityWithFileManager
     /**
      * Returns the relative (web) filepath of a property for a specific entity
      *
-     * @param  mixed   $entity        The current entity
-     * @param  string  $propertyName  The property matching the file
+     * @param mixed  $entity       The current entity
+     * @param string $propertyName The property matching the file
      *
-     * @return string  The relative filepath
+     * @return string The relative filepath
      */
     public function getFileWebPath(BaseEntityWithFile $entity, $propertyName)
     {
         $getter = $this->getter($propertyName, true);
+
         return sprintf('%s%s', $this->webPath, $entity->$getter());
     }
 
@@ -142,9 +141,9 @@ class BaseEntityWithFileManager
     /**
      * Persist and flush the entity
      *
-     * @param   BaseEntityWithFile $entity The entity to save
+     * @param BaseEntityWithFile $entity The entity to save
      *
-     * @return  BaseEntityWithFile The saved entity
+     * @return BaseEntityWithFile The saved entity
      */
     public function save(BaseEntityWithFile $entity)
     {
@@ -157,9 +156,9 @@ class BaseEntityWithFileManager
     /**
      * Remove and flush the entity
      *
-     * @param   BaseEntityWithFile $entity The entity to delete
+     * @param BaseEntityWithFile $entity The entity to delete
      *
-     * @return  BaseEntityWithFile The deleted entity
+     * @return BaseEntityWithFile The deleted entity
      */
     public function delete(BaseEntityWithFile $entity)
     {
@@ -172,11 +171,11 @@ class BaseEntityWithFileManager
     /**
      * Saves an entity and manages its file storage
      *
-     * @param   BaseEntityWithFile  $entity     The entity to save
-     * @param   array               $callback   A callback method. Ex : array(&$obj, 'somePublicMethod')
+     * @param BaseEntityWithFile $entity   The entity to save
+     * @param array              $callback A callback method. Ex : array(&$obj, 'somePublicMethod')
      *                                          The callback may have 3 parameters : original filename, extension, file size
      *
-     * @return  BaseEntityWithFile The saved entity
+     * @return BaseEntityWithFile The saved entity
      */
     public function saveWithFiles(BaseEntityWithFile $entity, $callback = null)
     {
@@ -195,7 +194,7 @@ class BaseEntityWithFileManager
             call_user_func($callback, $entity, $callbackElementArray);
         }
 
-        if($fileAdded){
+        if ($fileAdded) {
             $entity = $this->save($entity);
         }
 
@@ -205,9 +204,9 @@ class BaseEntityWithFileManager
     /**
      * Deletes an entity and manages its file storage
      *
-     * @param   BaseEntityWithFile $entity          The entity to delete
+     * @param BaseEntityWithFile $entity The entity to delete
      *
-     * @return  BaseEntityWithFile The deleted entity
+     * @return BaseEntityWithFile The deleted entity
      */
     public function deleteWithFiles(BaseEntityWithFile $entity)
     {
@@ -222,8 +221,8 @@ class BaseEntityWithFileManager
     /**
      * Builds the destination path for a file
      *
-     * @param  BaseEntityWithFile $entity       The entity of the file
-     * @param  string             $propertyName The file property
+     * @param BaseEntityWithFile $entity       The entity of the file
+     * @param string             $propertyName The file property
      *
      * @return string The complete file path
      */
@@ -231,7 +230,7 @@ class BaseEntityWithFileManager
     {
         $propertyGetter = $this->getter($propertyName);
 
-        if($sourceFilepath) {
+        if ($sourceFilepath) {
             $arrReplacement =  array(
                     '{-ext-}' => pathinfo($sourceFilepath, PATHINFO_EXTENSION),
                     '{-origin-}' => pathinfo($sourceFilepath, PATHINFO_FILENAME)
@@ -243,7 +242,7 @@ class BaseEntityWithFileManager
                     );
         }
 
-        if(method_exists($entity, 'getCustomPath')) {
+        if (method_exists($entity, 'getCustomPath')) {
             $arrReplacement['{-custom-}'] = $entity->getCustomPath($propertyName);
         }
 
@@ -268,11 +267,11 @@ class BaseEntityWithFileManager
     /**
      * Prepare the entity for file storage
      *
-     * @param   BaseEntityWithFile  $entity                 The entity owning the files
-     * @param   string              $propertyName           The property linked to the file
-     * @param   array               $callbackElementArray   Values that will be used for callback
+     * @param BaseEntityWithFile $entity               The entity owning the files
+     * @param string             $propertyName         The property linked to the file
+     * @param array              $callbackElementArray Values that will be used for callback
      *
-     * @return  string              The file destination name
+     * @return string The file destination name
      */
     protected function prepareFileMove(BaseEntityWithFile $entity, $propertyName, &$callbackElementArray)
     {
@@ -284,7 +283,7 @@ class BaseEntityWithFileManager
 
             $fileDestinationName = $this->buildDestination($entity, $propertyName);
 
-            if(is_file($this->rootPath.$entity->$propertyFileNameGetter())){
+            if (is_file($this->rootPath.$entity->$propertyFileNameGetter())) {
                 unlink($this->rootPath.$entity->$propertyFileNameGetter());
             }
             $entity->$propertyFileNameSetter($fileDestinationName);
@@ -301,28 +300,29 @@ class BaseEntityWithFileManager
     /**
      * Creates a slug from a string
      *
-     * @param  string $str The string to slug
+     * @param string $str The string to slug
      *
-     * @return string      The slugged string
+     * @return string The slugged string
      */
     public function slug($str)
     {
         $str = strtolower(trim($str));
         $str = preg_replace('/[^a-z0-9-]/', '-', $str);
         $str = preg_replace('/-+/', "-", $str);
+
         return $str;
     }
 
     /**
      * Move the file from temp upload to expected path.
      *
-     * @param  BaseEntityWithFile   $entity             The entity associated to the file
-     * @param  string               $propertyName       The property associated to the file
-     * @param  string               $fileDestination    The relative directory where
+     * @param BaseEntityWithFile $entity          The entity associated to the file
+     * @param string             $propertyName    The property associated to the file
+     * @param string             $fileDestination The relative directory where
      *                                                  the file will be stored
-     * @param   array               $callbackElementArray   Values that will be used for callback
+     * @param array $callbackElementArray Values that will be used for callback
      *
-     * @return boolean              TRUE if file move successfully, FALSE otherwise
+     * @return boolean TRUE if file move successfully, FALSE otherwise
      */
     protected function fileMove(BaseEntityWithFile $entity, $propertyName, $fileDestination)
     {
@@ -360,31 +360,31 @@ class BaseEntityWithFileManager
     /**
      * Removes one or several file from the entity
      *
-     * @param  BaseEntityWithFile $entity       The entity from witch the file will be removed
-     * @param  mixed              $properties   A file property name or an array containing file property names
-     * @param  boolean            $doEraseFiles Set to FALSE to keep file on the disk
-     * @param  boolean            $doSave       Set to FALSE if you don't want to save the entity while file are deleted
+     * @param BaseEntityWithFile $entity       The entity from witch the file will be removed
+     * @param mixed              $properties   A file property name or an array containing file property names
+     * @param boolean            $doEraseFiles Set to FALSE to keep file on the disk
+     * @param boolean            $doSave       Set to FALSE if you don't want to save the entity while file are deleted
      *
-     * @return BaseEntityWithFile               The saved entity
+     * @return BaseEntityWithFile The saved entity
      */
     public function removeFiles(BaseEntityWithFile $entity, $properties = array(), $doEraseFiles = true, $doSave = true)
     {
-        if(!is_array($properties)) {
-            if(is_string($properties)){
+        if (!is_array($properties)) {
+            if (is_string($properties)) {
                 $properties = array($properties);
             } else {
                 throw new \InvalidArgumentException();
             }
         }
 
-        if(count($properties) == 0) {
+        if (count($properties) == 0) {
             $properties = $this->getFileProperties();
         }
 
         foreach ($properties as $propertyName) {
             $path = $this->getFileAbsolutePath($entity, $propertyName);
             if ($path) {
-                if($doEraseFiles && is_file($path)){
+                if ($doEraseFiles && is_file($path)) {
                     unlink($path);
                 }
                 $setter = $this->setter($propertyName, true);
@@ -392,7 +392,7 @@ class BaseEntityWithFileManager
             }
         }
 
-        if($doSave) {
+        if ($doSave) {
             $this->save($entity);
         }
     }
@@ -400,11 +400,11 @@ class BaseEntityWithFileManager
     /**
      * Replace a property file by another, giver it's path
      *
-     * @param BaseEntityWithFile $entity               The entity owning the files
-     * @param string             $propertyName         The property linked to the file
-     * @param  [type]             $sourceFilepath [description]
-     * @param  [type]             $destFilepath   [description]
-     * @param string             $operation            'copy' or 'rename'
+     * @param BaseEntityWithFile $entity         The entity owning the files
+     * @param string             $propertyName   The property linked to the file
+     * @param [type]             $sourceFilepath [description]
+     * @param [type]             $destFilepath   [description]
+     * @param string             $operation      'copy' or 'rename'
      *
      * @return array An array containing informations about the copied file
      */
@@ -417,11 +417,11 @@ class BaseEntityWithFileManager
         if (is_file($sourceFilepath)) {
 
             $oldDestPath = $this->getFileAbsolutePath($entity, $propertyName);
-            if(is_file($oldDestPath)) {
+            if (is_file($oldDestPath)) {
                 unlink($oldDestPath);
             }
 
-            if(!$destFilepath) {
+            if (!$destFilepath) {
                 $destFilepath = $this->buildDestination($entity, $propertyName, $sourceFilepath);
             }
 
@@ -433,7 +433,7 @@ class BaseEntityWithFileManager
             $entity->$propertyFileNameSetter($destFilepath);
             $absoluteDestFilepath = $this->getFileAbsolutePath($entity, $propertyName);
             $absoluteDestDir = substr($absoluteDestFilepath, 0, strrpos($absoluteDestFilepath, '/'));
-            if(!is_dir($absoluteDestDir)){
+            if (!is_dir($absoluteDestDir)) {
                 mkdir($absoluteDestDir, 0777, true);
             }
             $operation($sourceFilepath, $absoluteDestFilepath);

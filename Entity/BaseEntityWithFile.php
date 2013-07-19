@@ -2,8 +2,6 @@
 
 namespace Novaway\Bundle\FileManagementBundle\Entity;
 
-use Doctrine\ORM\Mapping as ORM;
-
 /**
  * Novaway\Bundle\FileManagementBundle\Entity\BaseEntityWithFile
  *
@@ -17,10 +15,10 @@ abstract class BaseEntityWithFile
      * Magic method __call() override
      * Manages file properties getters and setters
      *
-     * @param  string $method     Name of the method to call
-     * @param  array  $arguments  Array of parameters
+     * @param string $method    Name of the method to call
+     * @param array  $arguments Array of parameters
      *
-     * @return mixed  Property value in case of getter, void in case of setter
+     * @return mixed Property value in case of getter, void in case of setter
      *
      * @throws \InvalidArgumentException if wrong number of arguments
      * @throws \BadMethodCallException   if method is neither a getter nor a setter
@@ -30,7 +28,7 @@ abstract class BaseEntityWithFile
         if ('get' === $method) {
             if (count($arguments) == 1) {
                 $prop = $arguments[0];
-                if(property_exists($this, $prop)){
+                if (property_exists($this, $prop)) {
                     return $this->$prop;
                 } else {
                     throw new \InvalidArgumentException();
@@ -38,7 +36,7 @@ abstract class BaseEntityWithFile
             } else {
                 throw new \InvalidArgumentException();
             }
-        } else if (!isset($this->$method) && preg_match('#^(get|set){1}([a-z0-1]+)$#i',
+        } elseif (!isset($this->$method) && preg_match('#^(get|set) {1}([a-z0-1]+)$#i',
                 $method, $match)) {
             $property = lcfirst($match[2]);
             if ($match[1] === 'get') {
