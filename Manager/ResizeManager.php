@@ -39,11 +39,11 @@ class ResizeManager
 
             if (!$dim['enlarge'] && $dim['trim_bg']) {
 
-                if ($layer->getWidth() > $dim['width']) {
-                    $layer->resizeInPixel($dim['width'], 0, true, 0, 0, 'MM');
+                if ($layer->getWidth() > $dim['width'] && $dim['width'] > 0) {
+                    $layer->resizeInPixel($dim['width'], null, true, 0, 0, 'MM');
                 }
-                if ($layer->getHeight() > $dim['height']) {
-                    $layer->resizeInPixel(0, $dim['height'], true, 0, 0, 'MM');
+                if ($layer->getHeight() > $dim['height'] && $dim['height'] > 0) {
+                    $layer->resizeInPixel(null, $dim['height'], true, 0, 0, 'MM');
                 }
 
             } else {
