@@ -11,14 +11,18 @@ class ResizeManager
     {
         $layer = ImageWorkshop::initFromPath($sourcePath);
         $initSize = array(
-            'width' => $layer->getWidth(),
-            'height' => $layer->getHeight(),
+            'width'    => $layer->getWidth(),
+            'height'   => $layer->getHeight(),
             'wh_ratio' => $layer->getWidth() / $layer->getHeight(),
             );
 
         if ($dim['size'] > 0) {
-            $dim['width'] = $dim['size'];
+            $dim['width']  = $dim['size'];
             $dim['height'] = $dim['size'];
+        }
+        if ($dim['max_size'] > 0) {
+            $dim['max_width']  = $dim['max_size'];
+            $dim['max_height'] = $dim['max_size'];
         }
 
         if ($dim['width'] > 0 || $dim['height'] > 0) {
@@ -69,11 +73,22 @@ class ResizeManager
                 }
 
             }
+
             //Add color background
             if (!$dim['trim_bg'] && ($layer->getWidth() <= $dim['width'] && $layer->getHeight() <= $dim['height'])) {
                 $colorLayer = ImageWorkshop::initVirginLayer($dim['width'], $dim['height'], $dim['bg_color']);
                 $colorLayer->addLayer(1, $layer, 0, 0, 'MM');
                 $layer = $colorLayer;
+            }
+
+        }
+
+        if ($dim['max_width'] > 0 || $dim['max_height'] > 0) {
+
+            if ($layer->getWidth() / $dim['max_width'] > $layer->getHeight() / $dim['max_height'] ) {
+                $layer->resizeInPixel(null, $dim['max_height'], true, 0, 0, 'MM');
+            } else {
+                $layer->resizeInPixel($dim['max_width'], null, true, 0, 0, 'MM');
             }
 
         }

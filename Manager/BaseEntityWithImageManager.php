@@ -40,6 +40,8 @@ class BaseEntityWithImageManager extends BaseEntityWithFileManager
             'width'            => 0,            // Width (if not square)
             'height'           => 0,            // Height (if not square)
             'max_size'         => 0,            // Resize to fit square at maximum
+            'max_width'        => 0,            // Resize to fit non square at maximum
+            'max_height'       => 0,            // Resize to fit non square at maximum
             'crop'             => false,        // Crop image
             'crop_position'    => 'MM',         // Crop image position (L = left, T = top, M = middle, B = bottom, R = right)
             'quality'          => 85,           // Output image quality (from 0 to 100)
