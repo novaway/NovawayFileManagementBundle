@@ -42,13 +42,12 @@ class BaseEntityWithImageManager extends BaseEntityWithFileManager
             'max_size'         => 0,            // Resize to fit square at maximum
             'crop'             => false,        // Crop image
             'crop_position'    => 'MM',         // Crop image position (L = left, T = top, M = middle, B = bottom, R = right)
-            'quality'          => 75,           // Output image quality (from 0 to 100)
+            'quality'          => 85,           // Output image quality (from 0 to 100)
             'enlarge'          => false,        // Enlarge image when source is smaller than output. Fill with bg_color when false
             'trim_bg'          => false,        // Remove the background color when not enlarging
             'keep_proportions' => true,         // Keep source image proportions (and fill with blank if needed)
             'bg_color'         => '#FFFFFF',    // Background color when image does not fill expected output size
         ),
-        'original'  => array('quality' => 95),
         'thumbnail' => array('size' => 100, 'crop' => true),
         );
     }
@@ -184,19 +183,22 @@ class BaseEntityWithImageManager extends BaseEntityWithFileManager
         $confDefault = isset($this->defaultConf[$format]) ? $this->defaultConf[$format] : null;
         $confFallback = $this->defaultConf['fallback'];
         $destPathWithFormat = $this->transformPathWithFormat($fileDestinationAbsolute, $format);
-        $dim = array('format_name' => $format);
 
-        foreach (array_keys($confFallback) as $key) {
-            $dim[$key] = ($confPerso && isset($confPerso[$key])) ?
-            $confPerso[$key] :
-            (($confDefault && isset($confDefault[$key])) ? $confDefault[$key] : $confFallback[$key]);
+        if ($format === 'original') {
+            copy($sourcePath, $destPathWithFormat);
+        } else {
+
+            $dim = array_merge(array('format_name' => $format),
+                               $confFallback,
+                               $confDefault ? $confDefault : array(),
+                               $confPerso ? $confPerso : array());
+
+            if (strpos($dim['bg_color'], '#') === 0) {
+                $dim['bg_color'] = substr($dim['bg_color'],1);
+            }
+
+            ResizeManager::resize($sourcePath, $destPathWithFormat, $dim);
         }
-
-        if (strpos($dim['bg_color'], '#') === 0) {
-            $dim['bg_color'] = substr($dim['bg_color'],1);
-        }
-
-        ResizeManager::resize($sourcePath, $destPathWithFormat, $dim);
 
     }
 
@@ -279,7 +281,6 @@ class BaseEntityWithImageManager extends BaseEntityWithFileManager
                     mkdir($absoluteDestDir, 0777, true);
                 }
 
-                // $operation($sourceFilepath, $absoluteDestFilepath);
                 $this->imageManipulation($sourceFilepath, $absoluteDestFilepath, $format);
             }
 
