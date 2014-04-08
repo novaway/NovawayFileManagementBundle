@@ -86,9 +86,9 @@ class ResizeManager
         if ($dim['max_width'] > 0 || $dim['max_height'] > 0) {
 
             if ($layer->getWidth() / $dim['max_width'] > $layer->getHeight() / $dim['max_height'] ) {
-                $layer->resizeInPixel(null, $dim['max_height'], true, 0, 0, 'MM');
+                $layer->resizeInPixel(min($dim['max_width'], $layer->getWidth()), null, true, 0, 0, 'MM');
             } else {
-                $layer->resizeInPixel($dim['max_width'], null, true, 0, 0, 'MM');
+                $layer->resizeInPixel(null, min($dim['max_height'], $layer->getHeight()), true, 0, 0, 'MM');
             }
 
         }
