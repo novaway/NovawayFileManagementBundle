@@ -3,6 +3,7 @@
 namespace Novaway\Bundle\FileManagementBundle\Twig\Extension;
 
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
+use Symfony\Component\PropertyAccess\PropertyAccess;
 
 class FileManagementExtension extends \Twig_Extension
 {
