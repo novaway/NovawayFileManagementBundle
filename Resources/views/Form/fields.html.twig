@@ -1,0 +1,10 @@
+{% block image_widget %}
+    {% spaceless %}
+
+    {{ block('form_widget') }}
+    {% if preview and image_url is not null %}
+        <img src="{{ asset(image_url) }}"/>
+    {% endif %}
+
+    {% endspaceless %}
+{% endblock %}

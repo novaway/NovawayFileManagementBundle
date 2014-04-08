@@ -26,13 +26,12 @@ class FileManagementExtension extends \Twig_Extension
 
     public function filepath($entity, $propertyName)
     {
-        //TODO : Gestion de l'absence de la propriété
-        $getter = 'get'.ucfirst($propertyName).'Filename';
-        if (!$entity->$getter()) {
-            return null;
-        }
+        $accessor = PropertyAccess::createPropertyAccessor();
 
-        return $this->webDirectory.$entity->$getter();
+        $property = $propertyName.'Filename';
+        $filePath = $accessor->getValue($entity, $property);
+
+        return $this->webDirectory.$filePath;
     }
 
     public function imagepath($entity, $propertyName, $format)
