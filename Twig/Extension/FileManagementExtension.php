@@ -31,6 +31,9 @@ class FileManagementExtension extends \Twig_Extension
 
         $property = $propertyName.'Filename';
         $filePath = $accessor->getValue($entity, $property);
+        if (empty($filePath)) {
+            return null;
+        }
 
         return $this->webDirectory.$filePath;
     }
@@ -38,6 +41,9 @@ class FileManagementExtension extends \Twig_Extension
     public function imagepath($entity, $propertyName, $format)
     {
         $pathTemplate = $this->filepath($entity, $propertyName);
+        if (empty($pathTemplate)) {
+            return null;
+        }
 
         return str_replace('{-imgformat-}', $format, $pathTemplate);
     }
@@ -45,6 +51,9 @@ class FileManagementExtension extends \Twig_Extension
     public function fileUrl($entity, $propertyName)
     {
         $path = $this->filepath($entity, $propertyName);
+        if (empty($path)) {
+            return null;
+        }
 
         return sprintf('%s://%s%s',
             $this->generator->getContext()->getScheme(),
