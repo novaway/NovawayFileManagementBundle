@@ -34,8 +34,12 @@ class ImageType extends AbstractType
      */
     public function setDefaultOptions(OptionsResolverInterface $resolver)
     {
-        $resolver->setOptional(array('format'));
-        $resolver->setOptional(array('preview'));
+        $resolver->setOptional(array('format', 'update_cache', 'preview'));
+        $resolver->setDefaults(array(
+            'format'       => 'thumbnail',
+            'update_cache' => true,
+            'preview'      => true
+            ));
     }
 
     /**
@@ -47,19 +51,23 @@ class ImageType extends AbstractType
      */
     public function buildView(FormView $view, FormInterface $form, array $options)
     {
-        $view->vars['preview'] = array_key_exists('preview', $options) ? $options['preview'] : true;
+        $view->vars['preview'] = $options['preview'];
 
         $view->vars['image_url'] = null;
-        if($view->vars['preview'] && array_key_exists('format', $options))
-        {
+        if ($view->vars['preview']) {
             $accessor = PropertyAccess::createPropertyAccessor();
 
             $property = $form->getName().'Filename';
             $parentData = $form->getParent()->getData();
             $imagePath = $accessor->getValue($parentData, $property);
 
+            if ($options['update_cache'] === true && $accessor->isReadable($parentData, 'updatedAt')) {
+                $imagePath .= '?v='.$accessor->getValue($parentData, 'updatedAt')->format('U');
+            }
+
             $view->vars['image_url'] = $imagePath ?
                 str_replace('{-imgformat-}', $options['format'], $this->webDirectory.$imagePath) : null;
         }
     }
 }
+
