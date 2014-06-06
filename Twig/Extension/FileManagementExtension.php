@@ -70,5 +70,5 @@ class FileManagementExtension extends \Twig_Extension
     {
         return 'twigextension';
     }
-
 }
+
