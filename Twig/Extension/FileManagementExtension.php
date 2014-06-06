@@ -9,28 +9,28 @@ class FileManagementExtension extends \Twig_Extension
 {
     private $generator;
     private $webDirectory;
+    private $accessor;
 
     public function __construct(UrlGeneratorInterface $generator, $webDirectory)
     {
-        $this->generator = $generator;
+        $this->generator    = $generator;
         $this->webDirectory = $webDirectory;
+        $this->accessor     = PropertyAccess::createPropertyAccessor();
     }
 
     public function getFilters()
     {
         return array(
-            'filepath' => new \Twig_Filter_Method($this, 'filepath'),
+            'filepath'  => new \Twig_Filter_Method($this, 'filepath'),
             'imagepath' => new \Twig_Filter_Method($this, 'imagepath'),
-            'fileUrl' => new \Twig_Filter_Method($this, 'fileUrl'),
+            'fileUrl'   => new \Twig_Filter_Method($this, 'fileUrl'),
         );
     }
 
     public function filepath($entity, $propertyName)
     {
-        $accessor = PropertyAccess::createPropertyAccessor();
-
         $property = $propertyName.'Filename';
-        $filePath = $accessor->getValue($entity, $property);
+        $filePath = $this->accessor->getValue($entity, $property);
         if (empty($filePath)) {
             return null;
         }
@@ -38,11 +38,15 @@ class FileManagementExtension extends \Twig_Extension
         return $this->webDirectory.$filePath;
     }
 
-    public function imagepath($entity, $propertyName, $format)
+    public function imagepath($entity, $propertyName, $format, $updateCache = true)
     {
         $pathTemplate = $this->filepath($entity, $propertyName);
         if (empty($pathTemplate)) {
             return null;
+        }
+
+        if ($updateCache && $this->accessor->isReadable($entity, 'updatedAt')) {
+            $pathTemplate .= '?v='.$this->accessor->getValue($entity, 'updatedAt')->format('U');
         }
 
         return str_replace('{-imgformat-}', $format, $pathTemplate);
