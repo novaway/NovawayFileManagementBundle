@@ -1,19 +1,16 @@
 # Novaway FileManagementBundle
 
-[![Dependencies](http://dependency.me/repository/image/skwi69/NovawayFileManagementBundle/master)](http://dependency.me/repository/branche/skwi69/NovawayFileManagementBundle/master)
+### Compatibility
 
-### Warning
-
-This Bundle is still in an early developpement stage. It is not yet stable.
-It is still highly likely to evolve.
-You are using it at your own risks.
+The current version of the bundle is only compatible with Symfony 2.5+
+Version 1.0 provides compatibility with older versions of Symfony
 
 
 ### Summary and features
 This package allows to manage files and image for entities in a smoother way with Symfony 2
 
 ### Usage
-Bundle documentation is yet to come (will be done when a more stable version is released)
+Bundle documentation is yet to come
 
 
 ### Contributors:
