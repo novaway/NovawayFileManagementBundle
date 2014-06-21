@@ -2,8 +2,7 @@
 
 ### Entity setup
 
-To manage file in your entity, you just need to extend the `BaseEntityWithFile` or `BaseEntityWithImage` (if you want to
-process images) class and add 2 properties :
+To manage files in your entity, you just need to extend the `BaseEntityWithFile` class and add 2 properties :
 
 * The first one for the file which is uploaded
 * The second is the filename which will be store in database. **This parameter should have the same name than the previous
@@ -25,11 +24,13 @@ use Novaway\Bundle\FileManagementBundle\Entity\BaseEntityWithFile;
 class MyEntity extends BaseEntityWithFile
 {
     // ...
-    protected $id; // The id need to be accessible by parent
+    protected $id; // Change property visibility. The id need to be accessible by parent class
     // ...
 
     /**
-     * @Assert\File
+     * @var \Symfony\Component\HttpFoundation\File\UploadedFile
+     *
+     * @Assert\File(maxSize="5M")
      */
     private $myFile;
 
@@ -38,7 +39,7 @@ class MyEntity extends BaseEntityWithFile
      *
      * @ORM\Column(name="image", type="string", length=255, nullable=true)
      */
-    private $myFileFilename; // same name than previous property with suffix 'Filename"
+    private $myFileFilename; // same name than previous property with suffix "Filename" and should be nullable
 
     // ...
 }
@@ -81,7 +82,19 @@ class MyEntityType extends AbstractType
 
 NovawayFileManagementBundle is provided with a manager that process your form (data and upload). To save the data and
 process the file, you need to call `BaseEntityWithFileManager::saveWithFiles` or `BaseEntityWithImageManager::saveWithFiles`
-(if you process images).
+(if you [process images](03-working-with-image.md)).
+
+The `BaseEntityWithFileManager` constructor require 2 parameters to process data :
+
+* *$arrayFilepath*: Associative array containing the file path for each property of the managed entity. This array must
+also contain a 'root' (optional) and a 'web' path. You can use some variables to setup a dynamic name to the file that is
+uploaded :
+    * *{propertyName}* : The value of property of an entity. Here 'propertyName'.
+    * *{-ext-}* : The original file extension
+    * *{-origin-}* : The original filename
+    * *{-custom-}* : Allow you to set a custom string to append to the uploaded filename. To get this custom string, you need
+to add a `getCustomPath` method to your entity
+* *$entityManager* : The entity manager used to persist and save data
 
 ``` php
 <?php
@@ -116,9 +129,3 @@ class DefaultController extends Controller
     }
 }
 ```
-
-The `BaseEntityWithFileManager` constructor require 2 parameters to process data :
-
-* *$arrayFilepath*: Associative array containing the file path for each property of the managed entity. This array must
-also contain a 'root' (optional) and a 'web' path.
-* *$entityManager* : The entity manager used to persist and save data
