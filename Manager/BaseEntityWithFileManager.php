@@ -2,8 +2,8 @@
 
 namespace Novaway\Bundle\FileManagementBundle\Manager;
 
+use Novaway\Bundle\FileManagementBundle\Adapter\FilesystemAdapter;
 use Novaway\Bundle\FileManagementBundle\Entity\BaseEntityWithFile;
-use Doctrine\ORM\EntityManager;
 
 /**
  * Novaway\Bundle\FileManagementBundle\Manager\BaseEntityWithFileManager
@@ -13,23 +13,30 @@ use Doctrine\ORM\EntityManager;
 class BaseEntityWithFileManager
 {
     /**
+     * Utility to manipulate the file system
+     *
+     * @var Filesystem $filesystem
+     */
+    protected $filesystem;
+
+    /**
      * Stores the file path
      *
-     * array $arrayFilepath
+     * @var array $arrayFilepath
      */
     protected $arrayFilepath;
 
     /**
      * The absolute path to access files
      *
-     * string $rootPath
+     * @var string $rootPath
      */
     protected $rootPath;
 
     /**
      * The relative path for web access to files
      *
-     * string $webPath
+     * @var string $webPath
      */
     protected $webPath;
 
@@ -43,6 +50,7 @@ class BaseEntityWithFileManager
     /**
      * The manager constructor
      *
+     * @param FilesystemAdapter $filesystem Utility to manipulate the file system
      * @param array $arrayFilepath Associative array containing the file
      *                               path for each property of the managed
      *                               entity. This array must also contain a
@@ -50,8 +58,9 @@ class BaseEntityWithFileManager
      * @param mixed $entityManager The entity manager used to persist
      *                               and save data.
      */
-    public function __construct($arrayFilepath, $entityManager)
+    public function __construct(FilesystemAdapter $filesystem, $arrayFilepath, $entityManager)
     {
+        $this->filesystem = $filesystem;
         $this->entityManager = $entityManager;
         $this->webPath = $arrayFilepath['bundle.web'];
 
@@ -292,8 +301,8 @@ class BaseEntityWithFileManager
 
             $fileDestinationName = $this->buildDestination($entity, $propertyName);
 
-            if (is_file($this->rootPath.$entity->$propertyFileNameGetter())) {
-                unlink($this->rootPath.$entity->$propertyFileNameGetter());
+            if ($this->filesystem->isFile($this->rootPath.$entity->$propertyFileNameGetter())) {
+                $this->filesystem->remove($this->rootPath.$entity->$propertyFileNameGetter());
             }
             $entity->$propertyFileNameSetter($fileDestinationName);
 
@@ -355,7 +364,7 @@ class BaseEntityWithFileManager
                 $destMatch[1],
                 $destMatch[2].'.'.$destMatch[3]);
 
-        chmod($destFullPath, 0755);
+        $this->filesystem->chmod($destFullPath, 0755);
 
         // clean up the file property as you won't need it anymore
         $entity->$propertySetter(null);
@@ -393,8 +402,8 @@ class BaseEntityWithFileManager
         foreach ($properties as $propertyName) {
             $path = $this->getFileAbsolutePath($entity, $propertyName);
             if ($path) {
-                if ($doEraseFiles && is_file($path)) {
-                    unlink($path);
+                if ($doEraseFiles && $this->filesystem->isFile($path)) {
+                    $this->filesystem->remove($path);
                 }
                 $setter = $this->setter($propertyName, true);
                 $entity->$setter(null);
@@ -423,11 +432,11 @@ class BaseEntityWithFileManager
         $propertyFileNameGetter = $this->getter($propertyName, true);
         $propertyFileNameSetter = $this->setter($propertyName, true);
 
-        if (is_file($sourceFilepath)) {
+        if ($this->filesystem->isFile($sourceFilepath)) {
 
             $oldDestPath = $this->getFileAbsolutePath($entity, $propertyName);
-            if (is_file($oldDestPath)) {
-                unlink($oldDestPath);
+            if ($this->filesystem->isFile($oldDestPath)) {
+                $this->filesystem->remove($oldDestPath);
             }
 
             if (!$destFilepath) {
@@ -442,10 +451,10 @@ class BaseEntityWithFileManager
             $entity->$propertyFileNameSetter($destFilepath);
             $absoluteDestFilepath = $this->getFileAbsolutePath($entity, $propertyName);
             $absoluteDestDir = substr($absoluteDestFilepath, 0, strrpos($absoluteDestFilepath, '/'));
-            if (!is_dir($absoluteDestDir)) {
-                mkdir($absoluteDestDir, 0777, true);
+            if (!$this->filesystem->isDirectory($absoluteDestDir)) {
+                $this->filesystem->mkdir($absoluteDestDir, 0777);
             }
-            $operation($sourceFilepath, $absoluteDestFilepath);
+            $this->filesystem->$operation($sourceFilepath, $absoluteDestFilepath);
 
             return $fileInfo;
         }

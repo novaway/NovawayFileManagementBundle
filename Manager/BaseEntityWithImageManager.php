@@ -2,9 +2,8 @@
 
 namespace Novaway\Bundle\FileManagementBundle\Manager;
 
+use Novaway\Bundle\FileManagementBundle\Adapter\FilesystemAdapter;
 use Novaway\Bundle\FileManagementBundle\Entity\BaseEntityWithFile;
-
-//use PHPImageWorkshop\ImageWorkshop;
 
 /**
  * Novaway\Bundle\FileManagementBundle\Manager\BaseEntityWithFileManager
@@ -22,6 +21,7 @@ class BaseEntityWithImageManager extends BaseEntityWithFileManager
     /**
      * The manager constructor
      *
+     * @param FilesystemAdapter $filesystem Utility to manipulate the file system
      * @param array $arrayFilepath Associative array containing the file
      *                               path for each property of the managed
      *                               entity. This array must also contain a
@@ -29,9 +29,9 @@ class BaseEntityWithImageManager extends BaseEntityWithFileManager
      * @param mixed $entityManager The entity manager used to persist
      *                               and save data.
      */
-    public function __construct($arrayFilepath, $entityManager, $imageFormatDefinition, $imageFormatChoices)
+    public function __construct(FilesystemAdapter $filesystem, $arrayFilepath, $entityManager, $imageFormatDefinition, $imageFormatChoices)
     {
-        parent::__construct($arrayFilepath, $entityManager);
+        parent::__construct($filesystem, $arrayFilepath, $entityManager);
         $this->imageFormatDefinition = $imageFormatDefinition;
         $this->imageFormatChoices = $imageFormatChoices;
         $this->defaultConf = array(
@@ -161,7 +161,7 @@ class BaseEntityWithImageManager extends BaseEntityWithFileManager
                 $this->imageManipulation($tmpPath, $fileDestinationAbsolute, $format);
             }
 
-            unlink($tmpPath);
+            $this->filesystem->remove($tmpPath);
             $entity->$propertySetter(null);
 
             return true;
@@ -187,7 +187,7 @@ class BaseEntityWithImageManager extends BaseEntityWithFileManager
         $destPathWithFormat = $this->transformPathWithFormat($fileDestinationAbsolute, $format);
 
         if ($format === 'original') {
-            copy($sourcePath, $destPathWithFormat);
+            $this->filesystem->copy($sourcePath, $destPathWithFormat);
         } else {
 
             $dim = array_merge(array('format_name' => $format),
@@ -232,8 +232,8 @@ class BaseEntityWithImageManager extends BaseEntityWithFileManager
             foreach ($this->imageFormatChoices[$propertyName] as $format) {
                 $path = $this->getFileAbsolutePath($entity, $propertyName, $format);
                 if ($path) {
-                    if ($doEraseFiles && is_file($path)) {
-                        unlink($path);
+                    if ($doEraseFiles && $this->filesystem->isFile($path)) {
+                        $this->filesystem->remove($path);
                     }
                 }
             }
@@ -262,7 +262,7 @@ class BaseEntityWithImageManager extends BaseEntityWithFileManager
         $propertyFileNameGetter = $this->getter($propertyName, true);
         $propertyFileNameSetter = $this->setter($propertyName, true);
 
-        if (is_file($sourceFilepath)) {
+        if ($this->filesystem->isFile($sourceFilepath)) {
 
             if ($destFilepath) {
                 $entity->$propertyFileNameSetter($destFilepath);
@@ -273,14 +273,14 @@ class BaseEntityWithImageManager extends BaseEntityWithFileManager
             foreach ($this->imageFormatChoices[$propertyName] as $format) {
 
                 $oldDestPath = $this->getFileAbsolutePath($entity, $propertyName, $format);
-                if (is_file($oldDestPath)) {
-                    unlink($oldDestPath);
+                if ($this->filesystem->isFile($oldDestPath)) {
+                    $this->filesystem->remove($oldDestPath);
                 }
 
                 $absoluteDestFilepath = $this->getFileAbsolutePath($entity, $propertyName, $format);
                 $absoluteDestDir = substr($absoluteDestFilepath, 0, strrpos($absoluteDestFilepath, '/'));
-                if (!is_dir($absoluteDestDir)) {
-                    mkdir($absoluteDestDir, 0777, true);
+                if (!$this->filesystem->isDirectory($absoluteDestDir)) {
+                    $this->filesystem->mkdir($absoluteDestDir, 0777, true);
                 }
 
                 $this->imageManipulation($sourceFilepath, $absoluteDestFilepath, $format);
