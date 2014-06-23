@@ -9,3 +9,9 @@
 * [Working with file](02-working-with-file.md)
 * [Working with image](03-working-with-image.md)
 * [Usage in Twig template](04-use-in-twig-template.md)
+
+## Reference
+
+* [BaseEntityWithFileManager](reference-BaseEntityWithFileManager.md)
+* [BaseEntityWithImageManager](reference-BaseEntityWithImageManager.md)
+* [ResizeManager](reference-ResizeManager.md)
