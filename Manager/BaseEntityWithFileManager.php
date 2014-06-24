@@ -6,8 +6,6 @@ use Novaway\Bundle\FileManagementBundle\Entity\BaseEntityWithFile;
 use Doctrine\ORM\EntityManager;
 
 /**
- * Novaway\Bundle\FileManagementBundle\Manager\BaseEntityWithFileManager
- *
  * Extend your managers with this class to add File management.
  */
 class BaseEntityWithFileManager
@@ -15,21 +13,21 @@ class BaseEntityWithFileManager
     /**
      * Stores the file path
      *
-     * array $arrayFilepath
+     * @var array $arrayFilepath
      */
     protected $arrayFilepath;
 
     /**
      * The absolute path to access files
      *
-     * string $rootPath
+     * @var string $rootPath
      */
     protected $rootPath;
 
     /**
      * The relative path for web access to files
      *
-     * string $webPath
+     * @var string $webPath
      */
     protected $webPath;
 
@@ -37,6 +35,8 @@ class BaseEntityWithFileManager
      * The entity manager used to persist and flush entities
      * Doctrine\ORM\EntityManager by default, but it can be replaced
      * (overwritting the save method might be required then)
+     *
+     * @var mixed $entityManager
      */
     protected $entityManager;
 
@@ -102,8 +102,8 @@ class BaseEntityWithFileManager
     /**
      * Returns the absolute (root) filepath of a property for a specific entity
      *
-     * @param mixed  $entity       The current entity
-     * @param string $propertyName The property matching the file
+     * @param BaseEntityWithFile $entity       The current entity
+     * @param string             $propertyName The property matching the file
      *
      * @return string The absolute filepath
      */
@@ -123,8 +123,8 @@ class BaseEntityWithFileManager
     /**
      * Returns the relative (web) filepath of a property for a specific entity
      *
-     * @param mixed  $entity       The current entity
-     * @param string $propertyName The property matching the file
+     * @param BaseEntityWithFile $entity       The current entity
+     * @param string             $propertyName The property matching the file
      *
      * @return string The relative filepath
      */
@@ -185,7 +185,7 @@ class BaseEntityWithFileManager
      * Saves an entity and manages its file storage
      *
      * @param BaseEntityWithFile $entity   The entity to save
-     * @param array              $callback A callback method. Ex : array(&$obj, 'somePublicMethod')
+     * @param callable|null      $callback A callback method. Ex : array(&$obj, 'somePublicMethod')
      *                                          The callback may have 3 parameters : original filename, extension, file size
      *
      * @return BaseEntityWithFile The saved entity
@@ -234,8 +234,9 @@ class BaseEntityWithFileManager
     /**
      * Builds the destination path for a file
      *
-     * @param BaseEntityWithFile $entity       The entity of the file
-     * @param string             $propertyName The file property
+     * @param BaseEntityWithFile $entity         The entity of the file
+     * @param string             $propertyName   The file property
+     * @param string|null        $sourceFilePath The file source folder
      *
      * @return string The complete file path
      */
@@ -331,9 +332,7 @@ class BaseEntityWithFileManager
      *
      * @param BaseEntityWithFile $entity          The entity associated to the file
      * @param string             $propertyName    The property associated to the file
-     * @param string             $fileDestination The relative directory where
-     *                                                  the file will be stored
-     * @param array $callbackElementArray Values that will be used for callback
+     * @param string             $fileDestination The relative directory where the file will be stored
      *
      * @return boolean TRUE if file move successfully, FALSE otherwise
      */
@@ -374,7 +373,7 @@ class BaseEntityWithFileManager
      * Removes one or several file from the entity
      *
      * @param BaseEntityWithFile $entity       The entity from witch the file will be removed
-     * @param mixed              $properties   A file property name or an array containing file property names
+     * @param array|string       $properties   A file property name or an array containing file property names
      * @param boolean            $doEraseFiles Set to FALSE to keep file on the disk
      * @param boolean            $doSave       Set to FALSE if you don't want to save the entity while file are deleted
      *
@@ -415,11 +414,11 @@ class BaseEntityWithFileManager
      *
      * @param BaseEntityWithFile $entity         The entity owning the files
      * @param string             $propertyName   The property linked to the file
-     * @param [type]             $sourceFilepath [description]
-     * @param [type]             $destFilepath   [description]
+     * @param string             $sourceFilepath The file source folder
+     * @param string|null        $destFilepath   The folder where the file will be copied
      * @param string             $operation      'copy' or 'rename'
      *
-     * @return array An array containing informations about the copied file
+     * @return array|null An array containing informations about the copied file
      */
     public function replaceFile(BaseEntityWithFile $entity, $propertyName, $sourceFilepath, $destFilepath = null, $operation = 'copy')
     {

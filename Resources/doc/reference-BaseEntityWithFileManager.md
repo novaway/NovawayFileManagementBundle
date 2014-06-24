@@ -1,14 +1,12 @@
-<small>Novaway\Bundle\FileManagementBundle\Manager</small>
-
 BaseEntityWithFileManager
 =========================
 
-Novaway\Bundle\FileManagementBundle\Manager\BaseEntityWithFileManager
-
-Description
------------
-
 Extend your managers with this class to add File management.
+
+Namespace
+---------
+
+Novaway\Bundle\FileManagementBundle\Manager
 
 Signature
 ---------
@@ -52,7 +50,7 @@ Returns the absolute (root) filepath of a property for a specific entity
 
 - It is a **public** method.
 - It accepts the following parameter(s):
-    - `$entity` ([`BaseEntityWithFile`](../../../../Novaway/Bundle/FileManagementBundle/Entity/BaseEntityWithFile.md)) &mdash; The current entity
+    - `$entity` (`BaseEntityWithFile`) &mdash; The current entity
     - `$propertyName` (`string`) &mdash; The property matching the file
 - _Returns:_ The absolute filepath
     - `string`
@@ -65,7 +63,7 @@ Returns the relative (web) filepath of a property for a specific entity
 
 - It is a **public** method.
 - It accepts the following parameter(s):
-    - `$entity` ([`BaseEntityWithFile`](../../../../Novaway/Bundle/FileManagementBundle/Entity/BaseEntityWithFile.md)) &mdash; The current entity
+    - `$entity` (`BaseEntityWithFile`) &mdash; The current entity
     - `$propertyName` (`string`) &mdash; The property matching the file
 - _Returns:_ The relative filepath
     - `string`
@@ -88,9 +86,9 @@ Persist and flush the entity
 
 - It is a **public** method.
 - It accepts the following parameter(s):
-    - `$entity` ([`BaseEntityWithFile`](../../../../Novaway/Bundle/FileManagementBundle/Entity/BaseEntityWithFile.md)) &mdash; The entity to save
+    - `$entity` (`BaseEntityWithFile`) &mdash; The entity to save
 - _Returns:_ The saved entity
-    - [`BaseEntityWithFile`](../../../../Novaway/Bundle/FileManagementBundle/Entity/BaseEntityWithFile.md)
+    - `BaseEntityWithFile`
 
 ### `delete()` <a name="delete"></a>
 
@@ -100,9 +98,9 @@ Remove and flush the entity
 
 - It is a **public** method.
 - It accepts the following parameter(s):
-    - `$entity` ([`BaseEntityWithFile`](../../../../Novaway/Bundle/FileManagementBundle/Entity/BaseEntityWithFile.md)) &mdash; The entity to delete
+    - `$entity` (`BaseEntityWithFile`) &mdash; The entity to delete
 - _Returns:_ The deleted entity
-    - [`BaseEntityWithFile`](../../../../Novaway/Bundle/FileManagementBundle/Entity/BaseEntityWithFile.md)
+    - `BaseEntityWithFile`
 
 ### `saveWithFiles()` <a name="saveWithFiles"></a>
 
@@ -112,10 +110,10 @@ Saves an entity and manages its file storage
 
 - It is a **public** method.
 - It accepts the following parameter(s):
-    - `$entity` ([`BaseEntityWithFile`](../../../../Novaway/Bundle/FileManagementBundle/Entity/BaseEntityWithFile.md)) &mdash; The entity to save
-    - `$callback` (`array`) &mdash; A callback method. Ex : array(&amp;$obj, &#039;somePublicMethod&#039;) The callback may have 3 parameters : original filename, extension, file size
+    - `$entity` (`BaseEntityWithFile`) &mdash; The entity to save
+    - `$callback` (`callable`|`null`) &mdash; A callback method. Ex : array(&amp;$obj, &#039;somePublicMethod&#039;) The callback may have 3 parameters : original filename, extension, file size
 - _Returns:_ The saved entity
-    - [`BaseEntityWithFile`](../../../../Novaway/Bundle/FileManagementBundle/Entity/BaseEntityWithFile.md)
+    - `BaseEntityWithFile`
 
 ### `deleteWithFiles()` <a name="deleteWithFiles"></a>
 
@@ -125,9 +123,9 @@ Deletes an entity and manages its file storage
 
 - It is a **public** method.
 - It accepts the following parameter(s):
-    - `$entity` ([`BaseEntityWithFile`](../../../../Novaway/Bundle/FileManagementBundle/Entity/BaseEntityWithFile.md)) &mdash; The entity to delete
+    - `$entity` (`BaseEntityWithFile`) &mdash; The entity to delete
 - _Returns:_ The deleted entity
-    - [`BaseEntityWithFile`](../../../../Novaway/Bundle/FileManagementBundle/Entity/BaseEntityWithFile.md)
+    - `BaseEntityWithFile`
 
 ### `slug()` <a name="slug"></a>
 
@@ -149,12 +147,12 @@ Removes one or several file from the entity
 
 - It is a **public** method.
 - It accepts the following parameter(s):
-    - `$entity` ([`BaseEntityWithFile`](../../../../Novaway/Bundle/FileManagementBundle/Entity/BaseEntityWithFile.md)) &mdash; The entity from witch the file will be removed
-    - `$properties` (`mixed`) &mdash; A file property name or an array containing file property names
+    - `$entity` (`BaseEntityWithFile`) &mdash; The entity from witch the file will be removed
+    - `$properties` (`array`|`string`) &mdash; A file property name or an array containing file property names
     - `$doEraseFiles` (`boolean`) &mdash; Set to FALSE to keep file on the disk
     - `$doSave` (`boolean`) &mdash; Set to FALSE if you don&#039;t want to save the entity while file are deleted
 - _Returns:_ The saved entity
-    - [`BaseEntityWithFile`](../../../../Novaway/Bundle/FileManagementBundle/Entity/BaseEntityWithFile.md)
+    - `BaseEntityWithFile`
 
 ### `replaceFile()` <a name="replaceFile"></a>
 
@@ -164,11 +162,11 @@ Replace a property file by another, giver it&#039;s path
 
 - It is a **public** method.
 - It accepts the following parameter(s):
-    - `$entity` ([`BaseEntityWithFile`](../../../../Novaway/Bundle/FileManagementBundle/Entity/BaseEntityWithFile.md)) &mdash; The entity owning the files
+    - `$entity` (`BaseEntityWithFile`) &mdash; The entity owning the files
     - `$propertyName` (`string`) &mdash; The property linked to the file
-    - `$sourceFilepath` (`Novaway\Bundle\FileManagementBundle\Manager\[type]`) &mdash; [description]
-    - `$destFilepath` (`Novaway\Bundle\FileManagementBundle\Manager\[type]`) &mdash; [description]
+    - `$sourceFilepath` (`string`) &mdash; The file source folder
+    - `$destFilepath` (`string`|`null`) &mdash; The folder where the file will be copied
     - `$operation` (`string`) &mdash; &#039;copy&#039; or &#039;rename&#039;
 - _Returns:_ An array containing informations about the copied file
     - `array`
-
+    - `null`
