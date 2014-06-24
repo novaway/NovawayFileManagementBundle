@@ -89,7 +89,7 @@ The `BaseEntityWithFileManager` constructor require 2 parameters to process data
 * *$arrayFilepath*: Associative array containing the file path for each property of the managed entity. This array must
 also contain a 'root' (optional) and a 'web' path. You can use some variables to setup a dynamic name to the file that is
 uploaded :
-    * *{propertyName}* : The value of property of an entity. Here 'propertyName'.
+    * *{propertyName}* : The value of property of an entity. Here 'propertyName'. **Visibility level of each property used to build file path should be at least `protected`.**
     * *{-ext-}* : The original file extension
     * *{-origin-}* : The original filename
     * *{-custom-}* : Allow you to set a custom string to append to the uploaded filename. To get this custom string, you need
