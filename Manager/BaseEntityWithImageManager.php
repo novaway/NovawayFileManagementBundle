@@ -13,10 +13,25 @@ use Novaway\Bundle\FileManagementBundle\Entity\BaseEntityWithFile;
  */
 class BaseEntityWithImageManager extends BaseEntityWithFileManager
 {
+    /**
+     * Associative array to define image properties which be stored on filesystem
+     *
+     * @var array $imageFormatDefinitionAssociative
+     */
     private $imageFormatDefinition;
 
+    /**
+     * Associative array to apply some format definitions to an entity property
+     *
+     * @var array $imageFormatChoices
+     */
     private $imageFormatChoices;
 
+    /**
+     * Default manager configuration
+     *
+     * @var array $defaultConf
+     */
     private $defaultConf;
 
     /**
@@ -55,8 +70,10 @@ class BaseEntityWithImageManager extends BaseEntityWithFileManager
 
     /**
      * Transform a path string with format placeholder to the right path string
+     *
      * @param  string $path   The path string with placeholder
      * @param  string $format The required format
+     *
      * @return string The format path string
      */
     private function transformPathWithFormat($path, $format)
@@ -67,8 +84,8 @@ class BaseEntityWithImageManager extends BaseEntityWithFileManager
     /**
      * Returns the absolute (root) filepath of a property for a specific entity
      *
-     * @param mixed  $entity       The current entity
-     * @param string $propertyName The property matching the file
+     * @param BaseEntityWithFile $entity       The current entity
+     * @param string|null        $propertyName The property matching the file
      *
      * @return string The absolute filepath
      */
@@ -86,8 +103,9 @@ class BaseEntityWithImageManager extends BaseEntityWithFileManager
     /**
      * Returns the relative (web) filepath of a property for a specific entity
      *
-     * @param mixed  $entity       The current entity
-     * @param string $propertyName The property matching the file
+     * @param BaseEntityWithFile $entity       The current entity
+     * @param string|null        $propertyName The property matching the file
+     * @param string|null        $format       The desired image format
      *
      * @return string The relative filepath
      */
@@ -105,9 +123,10 @@ class BaseEntityWithImageManager extends BaseEntityWithFileManager
     /**
      * Builds the destination path for a file
      *
-     * @param BaseEntityWithFile $entity       The entity of the file
-     * @param string             $propertyName The file property
-     * @param string             $format       The image format
+     * @param BaseEntityWithFile $entity         The entity of the file
+     * @param string             $propertyName   The file property
+     * @param string|null        $sourceFilepath The image source folder
+     * @param string|null        $format         The desired image format
      *
      * @return string The complete file path
      */
@@ -127,9 +146,7 @@ class BaseEntityWithImageManager extends BaseEntityWithFileManager
      *
      * @param BaseEntityWithFile $entity          The entity associated to the file
      * @param string             $propertyName    The property associated to the file
-     * @param string             $fileDestination The relative directory where
-     *                                                  the file will be stored
-     * @param array $callbackElementArray Values that will be used for callback
+     * @param string             $fileDestination The relative directory where the file will be stored
      *
      * @return boolean TRUE if file move successfully, FALSE otherwise
      */
@@ -207,11 +224,9 @@ class BaseEntityWithImageManager extends BaseEntityWithFileManager
      * Removes one or several file from the entity
      *
      * @param BaseEntityWithFile $entity       The entity from witch the file will be removed
-     * @param mixed              $properties   A file property name or an array containing file property names
+     * @param array|string       $properties   A file property name or an array containing file property names
      * @param boolean            $doEraseFiles Set to FALSE to keep file on the disk
      * @param boolean            $doSave       Set to FALSE if you don't want to save the entity while file are deleted
-     *
-     * @return BaseEntityWithFile The saved entity
      */
     public function removeFiles(BaseEntityWithFile $entity, $properties = array(), $doEraseFiles = true, $doSave = true)
     {
@@ -248,12 +263,13 @@ class BaseEntityWithImageManager extends BaseEntityWithFileManager
     /**
      * Replace a property file by another, giver it's path
      *
-     * @param BaseEntityWithFile $entity               The entity owning the files
-     * @param string             $propertyName         The property linked to the file
-     * @param array              $callbackElementArray Values that will be used for callback
-     * @param string             $operation            'copy' or 'rename'
+     * @param BaseEntityWithFile $entity         The entity owning the files
+     * @param string             $propertyName   The property linked to the file
+     * @param string             $sourceFilepath The image source folder
+     * @param string|null        $destFilepath   The image destination folder
+     * @param string             $operation      'copy' or 'rename'
      *
-     * @return array An array containing informations about the copied file
+     * @return array|null An array containing informations about the copied file
      */
     public function replaceFile(BaseEntityWithFile $entity, $propertyName, $sourceFilepath, $destFilepath = null, $operation = 'copy')
     {
