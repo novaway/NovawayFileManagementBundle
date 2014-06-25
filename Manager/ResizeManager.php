@@ -4,9 +4,33 @@ namespace Novaway\Bundle\FileManagementBundle\Manager;
 
 use PHPImageWorkshop\ImageWorkshop;
 
+/**
+ * Image resizer helper
+ */
 class ResizeManager
 {
-
+    /**
+     * Resize an image
+     *
+     * Image properties parameters:
+     *   - size : Square size (set to 0 if not square)
+     *   - width : Width (if not square)
+     *   - height : Height (if not square)
+     *   - max_size : Resize to fit square at maximum
+     *   - max_width : Resize to fit non square at maximum
+     *   - max_height : Resize to fit non square at maximum
+     *   - crop : Crop image
+     *   - crop_position : Crop image position (L = left, T = top, M = middle, B = bottom, R = right)
+     *   - quality : Output image quality (from 0 to 100)
+     *   - enlarge : Enlarge image when source is smaller than output. Fill with bg_color when false
+     *   - trim_bg : Remove the background color when not enlarging
+     *   - keep_proportions : Keep source image proportions (and fill with blank if needed)
+     *   - bg_color : Background color when image does not fill expected output size
+     *
+     * @param string $sourcePath         Image path to process
+     * @param string $destPathWithFormat Folder to output processed image
+     * @param array  $dim                Image properties
+     */
     public static function resize($sourcePath, $destPathWithFormat, $dim)
     {
         $layer = ImageWorkshop::initFromPath($sourcePath);
