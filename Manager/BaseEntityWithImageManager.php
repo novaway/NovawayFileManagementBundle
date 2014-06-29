@@ -78,6 +78,10 @@ class BaseEntityWithImageManager extends BaseEntityWithFileManager
      */
     private function transformPathWithFormat($path, $format)
     {
+        if (!array_key_exists($format, $this->imageFormatDefinition)) {
+            throw new \InvalidArgumentException("Unknow format : the format [$format] isn't registered");
+        }
+
         return str_replace('{-imgformat-}', $format, $path);
     }
 
