@@ -283,6 +283,7 @@ class BaseEntityWithImageManager extends BaseEntityWithFileManager
 
         if (is_file($sourceFilepath)) {
 
+            $oldDestPathPattern = $this->getFileAbsolutePath($entity, $propertyName);
             if ($destFilepath) {
                 $entity->$propertyFileNameSetter($destFilepath);
             } else {
@@ -291,7 +292,7 @@ class BaseEntityWithImageManager extends BaseEntityWithFileManager
 
             foreach ($this->imageFormatChoices[$propertyName] as $format) {
 
-                $oldDestPath = $this->getFileAbsolutePath($entity, $propertyName, $format);
+                $oldDestPath = $this->transformPathWithFormat($oldDestPathPattern, $format);
                 if (is_file($oldDestPath)) {
                     unlink($oldDestPath);
                 }
