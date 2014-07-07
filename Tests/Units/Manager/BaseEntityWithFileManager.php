@@ -10,13 +10,10 @@ class BaseEntityWithFileManager extends BaseManagerTestCase
     public function testManagerConstructorWithInvalidArgument()
     {
         $this
-            ->given(
-                $entityManager = $this->createMockEntityManager(),
-                $filesystem = $this->createMockFilesystem()
-            )
+            ->given($entityManager = $this->createMockEntityManager())
             ->then
-                ->exception(function() use ($filesystem, $entityManager) {
-                    $testedClass = new Manager\BaseEntityWithFileManager($filesystem, array(), $entityManager);
+                ->exception(function() use ($entityManager) {
+                    $testedClass = new Manager\BaseEntityWithFileManager(array(), $entityManager);
                 })
                     ->isInstanceOf('\InvalidArgumentException')
         ;
@@ -475,16 +472,12 @@ class BaseEntityWithFileManager extends BaseManagerTestCase
         );
     }
 
-    private function createTestedClassInstance(array $filepaths, $entityManager = null, $filesystem = null)
+    private function createTestedClassInstance(array $filepaths, $entityManager = null)
     {
         if (null === $entityManager) {
             $entityManager = $this->createMockEntityManager();
         }
 
-        if (null === $filesystem) {
-            $filesystem = $this->createMockFilesystem();
-        }
-
-        return new Manager\BaseEntityWithFileManager($filesystem, $filepaths, $entityManager);
+        return new Manager\BaseEntityWithFileManager($filepaths, $entityManager);
     }
 }

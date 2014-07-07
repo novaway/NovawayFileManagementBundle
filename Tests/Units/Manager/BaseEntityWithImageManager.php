@@ -10,13 +10,10 @@ class BaseEntityWithImageManager extends BaseManagerTestCase
     public function testManagerConstructorWithInvalidArgument()
     {
         $this
-            ->given(
-                $entityManager = $this->createMockEntityManager(),
-                $filesystem = $this->createMockFilesystem()
-            )
+            ->given($entityManager = $this->createMockEntityManager())
             ->then
-                ->exception(function() use ($filesystem, $entityManager) {
-                    $testedClass = new Manager\BaseEntityWithImageManager($filesystem, array(), $entityManager, array(), array());
+                ->exception(function() use ($entityManager) {
+                    $testedClass = new Manager\BaseEntityWithImageManager(array(), $entityManager, array(), array());
                 })
                     ->isInstanceOf('\InvalidArgumentException')
         ;
@@ -295,10 +292,6 @@ class BaseEntityWithImageManager extends BaseManagerTestCase
             $entityManager = $this->createMockEntityManager();
         }
 
-        if (null === $filesystem) {
-            $filesystem = $this->createMockFilesystem();
-        }
-
         $imageFormatDefinitions = array(
             'original' => array(),
             'format1Definition' => array('size' => 500, 'quality' => 95, 'bg_color' => 'FFFFFF'),
@@ -309,6 +302,6 @@ class BaseEntityWithImageManager extends BaseManagerTestCase
             'secondFile' => array('format1Definition'),
         );
 
-        return new Manager\BaseEntityWithImageManager($filesystem, $filepaths, $entityManager, $imageFormatDefinitions, $imageFormatChoices);
+        return new Manager\BaseEntityWithImageManager($filepaths, $entityManager, $imageFormatDefinitions, $imageFormatChoices);
     }
 }
