@@ -4,14 +4,6 @@ namespace Novaway\Bundle\FileManagementBundle\Tests\Helper;
 
 class BaseManagerTestCase extends FileTestCase
 {
-    protected function createMockFilesystem()
-    {
-        $filesystem = new \mock\Novaway\Bundle\FileManagementBundle\Adapter\FilesystemAdapter();
-        $filesystem->getMockController()->chmod = function() { };
-
-        return $filesystem;
-    }
-
     protected function createMockEntityManager()
     {
         return new \mock\EntityManager();
