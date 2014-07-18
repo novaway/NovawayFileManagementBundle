@@ -259,16 +259,16 @@ class BaseEntityWithImageManager extends BaseManagerTestCase
             'bundle.root' => '/bundle/root/',
         );
         $filePathsWithoutRoot = array(
-            'bundle.web' => '/bundle/dir/'
+            'bundle.web' => '/bundle/dir/',
         );
 
         return array(
             array($filePaths, 'userPhoto', null, '/bundle/root/my-photo_{-imgformat-}.png'),
             array($filePaths, 'userPhoto', 'original', '/bundle/root/my-photo_original.png'),
-            array($filePaths, 'userPhoto', 'myFormat', '/bundle/root/my-photo_myFormat.png'),
+            array($filePaths, 'userPhoto', 'format1Definition', '/bundle/root/my-photo_format1Definition.png'),
             array($filePathsWithoutRoot, 'userPhoto', null, $managerDirPath.'/../../../../../../../web/bundle/dir/my-photo_{-imgformat-}.png'),
             array($filePathsWithoutRoot, 'userPhoto', 'original', $managerDirPath.'/../../../../../../../web/bundle/dir/my-photo_original.png'),
-            array($filePathsWithoutRoot, 'userPhoto', 'myFormat', $managerDirPath.'/../../../../../../../web/bundle/dir/my-photo_myFormat.png'),
+            array($filePathsWithoutRoot, 'userPhoto', 'format1Definition', $managerDirPath.'/../../../../../../../web/bundle/dir/my-photo_format1Definition.png'),
         );
     }
 
@@ -282,7 +282,7 @@ class BaseEntityWithImageManager extends BaseManagerTestCase
         return array(
             array($filePaths, 'userPhoto', null, '/bundle/web/my-photo_{-imgformat-}.png'),
             array($filePaths, 'userPhoto', 'original', '/bundle/web/my-photo_original.png'),
-            array($filePaths, 'userPhoto', 'myFormat', '/bundle/web/my-photo_myFormat.png'),
+            array($filePaths, 'userPhoto', 'format1Definition', '/bundle/web/my-photo_format1Definition.png'),
         );
     }
 
