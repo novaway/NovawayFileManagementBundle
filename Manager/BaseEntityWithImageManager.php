@@ -271,11 +271,10 @@ class BaseEntityWithImageManager extends BaseEntityWithFileManager
      * @param string             $propertyName   The property linked to the file
      * @param string             $sourceFilepath The image source folder
      * @param string|null        $destFilepath   The image destination folder
-     * @param string             $operation      'copy' or 'rename'
      *
      * @return array|null An array containing informations about the copied file
      */
-    public function replaceFile(BaseEntityWithFile $entity, $propertyName, $sourceFilepath, $destFilepath = null, $operation = 'copy')
+    public function replaceFile(BaseEntityWithFile $entity, $propertyName, $sourceFilepath, $destFilepath = null)
     {
         $propertyGetter = $this->getter($propertyName);
         $propertyFileNameGetter = $this->getter($propertyName, true);
@@ -283,6 +282,7 @@ class BaseEntityWithImageManager extends BaseEntityWithFileManager
 
         if (is_file($sourceFilepath)) {
 
+            $oldDestPathPattern = $this->getFileAbsolutePath($entity, $propertyName);
             if ($destFilepath) {
                 $entity->$propertyFileNameSetter($destFilepath);
             } else {
@@ -291,7 +291,7 @@ class BaseEntityWithImageManager extends BaseEntityWithFileManager
 
             foreach ($this->imageFormatChoices[$propertyName] as $format) {
 
-                $oldDestPath = $this->getFileAbsolutePath($entity, $propertyName, $format);
+                $oldDestPath = $this->transformPathWithFormat($oldDestPathPattern, $format);
                 if (is_file($oldDestPath)) {
                     unlink($oldDestPath);
                 }
