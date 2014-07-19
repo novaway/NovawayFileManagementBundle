@@ -102,6 +102,7 @@ Replace a property file by another, giver it&#039;s path
     - `$propertyName` (`string`) &mdash; The property linked to the file
     - `$sourceFilepath` (`string`) &mdash; The image source folder
     - `$destFilepath` (`string`|`null`) &mdash; The image destination folder
+    - `$operation` (`string`) &mdash; &#039;copy&#039; or &#039;rename&#039;
 - _Returns:_ An array containing informations about the copied file
     - `array`
     - `null`
