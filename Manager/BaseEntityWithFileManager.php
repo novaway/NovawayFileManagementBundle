@@ -52,6 +52,10 @@ class BaseEntityWithFileManager
      */
     public function __construct($arrayFilepath, $entityManager)
     {
+        if (!isset($arrayFilepath['bundle.web'])) {
+            throw new \InvalidArgumentException('$arrayFilepath must have a bundle.web key (even empty).');
+        }
+
         $this->entityManager = $entityManager;
         $this->webPath = $arrayFilepath['bundle.web'];
 
@@ -418,6 +422,10 @@ class BaseEntityWithFileManager
      */
     public function replaceFile(BaseEntityWithFile $entity, $propertyName, $sourceFilepath, $destFilepath = null, $operation = 'copy')
     {
+        if (!in_array($operation, array('copy', 'rename'))) {
+            throw new \InvalidArgumentException('$operation only accept "copy" or "rename" value');
+        }
+
         $propertyGetter = $this->getter($propertyName);
         $propertyFileNameGetter = $this->getter($propertyName, true);
         $propertyFileNameSetter = $this->setter($propertyName, true);
