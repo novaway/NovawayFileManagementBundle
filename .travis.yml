@@ -7,8 +7,7 @@ php:
   - 5.3
 
 before_script:
-  - wget http://getcomposer.org/composer.phar
-  - php composer.phar install --dev
+  - composer install --dev
 
 script:
-  vendor/bin/atoum -bf Tests/bootstrap.atoum.php -d Tests
+  vendor/bin/atoum
