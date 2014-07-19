@@ -18,10 +18,10 @@ Unit tests are written using [atoum](https://github.com/atoum/atoum). You will g
 running `composer install`. To run tests, you will need to run the following command :
 
 ``` sh
-$ vendor/bin/atoum -bf Tests/bootstrap.atoum.php -d Tests
+$ vendor/bin/atoum
 
 # To run tests in a loop, ideal to do TDD
-$ vendor/bin/atoum -bf Tests/bootstrap.atoum.php -d Tests --loop
+$ vendor/bin/atoum --loop
 ```
 
 ### Contributors:

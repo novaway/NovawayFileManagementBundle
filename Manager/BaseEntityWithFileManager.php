@@ -52,6 +52,10 @@ class BaseEntityWithFileManager
      */
     public function __construct($arrayFilepath, $entityManager)
     {
+        if (!isset($arrayFilepath['bundle.web'])) {
+            throw new \InvalidArgumentException('$arrayFilepath must have a bundle.web key (event empty).');
+        }
+
         $this->entityManager = $entityManager;
         $this->webPath = $arrayFilepath['bundle.web'];
 
@@ -106,9 +110,12 @@ class BaseEntityWithFileManager
     public function getFileAbsolutePath(BaseEntityWithFile $entity, $propertyName)
     {
         $getter = $this->getter($propertyName, true);
-        $entity->$getter();
-        $path = sprintf('%s%s', $this->rootPath,
-            $entity->$getter());
+
+        try {
+            $path = sprintf('%s%s', $this->rootPath, $entity->$getter());
+        } catch (\Exception $e) {
+            throw new \UnexpectedValueException();
+        }
 
         return $path;
     }
@@ -125,7 +132,13 @@ class BaseEntityWithFileManager
     {
         $getter = $this->getter($propertyName, true);
 
-        return sprintf('%s%s', $this->webPath, $entity->$getter());
+        try {
+            $path = sprintf('%s%s', $this->webPath, $entity->$getter());
+        } catch (\Exception $e) {
+            throw new \UnexpectedValueException();
+        }
+
+        return $path;
     }
 
     /**
@@ -409,6 +422,10 @@ class BaseEntityWithFileManager
      */
     public function replaceFile(BaseEntityWithFile $entity, $propertyName, $sourceFilepath, $destFilepath = null, $operation = 'copy')
     {
+        if (!in_array($operation, array('copy', 'rename'))) {
+            throw new \InvalidArgumentException('$operation only accept "copy" or "rename" value');
+        }
+
         $propertyGetter = $this->getter($propertyName);
         $propertyFileNameGetter = $this->getter($propertyName, true);
         $propertyFileNameSetter = $this->setter($propertyName, true);
