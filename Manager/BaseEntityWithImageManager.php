@@ -46,7 +46,7 @@ class BaseEntityWithImageManager extends BaseEntityWithFileManager
     public function __construct($arrayFilepath, $entityManager, $imageFormatDefinition, $imageFormatChoices)
     {
         parent::__construct($arrayFilepath, $entityManager);
-        $this->imageFormatDefinition = $imageFormatDefinition;
+        $this->imageFormatDefinition = array_merge($imageFormatDefinition, array('original' => null));
         $this->imageFormatChoices = $imageFormatChoices;
         $this->defaultConf = array(
         'fallback' => array(                    // -- Default options when not overriden --
