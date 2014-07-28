@@ -54,5 +54,5 @@ abstract class BaseEntityWithFile
             throw new \BadMethodCallException();
         }
     }
-
 }
+
