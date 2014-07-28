@@ -1,5 +1,7 @@
 # Novaway FileManagementBundle
 
+[![Build Status](https://travis-ci.org/novaway/NovawayFileManagementBundle.svg)](https://travis-ci.org/novaway/NovawayFileManagementBundle)
+
 ### Compatibility
 
 The current version of the bundle is only compatible with Symfony 2.5+
