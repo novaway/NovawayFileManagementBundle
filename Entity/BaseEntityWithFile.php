@@ -36,7 +36,7 @@ abstract class BaseEntityWithFile
             } else {
                 throw new \InvalidArgumentException();
             }
-        } elseif (!isset($this->$method) && preg_match('#^(get|set) {1}([a-z0-1]+)$#i',
+        } elseif (!method_exists($this, $method) && preg_match('#^(get|set) {1}([a-z0-1]+)$#i',
                 $method, $match)) {
             $property = lcfirst($match[2]);
             if ($match[1] === 'get') {
@@ -48,6 +48,8 @@ abstract class BaseEntityWithFile
                     throw new \InvalidArgumentException();
                 }
             }
+        } elseif (method_exists($this, $method)) {
+            return call_user_func_array(array($this, $method), $arguments);
         } else {
             throw new \BadMethodCallException();
         }

@@ -268,19 +268,25 @@ class BaseEntityWithFileManager
         //Replace slugged placeholder
         $fileDestinationName = preg_replace_callback(
             '#{slug::([^}-]+)}#i',
-            create_function('$matches', 'return $this->slug($entity->get("$1"));'),
+            function($matches) use ($entity) {
+                return $this->slug($entity->get($matches[1]));
+            },
             $fileDestinationName);
 
         //Replace date format placeholder
         $fileDestinationName = preg_replace_callback(
             '#{date::([^}-]+)::([^}-]+)}#i',
-            create_function('$matches', 'return $entity->get("$2")->format("$1");'),
+            function($matches) use ($entity) {
+                return $entity->get($matches[2])->format($matches[1]);
+            },
             $fileDestinationName);
 
         //Replace classic placeholder
         $fileDestinationName = preg_replace_callback(
             '#{([^}-]+)}#i',
-            create_function('$matches', 'return $entity->get("$1");'),
+            function($matches) use ($entity) {
+                return $entity->get($matches[1]);
+            },
             $fileDestinationName);
 
         return $fileDestinationName;
