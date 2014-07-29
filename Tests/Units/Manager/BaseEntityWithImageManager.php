@@ -38,6 +38,31 @@ class BaseEntityWithImageManager extends BaseManagerTestCase
                     $testedClass->getFileWebPath($entity, 'undefinedField');
                 })
                     ->isInstanceOf('\UnexpectedValueException')
+
+        ;
+    }
+
+    public function testGetFileAbsolutePathWithInvalidFormat()
+    {
+        $filePaths = array(
+            'bundle.web' => '/bundle/dir/',
+            'bundle.root' => '/bundle/root/',
+        );
+
+        $this
+            ->given(
+                $entity = $this->createMockEntity(array(
+                    'userPhotoFilename' => 'my-photo_{-imgformat-}.png',
+                ))
+            )
+            ->if($testedClass = $this->createTestedClassInstance($filePaths))
+            ->then
+                ->exception(function() use ($testedClass, $entity) {
+                    $testedClass->getFileAbsolutePath($entity, 'userPhoto', 'failDefinition');
+                })
+                    ->isInstanceOf('\InvalidArgumentException')
+                    ->hasMessage('Unknow format : the format [failDefinition] isn\'t registered')
+
         ;
     }
 
@@ -293,7 +318,6 @@ class BaseEntityWithImageManager extends BaseManagerTestCase
         }
 
         $imageFormatDefinitions = array(
-            'original' => array(),
             'format1Definition' => array('size' => 500, 'quality' => 95, 'bg_color' => 'FFFFFF'),
             'format2Definition' => array('crop' => false, 'quality' => 95, 'size' => 64),
         );

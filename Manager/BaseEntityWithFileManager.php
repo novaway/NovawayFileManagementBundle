@@ -268,19 +268,25 @@ class BaseEntityWithFileManager
         //Replace slugged placeholder
         $fileDestinationName = preg_replace_callback(
             '#{slug::([^}-]+)}#i',
-            create_function('$matches', 'return $this->slug($entity->get("$1"));'),
+            function ($matches) use ($entity) {
+                return $this->slug($entity->get($matches[1]));
+            },
             $fileDestinationName);
 
         //Replace date format placeholder
         $fileDestinationName = preg_replace_callback(
             '#{date::([^}-]+)::([^}-]+)}#i',
-            create_function('$matches', 'return $entity->get("$2")->format("$1");'),
+            function ($matches) use ($entity) {
+                return $entity->get($matches[2])->format($matches[1]);
+            },
             $fileDestinationName);
 
         //Replace classic placeholder
         $fileDestinationName = preg_replace_callback(
             '#{([^}-]+)}#i',
-            create_function('$matches', 'return $entity->get("$1");'),
+            function ($matches) use ($entity) {
+                return $entity->get($matches[1]);
+            },
             $fileDestinationName);
 
         return $fileDestinationName;
@@ -355,27 +361,27 @@ class BaseEntityWithFileManager
         }
 
         $destFullPath = sprintf('%s%s', $this->rootPath, $fileDestination);
-        if(preg_match(
+        if (preg_match(
             '#(.+)/([^/.]+).([A-Z]{3,5})#i',
             $destFullPath,
             $destMatch
             )
-            ) {
+        ) {
             // move the file to the required directory
             $entity->$propertyGetter()->move(
                 $destMatch[1],
                 $destMatch[2].'.'.$destMatch[3]);
 
-        chmod($destFullPath, 0755);
+            chmod($destFullPath, 0755);
 
-        // clean up the file property as you won't need it anymore
-        $entity->$propertySetter(null);
+            // clean up the file property as you won't need it anymore
+            $entity->$propertySetter(null);
 
-        return true;
+            return true;
+        }
+
+        return false;
     }
-
-    return false;
-}
 
     /**
      * Removes one or several file from the entity
@@ -467,5 +473,5 @@ class BaseEntityWithFileManager
 
         return null;
     }
-
 }
+
