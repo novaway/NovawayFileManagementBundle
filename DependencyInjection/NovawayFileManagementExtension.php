@@ -25,5 +25,6 @@ class NovawayFileManagementExtension extends Extension
         $loader = new Loader\YamlFileLoader($container, new FileLocator(__DIR__.'/../Resources/config'));
         $loader->load('services.yml');
 
+        $container->setParameter('novaway.fmb.webdir', isset($config['web_file_path']) ? $config['web_file_path'] : '/' );
     }
 }
