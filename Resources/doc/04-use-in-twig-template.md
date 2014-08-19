@@ -2,7 +2,7 @@
 
 ### Introduction
 
-In order to facilitate usage of uploaded file in the viewof application, the bundle provide a Twig extensions to add
+In order to facilitate usage of uploaded file in the view of application, the bundle provide a Twig extensions to add
 some helpers.
 
 ### Register the extension as service

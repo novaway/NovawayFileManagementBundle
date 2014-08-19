@@ -1,17 +1,18 @@
 parameters:
     novaway.fmb.twigextension.class : Novaway\Bundle\FileManagementBundle\Twig\Extension\FileManagementExtension
-
+    novaway.fmb.form.type.image.extension.class : Novaway\Bundle\FileManagementBundle\Form\Extensions\ImageTypeExtension
+    novaway.fmb.form.type.image.class : Novaway\Bundle\FileManagementBundle\Form\Type\ImageType
 
 services:
 
     novaway.fmb.form.type.image:
-        class: Novaway\Bundle\FileManagementBundle\Form\Type\ImageType
+        class: %novaway.fmb.form.type.image.class%
         arguments: [%novaway.fmb.webdir%]
         tags:
             - { name: form.type, alias: image }
 
     novaway.fmb.form.type.image.extension:
-        class: Novaway\Bundle\FileManagementBundle\Form\Extensions\ImageTypeExtension
+        class: %novaway.fmb.form.type.image.extension.class%
         tags:
             - { name: form.type_extension, alias: image }
 
