@@ -10,8 +10,9 @@ namespace Novaway\Bundle\FileManagementBundle\Tests\Units\Form\Type;
 
 use mageekguy\atoum;
 use Novaway\Bundle\FileManagementBundle\Form\Type;
+use Novaway\Bundle\FileManagementBundle\Tests\Helper\BaseManagerTestCase;
 
-class ImageType extends atoum\test {
+class ImageType extends BaseManagerTestCase{
 
     public function testSetDefaultOptions()
     {
@@ -91,7 +92,8 @@ class ImageType extends atoum\test {
 
     public function getBuildViewDataProvider()
     {
-        $updatedAt = new \DateTime('2014-08-20 11:27:10');
+        $updatedAt = new \DateTime();
+        $updatedAt->setTimestamp(1408526830);
 
         return array(
             //$format, $updateCache, $updatedAt, $expectedUrlRegex
@@ -104,29 +106,6 @@ class ImageType extends atoum\test {
     private function createTestedClassInstance($webdir = '/mydir/')
     {
         return new Type\ImageType($webdir);
-    }
-
-    private function createMockEntity(array $fields = array())
-    {
-        $entity = new \mock\Novaway\Bundle\FileManagementBundle\Entity\BaseEntityWithFile();
-        foreach ($fields as $name => $value) {
-            $entity->$name = $value;
-
-            // mock accessors
-            $accessor = sprintf('get%s', ucfirst($name));
-            $entity->getMockController()->$accessor = function() use ($entity, $name) {
-                return $entity->$name;
-            };
-
-            // mock setters
-            $setter = sprintf('set%s', ucfirst($name));
-            $entity->getMockController()->$setter = function($param) use ($entity, $name) {
-                $entity->$name = $param;
-                return $entity;
-            };
-        }
-
-        return $entity;
     }
 
     private function getMockForm($name, $entityProperties)
