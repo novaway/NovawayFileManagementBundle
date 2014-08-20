@@ -61,8 +61,12 @@ class ImageType extends AbstractType
             $parentData = $form->getParent()->getData();
             $imagePath = $accessor->getValue($parentData, $property);
 
-            if ($options['update_cache'] === true && $accessor->isReadable($parentData, 'updatedAt')) {
-                $imagePath .= '?v='.$accessor->getValue($parentData, 'updatedAt')->format('U');
+            if ($options['update_cache'] === true) {
+                $imagePath .= sprintf('?v=%d',
+                    $accessor->isReadable($parentData, 'updatedAt') ?
+                        $accessor->getValue($parentData, 'updatedAt')->format('U') :
+                        date('U')
+                );
             }
 
             $view->vars['image_url'] = $imagePath ?
