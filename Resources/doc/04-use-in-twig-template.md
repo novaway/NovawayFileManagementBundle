@@ -26,9 +26,6 @@ services:
 
 The Twig extensions provide 3 filters you can use in your templates.
 
-* *filepath* : That filter return a relative link to a file
-> Usage : {{ entity|filepath('myEntityProperty') }}
-* *imagepath* : Same a precedent, but for image
-> Usage : {{ entity|imagepath('myEntityProperty', 'myPictureFormat') }}
-* *fileUrl* : This filter return an absolute link to a file
-> Usage : {{ entity|fileUrl('myEntityProperty') }}
+* *filepath* : That filter return a relative link to a file. `Usage : {{ entity|filepath('myEntityProperty') }}`
+* *imagepath* : Same a precedent, but for image. `Usage : {{ entity|imagepath('myEntityProperty', 'myPictureFormat') }}`
+* *fileUrl* : This filter return an absolute link to a file. `Usage : {{ entity|fileUrl('myEntityProperty') }}`
