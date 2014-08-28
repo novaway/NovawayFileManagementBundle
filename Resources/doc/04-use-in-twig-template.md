@@ -16,7 +16,7 @@ services:
     novaway.twig.filemanagement_extension:
         class: Novaway\Bundle\FileManagementBundle\Twig\Extension\FileManagementExtension
         arguments:
-            - { type: service, id: router }
+            - @router
             - "%kernel.root_dir%/../web/uploads"
         tags:
             - { name: twig.extension }
