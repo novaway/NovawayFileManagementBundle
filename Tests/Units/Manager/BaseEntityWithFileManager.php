@@ -392,9 +392,21 @@ class BaseEntityWithFileManager extends BaseManagerTestCase
             )
             ->when($fileProperties = $testedClass->replaceFile($entity, 'userFile', __DIR__.'/../../data/my-file.txt', '/dir1/dir2/replacement_file.txt'))
             ->then
+                ->boolean(file_exists(__DIR__.'/../../data/my-file.txt'))->isTrue() // check for copy operation
                 ->boolean(file_exists($this->workspace.'/my-photo_original.png'))->isFalse()
                 ->string($entity->getUserFileFilename())->isEqualTo('/dir1/dir2/replacement_file.txt')
                 ->boolean(file_exists($this->workspace.'/dir1/dir2/replacement_file.txt'))->isTrue()
+
+            // with rename operation
+            ->given(
+                mkdir($this->workspace.'/temp'),
+                touch($this->workspace.'/temp/uploaded-file.txt')
+            )
+            ->when($testedClass->replaceFile($entity, 'userFile', $this->workspace.'/temp/uploaded-file.txt', null, Manager\BaseEntityWithFileManager::OPERATION_RENAME))
+            ->then
+                ->boolean(file_exists($this->workspace.'/uploaded-file.txt'))->isTrue()
+                ->boolean(file_exists($this->workspace.'/temp/uploaded-file.txt'))->isFalse()
+                ->string($entity->getUserFileFilename())->isEqualTo('/uploaded-file.txt')
 
             // with invalid file
             ->when($fileProperties = $testedClass->replaceFile($entity, 'userFile', $this->workspace.'/invalid-file.txt'))

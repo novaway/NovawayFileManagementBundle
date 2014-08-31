@@ -300,13 +300,25 @@ class BaseEntityWithImageManager extends BaseManagerTestCase
                         'userPhoto' => '/{-origin-}_{-imgformat-}.{-ext-}',
                     ), $entityManager)
                 )
-                ->when($testedClass->replaceFile($entity, 'userPhoto', $this->workspace.'/image.png', $this->workspace.'/dest/replacement_{-imgformat-}.png', 'rename'))
+                ->when($testedClass->replaceFile($entity, 'userPhoto', $this->workspace.'/image.png', $this->workspace.'/dest/replacement_{-imgformat-}.png', Manager\BaseEntityWithImageManager::OPERATION_RENAME))
                 ->then
                     ->boolean(file_exists($this->workspace.'/my-photo_original.png'))->isFalse()
                     ->boolean(file_exists($this->workspace.'/my-photo_format1Definition.png'))->isFalse()
                     ->boolean(file_exists($this->workspace.'/my-photo_format2Definition.png'))->isFalse()
                     ->string($entity->getUserPhotoFilename())->isEqualTo($this->workspace.'/dest/replacement_{-imgformat-}.png')
                     ->boolean(file_exists($this->workspace.'/image.png'))->isFalse()
+
+            ->assert('BaseEntityWithImageManager::replaceFile with invalid file')
+                ->if(
+                    $testedClass = $this->createTestedClassInstance(array(
+                        'bundle.web' => $this->workspace.'/',
+                        'bundle.root' => $this->workspace.'/',
+                        'userPhoto' => '/{-origin-}_{-imgformat-}.{-ext-}',
+                    ), $entityManager)
+                )
+                ->when($fileProperties = $testedClass->replaceFile($entity, 'userFile', $this->workspace.'/invalid-file.txt'))
+                ->then
+                    ->variable($fileProperties)->isNull()
         ;
     }
 
@@ -345,7 +357,7 @@ class BaseEntityWithImageManager extends BaseManagerTestCase
         );
     }
 
-    private function createTestedClassInstance(array $filepaths, $entityManager = null, $filesystem = null)
+    private function createTestedClassInstance(array $filepaths, $entityManager = null)
     {
         if (null === $entityManager) {
             $entityManager = $this->createMockEntityManager();
