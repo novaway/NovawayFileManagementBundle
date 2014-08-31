@@ -311,6 +311,13 @@ class BaseEntityWithImageManager extends BaseEntityWithFileManager
             $fileInfo['size'] = filesize($sourceFilepath);
             $fileInfo['mime'] = mime_content_type($sourceFilepath);
 
+            // to simplfy image processing operation, this method works on uploaded file
+            // in case developer decided to move uploaded file, we need to delete $sourceFilepath
+            // after this process
+            if ('rename' === $operation) {
+                unlink($sourceFilepath);
+            }
+
             return $fileInfo;
         }
 
