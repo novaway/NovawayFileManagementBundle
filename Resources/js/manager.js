@@ -1,15 +1,16 @@
 goog.provide('novaway.FileManager');
 
+goog.require('goog.array');
+
 /**
  * @constructor
  * @param {string} webpath
- * @param {Object.<string, Object>} imageDefinitions
+ * @param {Object.<string, Object>} imageFormats
  */
-novaway.FileManager = function(webpath, imageDefinitions) {
+novaway.FileManager = function(webpath, imageFormats) {
     this.webPath = webpath || "";
-    this.imageDefinitions = imageDefinitions || {};
+    this.imageFormats = imageFormats || {};
 };
-goog.addSingletonGetter(novaway.FileManager);
 
 /**
  * @param {Object.<string, string|number|boolean>} obj
@@ -22,6 +23,10 @@ novaway.FileManager.prototype.getPath = function(obj, propertyName, format) {
         return this.getFilePath(obj, propertyName);
     }
 
+    if (!goog.array.contains(this.imageFormats[propertyName], format)) {
+        throw new Error('The format "' + format + '" does not exist.');
+    }
+
     var filePath = this.getFilePath(obj, propertyName);
     return this.transformPathWithFormat(filePath, format);
 };
@@ -32,10 +37,6 @@ novaway.FileManager.prototype.getPath = function(obj, propertyName, format) {
  * @returns {string|undefined}
  */
 novaway.FileManager.prototype.transformPathWithFormat = function(path, format) {
-    if (!(format in this.imageDefinitions)) {
-        return undefined;
-    }
-
     return path.replace('{-imgformat-}', format);
 };
 
@@ -56,8 +57,8 @@ novaway.FileManager.prototype.setWebPath = function(webpath) {
 };
 
 /**
- * @param {Object.<string, Object>} definitions
+ * @param {Object.<string, Object>} formats
  */
-novaway.FileManager.prototype.setImageDefinitions = function(definitions) {
-    this.imageDefinitions = definitions;
+novaway.FileManager.prototype.setImageFormats = function(formats) {
+    this.imageFormats = formats;
 };

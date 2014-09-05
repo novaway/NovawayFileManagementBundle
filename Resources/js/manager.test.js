@@ -2,8 +2,7 @@ goog.require('goog.testing.jsunit');
 
 function testGetPath() {
     var manager = new novaway.FileManager('/app_dev.php', {
-        original: {},
-        thumb: {}
+        photo: ['original', 'thumb']
     });
 
     var media = {
@@ -15,18 +14,29 @@ function testGetPath() {
     assertEquals('/app_dev.php/file.txt', manager.getPath(media, 'resume'));
     assertEquals('/app_dev.php/media/name_original.jpg', manager.getPath(media, 'photo', 'original'));
     assertEquals('/app_dev.php/media/name_thumb.jpg', manager.getPath(media, 'photo', 'thumb'));
-    assertUndefined(manager.getPath(media, 'photo', 'unknow'));
+
+    try {
+        manager.getPath(media, 'photo', 'unknow');
+        fail('Unexpected success imanager.getPath() with unknow image format');
+    } catch(e) {
+        assertEquals('Error', e.name);
+    }
 }
 
 function testTransformPathWithFormat() {
     var manager = new novaway.FileManager('/app_dev.php', {
-        original: {},
-        thumb: {}
+        photo: ['original', 'thumb']
     });
 
     assertEquals('http://cdn.com/file_original.png', manager.transformPathWithFormat('http://cdn.com/file_{-imgformat-}.png', 'original'));
     assertEquals('http://cdn.com/file_thumb.png', manager.transformPathWithFormat('http://cdn.com/file_{-imgformat-}.png', 'thumb'));
-    assertUndefined(manager.transformPathWithFormat('http://cdn.com/file_{-imgformat-}.png', 'unknow'));
+
+    try {
+        manager.transformPathWithFormat('http://cdn.com/file_{-imgformat-}.png', 'unknow');
+        fail('Unexpected success imanager.transformPathWithFormat() with unknow image format');
+    } catch(e) {
+        assertEquals('Error', e.name);
+    }
 }
 
 function testGetFilePath() {

@@ -12,13 +12,11 @@ goog.exportSymbol('novaway.FileManager', novaway.FileManager);
 goog.exportSymbol('novaway.FileManager.setData', function(data) {
     var manager = novaway.FileManager.getInstance();
     manager.setWebPath(/** @type {string} */ (data['webpath']));
-    manager.setImageDefinitions(/** @type {Object.<string, Object.<string, string|number|boolean>>} */ (data['image_definitions']));
+    manager.setImageFormats(/** @type {Object.<string, Object.<string, string|number|boolean>>} */ (data['image_formats']));
 });
 goog.exportProperty(novaway.FileManager, 'getInstance', novaway.FileManager.getInstance);
 goog.exportProperty(novaway.FileManager.prototype, 'getPath', novaway.FileManager.prototype.getPath);
 goog.exportProperty(novaway.FileManager.prototype, 'transformPathWithFormat', novaway.FileManager.prototype.transformPathWithFormat);
 goog.exportProperty(novaway.FileManager.prototype, 'getFilePath', novaway.FileManager.prototype.getFilePath);
 goog.exportProperty(novaway.FileManager.prototype, 'setWebPath', novaway.FileManager.prototype.setWebPath);
-goog.exportProperty(novaway.FileManager.prototype, 'setImageDefinitions', novaway.FileManager.prototype.setImageDefinitions);
-
-window['FileManager'] = novaway.FileManager.getInstance();
+goog.exportProperty(novaway.FileManager.prototype, 'setImageFormats', novaway.FileManager.prototype.setImageFormats);
