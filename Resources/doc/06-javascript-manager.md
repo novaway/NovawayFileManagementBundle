@@ -6,7 +6,7 @@ The Javascript manager allow you to generate file path directly in Javascript.
 
 Register the bundle in `app/AppKernel.php`:
 
-``` php
+```php
 // app/AppKernel.php
 public function registerBundles()
 {
@@ -19,7 +19,7 @@ public function registerBundles()
 
 Register the routing definition in `app/config/routing.yml`:
 
-``` yml
+```yml
 # app/config/routing.yml
 novaway_file_management:
     resource: "@NovawayFileManagementBundle/Controller/"
@@ -54,4 +54,25 @@ And use it to generate image path:
 
 ```javascript
 manager.getPath(mediaJsonEntity, 'photo', 'original')
+```
+
+### Usage with manager is declared as a service
+
+If your manager is declared as a service, you can create a javascript manager using twig :
+
+```html
+<script type="text/javascript" src="{{ path('novaway_filemanagement_routing_js', { service_manager: 'your_service.id', manager: 'myManager' }) }}"></script>
+```
+
+or
+
+```
+{{ render(url('novaway_filemanagement_routing_js', { service_manager: 'your_service.id', manager: 'myManager' })) }}
+```
+
+Which is the equivalent of :
+
+```javascript
+var myManager = new novaway.FileManager();
+myManager.setData({/* json data */});
 ```

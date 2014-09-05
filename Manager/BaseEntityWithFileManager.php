@@ -473,5 +473,15 @@ class BaseEntityWithFileManager
 
         return null;
     }
+
+    /**
+     * Get webpath
+     *
+     * @return string
+     */
+    public function getWebPath()
+    {
+        return $this->webPath;
+    }
 }
 
