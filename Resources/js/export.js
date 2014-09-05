@@ -9,12 +9,7 @@
 goog.require('novaway.FileManager');
 
 goog.exportSymbol('novaway.FileManager', novaway.FileManager);
-goog.exportSymbol('novaway.FileManager.setData', function(data) {
-    var manager = novaway.FileManager.getInstance();
-    manager.setWebPath(/** @type {string} */ (data['webpath']));
-    manager.setImageFormats(/** @type {Object.<string, Object.<string, string|number|boolean>>} */ (data['image_formats']));
-});
-goog.exportProperty(novaway.FileManager, 'getInstance', novaway.FileManager.getInstance);
+goog.exportProperty(novaway.FileManager.prototype, 'setData', novaway.FileManager.prototype.setData);
 goog.exportProperty(novaway.FileManager.prototype, 'getPath', novaway.FileManager.prototype.getPath);
 goog.exportProperty(novaway.FileManager.prototype, 'transformPathWithFormat', novaway.FileManager.prototype.transformPathWithFormat);
 goog.exportProperty(novaway.FileManager.prototype, 'getFilePath', novaway.FileManager.prototype.getFilePath);

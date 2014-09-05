@@ -13,6 +13,14 @@ novaway.FileManager = function(webpath, imageFormats) {
 };
 
 /**
+ * @param {Object} data
+ */
+novaway.FileManager.prototype.setData = function(data) {
+    this.setWebPath(data['webpath']);
+    this.setImageFormats(data['image_formats']);
+};
+
+/**
  * @param {Object.<string, string|number|boolean>} obj
  * @param {string} propertyName
  * @param {string} format
