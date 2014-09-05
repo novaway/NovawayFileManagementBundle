@@ -18,4 +18,5 @@ before_script:
   - composer install --dev --prefer-dist --no-interaction
 
 script:
-  vendor/bin/atoum
+  - vendor/bin/atoum
+  - phantomjs Resources/js/run_jsunit.js Resources/js/manager_test.html
