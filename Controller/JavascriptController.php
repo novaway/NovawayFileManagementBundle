@@ -15,7 +15,7 @@ use Symfony\Component\Routing\Annotation\Route;
 class JavascriptController extends Controller
 {
     /**
-     * @Route("/js/filemanager.{_format}", requirements={"id" = "json"}, name="novaway_filemanagement_routing_js", defaults={"_format"="js"})
+     * @Route("/js/filemanager.{_format}", name="novaway_filemanagement_routing_js", defaults={"_format"="js"})
      */
     public function indexAction(Request $request, $_format)
     {
