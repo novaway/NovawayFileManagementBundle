@@ -10,6 +10,9 @@ use Doctrine\ORM\EntityManager;
  */
 class BaseEntityWithFileManager
 {
+    const OPERATION_COPY = 'copy';
+    const OPERATION_RENAME = 'rename';
+
     /**
      * Stores the file path
      *
@@ -434,14 +437,12 @@ class BaseEntityWithFileManager
      *
      * @return array|null An array containing informations about the copied file
      */
-    public function replaceFile(BaseEntityWithFile $entity, $propertyName, $sourceFilepath, $destFilepath = null, $operation = 'copy')
+    public function replaceFile(BaseEntityWithFile $entity, $propertyName, $sourceFilepath, $destFilepath = null, $operation = self::OPERATION_COPY)
     {
-        if (!in_array($operation, array('copy', 'rename'))) {
-            throw new \InvalidArgumentException('$operation only accept "copy" or "rename" value');
+        if (!in_array($operation, array(self::OPERATION_COPY, self::OPERATION_RENAME))) {
+            throw new \InvalidArgumentException(sprintf('$operation only accept "%s" or "%s" value', self::OPERATION_COPY, self::OPERATION_RENAME));
         }
 
-        $propertyGetter = $this->getter($propertyName);
-        $propertyFileNameGetter = $this->getter($propertyName, true);
         $propertyFileNameSetter = $this->setter($propertyName, true);
 
         if (is_file($sourceFilepath)) {

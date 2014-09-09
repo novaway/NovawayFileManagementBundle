@@ -220,59 +220,105 @@ class BaseEntityWithImageManager extends BaseManagerTestCase
     public function testReplaceFile()
     {
         $this
-            // common usage
-            ->given(
-                touch($this->workspace.'/my-photo_original.png'),
-                touch($this->workspace.'/my-photo_format1Definition.png'),
-                touch($this->workspace.'/my-photo_format2Definition.png'),
-                $entity = $this->createMockEntity(array(
-                    'userPhoto' => $this->createMockFileType(__DIR__.'/../../data/image.png'),
-                    'userPhotoFilename' => 'my-photo_{-imgformat-}.png',
-                ),
-                $entityManager = $this->createMockEntityManager())
-            )
-            ->if(
-                $testedClass = $this->createTestedClassInstance(array(
-                    'bundle.web' => $this->workspace.'/',
-                    'bundle.root' => $this->workspace.'/',
-                    'userPhoto' => '/{-origin-}_{-imgformat-}.{-ext-}',
-                ), $entityManager)
-            )
-            ->when($fileProperties = $testedClass->replaceFile($entity, 'userPhoto', __DIR__.'/../../data/image.png'))
-            ->then
-                ->array($fileProperties)
-                    ->hasKeys(array('extension', 'original', 'size', 'mime'))
-                    ->string['extension']->isEqualTo('png')
-                    ->string['original']->isEqualTo('image.png')
-                    ->integer['size']->isGreaterThan(0)
-                ->boolean(file_exists($this->workspace.'/my-photo_original.png'))->isFalse()
-                ->boolean(file_exists($this->workspace.'/my-photo_format1Definition.png'))->isFalse()
-                ->boolean(file_exists($this->workspace.'/my-photo_format2Definition.png'))->isFalse()
-                ->string($entity->getUserPhotoFilename())->isEqualTo('/image_{-imgformat-}.png')
-                ->boolean(file_exists($this->workspace.'/image_original.png'))->isTrue()
-                ->boolean(file_exists($this->workspace.'/image_format1Definition.png'))->isTrue()
-                ->boolean(file_exists($this->workspace.'/image_format2Definition.png'))->isTrue()
+            ->assert('BaseEntityWithImageManager::replaceFile common usage')
+                ->given(
+                    touch($this->workspace.'/my-photo_original.png'),
+                    touch($this->workspace.'/my-photo_format1Definition.png'),
+                    touch($this->workspace.'/my-photo_format2Definition.png'),
+                    $entity = $this->createMockEntity(array(
+                        'userPhoto' => $this->createMockFileType(__DIR__.'/../../data/image.png'),
+                        'userPhotoFilename' => 'my-photo_{-imgformat-}.png',
+                    ),
+                    $entityManager = $this->createMockEntityManager())
+                )
+                ->if(
+                    $testedClass = $this->createTestedClassInstance(array(
+                        'bundle.web' => $this->workspace.'/',
+                        'bundle.root' => $this->workspace.'/',
+                        'userPhoto' => '/{-origin-}_{-imgformat-}.{-ext-}',
+                    ), $entityManager)
+                )
+                ->when($fileProperties = $testedClass->replaceFile($entity, 'userPhoto', __DIR__.'/../../data/image.png'))
+                ->then
+                    ->array($fileProperties)
+                        ->hasKeys(array('extension', 'original', 'size', 'mime'))
+                        ->string['extension']->isEqualTo('png')
+                        ->string['original']->isEqualTo('image.png')
+                        ->integer['size']->isGreaterThan(0)
+                    ->boolean(file_exists($this->workspace.'/my-photo_original.png'))->isFalse()
+                    ->boolean(file_exists($this->workspace.'/my-photo_format1Definition.png'))->isFalse()
+                    ->boolean(file_exists($this->workspace.'/my-photo_format2Definition.png'))->isFalse()
+                    ->string($entity->getUserPhotoFilename())->isEqualTo('/image_{-imgformat-}.png')
+                    ->boolean(file_exists($this->workspace.'/image_original.png'))->isTrue()
+                    ->boolean(file_exists($this->workspace.'/image_format1Definition.png'))->isTrue()
+                    ->boolean(file_exists($this->workspace.'/image_format2Definition.png'))->isTrue()
 
-           // replaceFile with destination file path
-            ->given(
-                mkdir($this->workspace.'/dir'),
-                touch($this->workspace.'/my-photo_original.png'),
-                touch($this->workspace.'/my-photo_format1Definition.png'),
-                touch($this->workspace.'/my-photo_format2Definition.png'),
-                $entity = $this->createMockEntity(array(
-                    'userPhoto' => $this->createMockFileType(__DIR__.'/../../data/image.png'),
-                    'userPhotoFilename' => 'my-photo_{-imgformat-}.png',
-                ))
-            )
-            ->when($testedClass->replaceFile($entity, 'userPhoto', __DIR__.'/../../data/image.png', '/dir1/dir2/replacement_{-imgformat-}.png'))
-            ->then
-                ->boolean(file_exists($this->workspace.'/my-photo_original.png'))->isFalse()
-                ->boolean(file_exists($this->workspace.'/my-photo_format1Definition.png'))->isFalse()
-                ->boolean(file_exists($this->workspace.'/my-photo_format2Definition.png'))->isFalse()
-                ->string($entity->getUserPhotoFilename())->isEqualTo('/dir1/dir2/replacement_{-imgformat-}.png')
-                ->boolean(file_exists($this->workspace.'/dir1/dir2/replacement_original.png'))->isTrue()
-                ->boolean(file_exists($this->workspace.'/dir1/dir2/replacement_format1Definition.png'))->isTrue()
-                ->boolean(file_exists($this->workspace.'/dir1/dir2/replacement_format2Definition.png'))->isTrue()
+            ->assert('BaseEntityWithImageManager::replaceFile with destination file path')
+                ->given(
+                    mkdir($this->workspace.'/dir'),
+                    touch($this->workspace.'/my-photo_original.png'),
+                    touch($this->workspace.'/my-photo_format1Definition.png'),
+                    touch($this->workspace.'/my-photo_format2Definition.png'),
+                    $entity = $this->createMockEntity(array(
+                        'userPhoto' => $this->createMockFileType(__DIR__.'/../../data/image.png'),
+                        'userPhotoFilename' => 'my-photo_{-imgformat-}.png',
+                    ))
+                )
+                ->if(
+                    $testedClass = $this->createTestedClassInstance(array(
+                        'bundle.web' => $this->workspace.'/',
+                        'bundle.root' => $this->workspace.'/',
+                        'userPhoto' => '/{-origin-}_{-imgformat-}.{-ext-}',
+                    ), $entityManager)
+                )
+                ->when($testedClass->replaceFile($entity, 'userPhoto', __DIR__.'/../../data/image.png', '/dir1/dir2/replacement_{-imgformat-}.png'))
+                ->then
+                    ->boolean(file_exists($this->workspace.'/my-photo_original.png'))->isFalse()
+                    ->boolean(file_exists($this->workspace.'/my-photo_format1Definition.png'))->isFalse()
+                    ->boolean(file_exists($this->workspace.'/my-photo_format2Definition.png'))->isFalse()
+                    ->string($entity->getUserPhotoFilename())->isEqualTo('/dir1/dir2/replacement_{-imgformat-}.png')
+                    ->boolean(file_exists($this->workspace.'/dir1/dir2/replacement_original.png'))->isTrue()
+                    ->boolean(file_exists($this->workspace.'/dir1/dir2/replacement_format1Definition.png'))->isTrue()
+                    ->boolean(file_exists($this->workspace.'/dir1/dir2/replacement_format2Definition.png'))->isTrue()
+
+            ->assert('BaseEntityWithImageManager::replaceFile with $operation operation = "move"')
+                ->given(
+                    mkdir($this->workspace.'/dest'),
+                    touch($this->workspace.'/my-photo_original.png'),
+                    touch($this->workspace.'/my-photo_format1Definition.png'),
+                    touch($this->workspace.'/my-photo_format2Definition.png'),
+                    copy(__DIR__.'/../../data/image.png', $this->workspace.'/image.png'),
+                    $entity = $this->createMockEntity(array(
+                        'userPhoto' => $this->createMockFileType($this->workspace.'/image.png'),
+                        'userPhotoFilename' => 'my-photo_{-imgformat-}.png',
+                    ))
+                )
+                ->if(
+                    $testedClass = $this->createTestedClassInstance(array(
+                        'bundle.web' => $this->workspace.'/',
+                        'bundle.root' => $this->workspace.'/',
+                        'userPhoto' => '/{-origin-}_{-imgformat-}.{-ext-}',
+                    ), $entityManager)
+                )
+                ->when($testedClass->replaceFile($entity, 'userPhoto', $this->workspace.'/image.png', $this->workspace.'/dest/replacement_{-imgformat-}.png', Manager\BaseEntityWithImageManager::OPERATION_RENAME))
+                ->then
+                    ->boolean(file_exists($this->workspace.'/my-photo_original.png'))->isFalse()
+                    ->boolean(file_exists($this->workspace.'/my-photo_format1Definition.png'))->isFalse()
+                    ->boolean(file_exists($this->workspace.'/my-photo_format2Definition.png'))->isFalse()
+                    ->string($entity->getUserPhotoFilename())->isEqualTo($this->workspace.'/dest/replacement_{-imgformat-}.png')
+                    ->boolean(file_exists($this->workspace.'/image.png'))->isFalse()
+
+            ->assert('BaseEntityWithImageManager::replaceFile with invalid file')
+                ->if(
+                    $testedClass = $this->createTestedClassInstance(array(
+                        'bundle.web' => $this->workspace.'/',
+                        'bundle.root' => $this->workspace.'/',
+                        'userPhoto' => '/{-origin-}_{-imgformat-}.{-ext-}',
+                    ), $entityManager)
+                )
+                ->when($fileProperties = $testedClass->replaceFile($entity, 'userFile', $this->workspace.'/invalid-file.txt'))
+                ->then
+                    ->variable($fileProperties)->isNull()
         ;
     }
 
@@ -311,7 +357,7 @@ class BaseEntityWithImageManager extends BaseManagerTestCase
         );
     }
 
-    private function createTestedClassInstance(array $filepaths, $entityManager = null, $filesystem = null)
+    private function createTestedClassInstance(array $filepaths, $entityManager = null)
     {
         if (null === $entityManager) {
             $entityManager = $this->createMockEntityManager();

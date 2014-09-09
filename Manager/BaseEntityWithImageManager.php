@@ -275,10 +275,12 @@ class BaseEntityWithImageManager extends BaseEntityWithFileManager
      *
      * @return array|null An array containing informations about the copied file
      */
-    public function replaceFile(BaseEntityWithFile $entity, $propertyName, $sourceFilepath, $destFilepath = null, $operation = 'copy')
+    public function replaceFile(BaseEntityWithFile $entity, $propertyName, $sourceFilepath, $destFilepath = null, $operation = self::OPERATION_COPY)
     {
-        $propertyGetter = $this->getter($propertyName);
-        $propertyFileNameGetter = $this->getter($propertyName, true);
+        if (!in_array($operation, array(self::OPERATION_COPY, self::OPERATION_RENAME))) {
+            throw new \InvalidArgumentException(sprintf('$operation only accept "%s" or "%s" value', self::OPERATION_COPY, self::OPERATION_RENAME));
+        }
+
         $propertyFileNameSetter = $this->setter($propertyName, true);
 
         if (is_file($sourceFilepath)) {
@@ -310,6 +312,13 @@ class BaseEntityWithImageManager extends BaseEntityWithFileManager
             $fileInfo['original'] = pathinfo($sourceFilepath, PATHINFO_BASENAME);
             $fileInfo['size'] = filesize($sourceFilepath);
             $fileInfo['mime'] = mime_content_type($sourceFilepath);
+
+            // to simplfy image processing operation, this method works on uploaded file
+            // in case developer decided to move uploaded file, we need to delete $sourceFilepath
+            // after this process
+            if (self::OPERATION_RENAME === $operation) {
+                unlink($sourceFilepath);
+            }
 
             return $fileInfo;
         }
