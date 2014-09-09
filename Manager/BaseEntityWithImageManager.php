@@ -326,4 +326,13 @@ class BaseEntityWithImageManager extends BaseEntityWithFileManager
         return null;
     }
 
+    /**
+     * Get image format choices
+     *
+     * @return array
+     */
+    public function getImageFormatChoices()
+    {
+        return $this->imageFormatChoices;
+    }
 }

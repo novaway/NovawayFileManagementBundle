@@ -10,6 +10,7 @@
 * [Working with image](03-working-with-image.md)
 * [Usage in Twig template](04-use-in-twig-template.md)
 * [The image form field](05-image-form-field.md)
+* [Working with Javascript manager](06-javascript-manager.md)
 
 ## Reference
 

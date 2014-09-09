@@ -1,0 +1,7 @@
+/**
+ * Portions of this code are from the Google Closure Library,
+ * received from the Closure Authors under the Apache 2.0 license.
+ *
+ * All other code is (C) Novaway and subject to the MIT license.
+ */
+(function() {var b=Array.prototype,e=b.indexOf?function(a,d,c){return b.indexOf.call(a,d,c)}:function(a,d,c){c=null==c?0:0>c?Math.max(0,a.length+c):c;if("string"==typeof a)return"string"==typeof d&&1==d.length?a.indexOf(d,c):-1;for(;c<a.length;c++)if(c in a&&a[c]===d)return c;return-1};function f(a,d){this.f=a||"";this.b=d||{}}f.prototype.setData=function(a){this.d(a.webpath);this.c(a.image_formats)};f.prototype.g=function(a,d,c){if(!c)return this.a(a,d);if(!(0<=e(this.b[d],c)))throw Error('The format "'+c+'" does not exist.');return this.e(this.a(a,d),c)};f.prototype.e=function(a,d){return a.replace("{-imgformat-}",d)};f.prototype.a=function(a,d){return this.f+a[d]+""};f.prototype.d=function(a){this.f=a};f.prototype.c=function(a){this.b=a};var g=["novaway","FileManager"],h=this;g[0]in h||!h.execScript||h.execScript("var "+g[0]);for(var k;g.length&&(k=g.shift());)g.length||void 0===f?h=h[k]?h[k]:h[k]={}:h[k]=f;f.prototype.setData=f.prototype.setData;f.prototype.getPath=f.prototype.g;f.prototype.transformPathWithFormat=f.prototype.e;f.prototype.getFilePath=f.prototype.a;f.prototype.setWebPath=f.prototype.d;f.prototype.setImageFormats=f.prototype.c;})();
