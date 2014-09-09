@@ -5,12 +5,25 @@
 Simply run assuming you have installed composer (composer.phar or composer binary) :
 
 ``` bash
-$ php composer.phar require novaway/filemanagementbundle 1.*
+$ php composer.phar require novaway/filemanagementbundle "2.*"
 ```
 
 ### Configuration
 
-In your *config.yml* file, you may need to set up the upload root path (realtive to symfony *web* path)
+Register the bundle in `app/AppKernel.php`:
+
+``` php
+// app/AppKernel.php
+public function registerBundles()
+{
+    return array(
+        // ...
+        new \Novaway\Bundle\FileManagementBundle\NovawayFileManagementBundle(),
+    );
+}
+```
+
+In your *app/config.yml* file, you may need to set up the upload root path (relative to symfony *web* path)
 
 ```yaml
 novaway_file_management :
