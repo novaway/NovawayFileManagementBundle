@@ -64,10 +64,11 @@ class ImageType extends BaseManagerTestCase{
      */
     public function testBuildViewWithPreview($format, $updateCache, $updatedAt, $expectedUrlRegex)
     {
-        $entityProperties = array('pictureFilename' => 'my-photo-{-imgformat-}.png');
-        if ($updatedAt) {
-           $entityProperties['updatedAt'] = $updatedAt;
-        }
+        $entityProperties = array(
+            'pictureFilename' => 'my-photo-{-imgformat-}.png',
+            'updatedAt' => $updatedAt,
+        );
+
         $view = new \mock\Symfony\Component\Form\FormView();
         $form = $this->getMockForm('picture', $entityProperties);
 

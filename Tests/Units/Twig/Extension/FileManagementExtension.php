@@ -55,8 +55,8 @@ class FileManagementExtension extends atoum\test
     public function testImagepath()
     {
         $this
-            ->if(
-                $testedClass = $this->createTestedClassInstance(),
+            ->if($testedClass = $this->createTestedClassInstance())
+            ->given(
                 $myEntity = $this->createEntityMock(array(
                     'nullPhotoFilename' => null,
                     'photoFilename' => '/my-photo.png',
@@ -64,19 +64,45 @@ class FileManagementExtension extends atoum\test
                 ))
             )
             ->then
-                ->variable($testedClass->imagepath($myEntity, 'nullPhoto', 'mini'))
+                ->variable($testedClass->imagepath($myEntity, 'nullPhoto', 'mini', false))
                     ->isNull()
-                ->string($testedClass->imagepath($myEntity, 'photo', 'mini'))
+                ->string($testedClass->imagepath($myEntity, 'photo', 'mini', false))
                     ->isEqualTo('/mydir/my-photo.png')
-                ->string($testedClass->imagepath($myEntity, 'photoWithFormat', 'mini'))
+                ->string($testedClass->imagepath($myEntity, 'photoWithFormat', 'mini', false))
                     ->isEqualTo('/mydir/picture-mini.jpg')
-                ->string($testedClass->imagepath($myEntity, 'photoWithFormat', 'normal'))
+                ->string($testedClass->imagepath($myEntity, 'photoWithFormat', 'normal', false))
                     ->isEqualTo('/mydir/picture-normal.jpg')
+                ->string($testedClass->imagepath($myEntity, 'photo', 'mini'))
+                    ->match('#^\/mydir\/my-photo.png\?v=\d+$#')
                 ->exception(function() use ($testedClass, $myEntity) {
                     $testedClass->filepath($myEntity, 'undefinedField');
                 })
                     ->isInstanceOf('Symfony\Component\PropertyAccess\Exception\NoSuchPropertyException')
                     ->hasCode(0)
+            ->given(
+                $updatedAt = new \DateTime(),
+                $updatedAt->setTimestamp(1408526830),
+                $myEntity = $this->createEntityMock(array(
+                    'nullPhotoFilename' => null,
+                    'photoFilename' => '/my-photo.png',
+                    'photoWithFormatFilename' => '/picture-{-imgformat-}.jpg',
+                    'updatedAt' => $updatedAt,
+                ))
+            )
+            ->then
+                ->string($testedClass->imagepath($myEntity, 'photo', 'mini'))
+                    ->isEqualTo('/mydir/my-photo.png?v=1408526830')
+            ->given(
+                $myEntity = $this->createEntityMock(array(
+                    'nullPhotoFilename' => null,
+                    'photoFilename' => '/my-photo.png',
+                    'photoWithFormatFilename' => '/picture-{-imgformat-}.jpg',
+                    'updatedAt' => null,
+                ))
+            )
+            ->then
+                ->string($testedClass->imagepath($myEntity, 'photo', 'mini'))
+                    ->match('#^\/mydir\/my-photo.png\?v=\d+$#')
         ;
     }
 
