@@ -63,7 +63,7 @@ class ImageType extends AbstractType
 
             if ($options['update_cache'] === true) {
                 $imagePath .= sprintf('?v=%d',
-                    $accessor->isReadable($parentData, 'updatedAt') ?
+                    $accessor->isReadable($parentData, 'updatedAt') && $accessor->getValue($parentData, 'updatedAt') instanceof \DateTime ?
                         $accessor->getValue($parentData, 'updatedAt')->format('U') :
                         date('U')
                 );

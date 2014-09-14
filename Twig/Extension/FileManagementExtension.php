@@ -45,8 +45,12 @@ class FileManagementExtension extends \Twig_Extension
             return null;
         }
 
-        if ($updateCache && $this->accessor->isReadable($entity, 'updatedAt')) {
-            $pathTemplate .= '?v='.$this->accessor->getValue($entity, 'updatedAt')->format('U');
+        if ($updateCache) {
+            $pathTemplate .= sprintf('?v=%s',
+                $this->accessor->isReadable($entity, 'updatedAt') && $this->accessor->getValue($entity, 'updatedAt') instanceof \DateTime ?
+                    $this->accessor->getValue($entity, 'updatedAt')->format('U') :
+                    date('U')
+            );
         }
 
         return str_replace('{-imgformat-}', $format, $pathTemplate);
