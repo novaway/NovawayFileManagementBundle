@@ -67,7 +67,9 @@ class BaseEntityWithFileManager
             $this->rootPath = $arrayFilepath['bundle.root'];
             unset($arrayFilepath['bundle.root']);
         } else {
-            $this->rootPath = __DIR__.'/../../../../../../../web'.$this->webPath;
+            $reflexionObject = new \ReflectionObject($this);
+            $classDir        = dirname($reflexionObject->getFileName());
+            $this->rootPath  = $classDir.'/../../../../../../../web'.$this->webPath;
         }
         $this->arrayFilepath = $arrayFilepath;
     }
