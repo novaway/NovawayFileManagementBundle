@@ -3,7 +3,6 @@
 namespace Novaway\Bundle\FileManagementBundle\Manager;
 
 use Novaway\Bundle\FileManagementBundle\Entity\BaseEntityWithFile;
-use Doctrine\ORM\EntityManager;
 
 /**
  * Extend your managers with this class to add File management.
