@@ -4,8 +4,6 @@ namespace Novaway\Bundle\FileManagementBundle\Manager;
 
 use Novaway\Bundle\FileManagementBundle\Entity\BaseEntityWithFile;
 
-//use PHPImageWorkshop\ImageWorkshop;
-
 /**
  * Novaway\Bundle\FileManagementBundle\Manager\BaseEntityWithFileManager
  *

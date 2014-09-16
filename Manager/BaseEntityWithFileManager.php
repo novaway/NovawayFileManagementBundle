@@ -3,7 +3,6 @@
 namespace Novaway\Bundle\FileManagementBundle\Manager;
 
 use Novaway\Bundle\FileManagementBundle\Entity\BaseEntityWithFile;
-use Doctrine\ORM\EntityManager;
 
 /**
  * Extend your managers with this class to add File management.
@@ -67,7 +66,9 @@ class BaseEntityWithFileManager
             $this->rootPath = $arrayFilepath['bundle.root'];
             unset($arrayFilepath['bundle.root']);
         } else {
-            $this->rootPath = __DIR__.'/../../../../../../../web'.$this->webPath;
+            $reflexionObject = new \ReflectionObject($this);
+            $classDir        = dirname($reflexionObject->getFileName());
+            $this->rootPath  = $classDir.'/../../../../../../../web'.$this->webPath;
         }
         $this->arrayFilepath = $arrayFilepath;
     }
