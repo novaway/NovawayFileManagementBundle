@@ -1,6 +1,7 @@
 # Novaway FileManagementBundle
 
 [![Build Status](https://travis-ci.org/novaway/NovawayFileManagementBundle.svg)](https://travis-ci.org/novaway/NovawayFileManagementBundle)
+[![SensioLabsInsight](https://insight.sensiolabs.com/projects/05c5f0dc-60bb-4f9c-8ace-621777d754a4/mini.png)](https://insight.sensiolabs.com/projects/05c5f0dc-60bb-4f9c-8ace-621777d754a4)
 
 ### Compatibility
 
