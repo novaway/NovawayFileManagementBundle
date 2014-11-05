@@ -9,6 +9,77 @@ use PHPImageWorkshop\ImageWorkshop;
  */
 class ResizeManager
 {
+    /** @var array */
+    private $imageFormatDefinition;
+
+    /** @var array|null */
+    private $defaultConfiguration;
+
+    /**
+     * Constructor
+     *
+     * @param array      $imageFormatDefinition Associative array to define image properties which be stored on filesystem
+     * @param array|null $defaultConfiguration  Default manager configuration
+     */
+    public function __construct($imageFormatDefinition, $defaultConfiguration = null)
+    {
+        $this->imageFormatDefinition = array_merge($imageFormatDefinition, array('original' => null));
+
+        $this->defaultConfiguration = $defaultConfiguration;
+        if (null === $this->defaultConfiguration) {
+            $this->defaultConfiguration = array(
+                'fallback' => array(                    // -- Default options when not overriden --
+                    'size'             => 0,            // Square size (set to 0 if not square)
+                    'width'            => 0,            // Width (if not square)
+                    'height'           => 0,            // Height (if not square)
+                    'max_size'         => 0,            // Resize to fit square at maximum
+                    'max_width'        => 0,            // Resize to fit non square at maximum
+                    'max_height'       => 0,            // Resize to fit non square at maximum
+                    'crop'             => false,        // Crop image
+                    'crop_position'    => 'MM',         // Crop image position (L = left, T = top, M = middle, B = bottom, R = right)
+                    'quality'          => 85,           // Output image quality (from 0 to 100)
+                    'enlarge'          => false,        // Enlarge image when source is smaller than output. Fill with bg_color when false
+                    'trim_bg'          => false,        // Remove the background color when not enlarging
+                    'keep_proportions' => true,         // Keep source image proportions (and fill with blank if needed)
+                    'bg_color'         => '#FFFFFF',    // Background color when image does not fill expected output size
+                ),
+                'thumbnail' => array('size' => 100, 'crop' => true),
+            );
+        }
+    }
+
+    /**
+     * Manipulates image according to image format definitons
+     *
+     * @param string $sourcePath
+     * @param string $destPathWithFormat
+     * @param string $format
+     */
+    public function transform($sourcePath, $destPathWithFormat, $format)
+    {
+        $confPerso = isset($this->imageFormatDefinition[$format]) ? $this->imageFormatDefinition[$format] : array();
+        $confDefault = isset($this->defaultConfiguration[$format]) ? $this->defaultConfiguration[$format] : array();
+        $confFallback = $this->defaultConfiguration['fallback'];
+
+        if ($format === 'original') {
+            copy($sourcePath, $destPathWithFormat);
+            return;
+        }
+
+        $dim = array_merge(
+            array('format_name' => $format),
+            $confFallback,
+            $confDefault ? $confDefault : array(),
+            $confPerso ? $confPerso : array()
+        );
+
+        if (strpos($dim['bg_color'], '#') === 0) {
+            $dim['bg_color'] = substr($dim['bg_color'],1);
+        }
+
+        ResizeManager::resize($sourcePath, $destPathWithFormat, $dim);
+    }
+
     /**
      * Resize an image
      *

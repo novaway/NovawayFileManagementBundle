@@ -194,32 +194,13 @@ class BaseEntityWithImageManager extends BaseEntityWithFileManager
      * @param string $sourcePath              The source image path
      * @param string $fileDestinationAbsolute The destination path ({-img-format-} placeholder will be updated if neeeded)
      * @param string $format                  The desired image format
-     *
-     * @return void
      */
     private function imageManipulation($sourcePath, $fileDestinationAbsolute, $format)
     {
-        $confPerso = isset($this->imageFormatDefinition[$format]) ? $this->imageFormatDefinition[$format] : null;
-        $confDefault = isset($this->defaultConf[$format]) ? $this->defaultConf[$format] : null;
-        $confFallback = $this->defaultConf['fallback'];
         $destPathWithFormat = $this->transformPathWithFormat($fileDestinationAbsolute, $format);
 
-        if ($format === 'original') {
-            copy($sourcePath, $destPathWithFormat);
-        } else {
-
-            $dim = array_merge(array('format_name' => $format),
-                               $confFallback,
-                               $confDefault ? $confDefault : array(),
-                               $confPerso ? $confPerso : array());
-
-            if (strpos($dim['bg_color'], '#') === 0) {
-                $dim['bg_color'] = substr($dim['bg_color'],1);
-            }
-
-            ResizeManager::resize($sourcePath, $destPathWithFormat, $dim);
-        }
-
+        $resizeManager = new ResizeManager($this->imageFormatDefinition, $this->defaultConf);
+        $resizeManager->transform($sourcePath, $destPathWithFormat, $format);
     }
 
     /**
