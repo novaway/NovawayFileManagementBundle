@@ -3,7 +3,9 @@
 namespace Novaway\Bundle\FileManagementBundle\Strategy\Factory;
 
 use Novaway\Bundle\FileManagementBundle\Entity\BaseEntityWithFileInterface;
+use Novaway\Bundle\FileManagementBundle\Strategy\CopyStrategy;
 use Novaway\Bundle\FileManagementBundle\Strategy\UploadStrategy;
+use Symfony\Component\HttpFoundation\File\UploadedFile;
 
 /**
  * Factory for strategy classes
@@ -30,6 +32,12 @@ class StrategyFactory implements StrategyFactoryInterface
      */
     public function create(BaseEntityWithFileInterface $entity, $propertyName)
     {
+        $propertyGetter = $entity->getter($propertyName);
+        $property = $entity->$propertyGetter();
+        if (is_string($property)) {
+            return new CopyStrategy($this->rootPath, $propertyName, $this->arrayFilepath[$propertyName]);
+        }
+
         return new UploadStrategy($this->rootPath, $propertyName, $this->arrayFilepath[$propertyName]);
     }
 
@@ -40,6 +48,9 @@ class StrategyFactory implements StrategyFactoryInterface
     {
         $strategyName = $this->getStrategyName($propertyName);
         switch ($strategyName) {
+            case 'copy':
+                return new CopyStrategy($this->rootPath, $propertyName, $this->arrayFilepath[$propertyName]);
+
             case 'upload':
                 return new UploadStrategy($this->rootPath, $propertyName, $this->arrayFilepath[$propertyName]);
         }
