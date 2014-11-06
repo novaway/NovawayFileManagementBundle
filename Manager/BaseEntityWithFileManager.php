@@ -3,6 +3,7 @@
 namespace Novaway\Bundle\FileManagementBundle\Manager;
 
 use Novaway\Bundle\FileManagementBundle\Entity\BaseEntityWithFile;
+use Novaway\Bundle\FileManagementBundle\Strategy\Factory\StrategyFactory;
 
 /**
  * Extend your managers with this class to add File management.
@@ -166,14 +167,18 @@ class BaseEntityWithFileManager
      */
     public function saveWithFiles(BaseEntityWithFile $entity, $callback = null)
     {
+        $fileAdded = false;
+        $callbackElementArray = array();
         $managedProperties = $this->getFileProperties();
 
         $entity = $this->save($entity);
-        $fileAdded = false;
-        $callbackElementArray = array();
+
+        $strategyFactory = new StrategyFactory($this->rootPath, $this->arrayFilepath);
         foreach ($managedProperties as $propertyName) {
-            $fileDestination = $this->prepareFileMove($entity, $propertyName, $callbackElementArray);
-            $fileAdded = $this->fileMove($entity, $propertyName, $fileDestination) || $fileAdded;
+            $strategy = $strategyFactory->create($propertyName);
+            $strategy->process($entity);
+
+            $callbackElementArray[$propertyName] = $strategy->getFileProperties();
         }
 
         if (is_callable($callback)) {
@@ -262,83 +267,6 @@ class BaseEntityWithFileManager
     }
 
     /**
-     * Prepare the entity for file storage
-     *
-     * @param BaseEntityWithFile $entity               The entity owning the files
-     * @param string             $propertyName         The property linked to the file
-     * @param array              $callbackElementArray Values that will be used for callback
-     *
-     * @return string The file destination name
-     */
-    protected function prepareFileMove(BaseEntityWithFile $entity, $propertyName, &$callbackElementArray)
-    {
-        $propertyGetter = $entity->getter($propertyName);
-        $propertyFileNameGetter = $entity->getter($propertyName, true);
-        $propertyFileNameSetter = $entity->setter($propertyName, true);
-
-        if (null !== $entity->$propertyGetter() && $entity->$propertyGetter()->getError() === UPLOAD_ERR_OK) {
-
-            $fileDestinationName = $this->buildDestination($entity, $propertyName);
-
-            if (is_file($this->rootPath.$entity->$propertyFileNameGetter())) {
-                unlink($this->rootPath.$entity->$propertyFileNameGetter());
-            }
-            $entity->$propertyFileNameSetter($fileDestinationName);
-
-            $callbackElementArray[$propertyName]['extension'] = pathinfo($entity->$propertyGetter()->getClientOriginalName(), PATHINFO_EXTENSION);
-            $callbackElementArray[$propertyName]['original'] = $entity->$propertyGetter()->getClientOriginalName();
-            $callbackElementArray[$propertyName]['size'] = $entity->$propertyGetter()->getClientSize();
-            $callbackElementArray[$propertyName]['mime'] = $entity->$propertyGetter()->getClientMimeType();
-
-            return $fileDestinationName;
-        }
-
-        return null;
-    }
-
-    /**
-     * Move the file from temp upload to expected path.
-     *
-     * @param BaseEntityWithFile $entity          The entity associated to the file
-     * @param string             $propertyName    The property associated to the file
-     * @param string             $fileDestination The relative directory where the file will be stored
-     *
-     * @return boolean TRUE if file move successfully, FALSE otherwise
-     */
-    protected function fileMove(BaseEntityWithFile $entity, $propertyName, $fileDestination)
-    {
-        $propertyGetter = $entity->getter($propertyName);
-        $propertySetter = $entity->setter($propertyName);
-
-        // the file property can be empty if the field is not required
-        if (null === $entity->$propertyGetter()) {
-            return false;
-        }
-
-        $destFullPath = sprintf('%s%s', $this->rootPath, $fileDestination);
-        if (preg_match(
-            '#(.+)/([^/.]+).([A-Z]{3,5})#i',
-            $destFullPath,
-            $destMatch
-            )
-        ) {
-            // move the file to the required directory
-            $entity->$propertyGetter()->move(
-                $destMatch[1],
-                $destMatch[2].'.'.$destMatch[3]);
-
-            chmod($destFullPath, 0755);
-
-            // clean up the file property as you won't need it anymore
-            $entity->$propertySetter(null);
-
-            return true;
-        }
-
-        return false;
-    }
-
-    /**
      * Removes one or several file from the entity
      *
      * @param BaseEntityWithFile $entity       The entity from witch the file will be removed
@@ -395,36 +323,35 @@ class BaseEntityWithFileManager
             throw new \InvalidArgumentException(sprintf('$operation only accept "%s" or "%s" value', self::OPERATION_COPY, self::OPERATION_RENAME));
         }
 
-        $propertyFileNameSetter = $entity->setter($propertyName, true);
-
-        if (is_file($sourceFilepath)) {
-
-            $oldDestPath = $this->getFileAbsolutePath($entity, $propertyName);
-            if (is_file($oldDestPath)) {
-                unlink($oldDestPath);
-            }
-
-            if (!$destFilepath) {
-                $destFilepath = $this->buildDestination($entity, $propertyName, $sourceFilepath);
-            }
-
-            $fileInfo['extension'] = pathinfo($sourceFilepath, PATHINFO_EXTENSION);
-            $fileInfo['original'] = pathinfo($sourceFilepath, PATHINFO_BASENAME);
-            $fileInfo['size'] = filesize($sourceFilepath);
-            $fileInfo['mime'] = mime_content_type($sourceFilepath);
-
-            $entity->$propertyFileNameSetter($destFilepath);
-            $absoluteDestFilepath = $this->getFileAbsolutePath($entity, $propertyName);
-            $absoluteDestDir = substr($absoluteDestFilepath, 0, strrpos($absoluteDestFilepath, '/'));
-            if (!is_dir($absoluteDestDir)) {
-                mkdir($absoluteDestDir, 0777, true);
-            }
-            $operation($sourceFilepath, $absoluteDestFilepath);
-
-            return $fileInfo;
+        if (!is_file($sourceFilepath)) {
+            return null;
         }
 
-        return null;
+        $propertyFileNameSetter = $entity->setter($propertyName, true);
+
+        $oldDestPath = $this->getFileAbsolutePath($entity, $propertyName);
+        if (is_file($oldDestPath)) {
+            unlink($oldDestPath);
+        }
+
+        if (!$destFilepath) {
+            $destFilepath = $this->buildDestination($entity, $propertyName, $sourceFilepath);
+        }
+
+        $fileInfo['extension'] = pathinfo($sourceFilepath, PATHINFO_EXTENSION);
+        $fileInfo['original'] = pathinfo($sourceFilepath, PATHINFO_BASENAME);
+        $fileInfo['size'] = filesize($sourceFilepath);
+        $fileInfo['mime'] = mime_content_type($sourceFilepath);
+
+        $entity->$propertyFileNameSetter($destFilepath);
+        $absoluteDestFilepath = $this->getFileAbsolutePath($entity, $propertyName);
+        $absoluteDestDir = substr($absoluteDestFilepath, 0, strrpos($absoluteDestFilepath, '/'));
+        if (!is_dir($absoluteDestDir)) {
+            mkdir($absoluteDestDir, 0777, true);
+        }
+        $operation($sourceFilepath, $absoluteDestFilepath);
+
+        return $fileInfo;
     }
 
     /**
