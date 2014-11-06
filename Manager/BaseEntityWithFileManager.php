@@ -175,7 +175,7 @@ class BaseEntityWithFileManager
 
         $strategyFactory = new StrategyFactory($this->rootPath, $this->arrayFilepath);
         foreach ($managedProperties as $propertyName) {
-            $strategy = $strategyFactory->create($propertyName);
+            $strategy = $strategyFactory->create($entity, $propertyName);
             $strategy->process($entity);
 
             $callbackElementArray[$propertyName] = $strategy->getFileProperties();

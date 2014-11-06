@@ -2,6 +2,7 @@
 
 namespace Novaway\Bundle\FileManagementBundle\Strategy\Factory;
 
+use Novaway\Bundle\FileManagementBundle\Entity\BaseEntityWithFileInterface;
 use Novaway\Bundle\FileManagementBundle\Strategy\UploadStrategy;
 
 /**
@@ -27,7 +28,15 @@ class StrategyFactory implements StrategyFactoryInterface
     /**
      * {@inheritdoc}
      */
-    public function create($propertyName)
+    public function create(BaseEntityWithFileInterface $entity, $propertyName)
+    {
+        return new UploadStrategy($this->rootPath, $propertyName, $this->arrayFilepath[$propertyName]);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function createFromArrayPath($propertyName)
     {
         $strategyName = $this->getStrategyName($propertyName);
         switch ($strategyName) {

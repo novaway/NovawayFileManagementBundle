@@ -6,13 +6,13 @@ use mageekguy\atoum;
 
 class StrategyFactory extends atoum\test
 {
-    public function testCreate()
+    public function testCreateFromArrayPath()
     {
         $this
             ->given($paths = array('myProperty' => '/path/to/prop'))
             ->if($this->newTestedInstance('/root', $paths))
             ->then
-                ->object($this->testedInstance->create('myProperty'))
+                ->object($this->testedInstance->createFromArrayPath('myProperty'))
                     ->isInstanceOf('Novaway\Bundle\FileManagementBundle\Strategy\UploadStrategy')
             ->given(
                 $paths = array(
@@ -22,9 +22,9 @@ class StrategyFactory extends atoum\test
             )
             ->if($this->newTestedInstance('/root', $paths))
             ->then
-                ->object($this->testedInstance->create('myProperty'))
+                ->object($this->testedInstance->createFromArrayPath('myProperty'))
                     ->isInstanceOf('Novaway\Bundle\FileManagementBundle\Strategy\UploadStrategy')
-                ->object($this->testedInstance->create('foo'))
+                ->object($this->testedInstance->createFromArrayPath('foo'))
                     ->isInstanceOf('Novaway\Bundle\FileManagementBundle\Strategy\UploadStrategy')
         ;
     }
