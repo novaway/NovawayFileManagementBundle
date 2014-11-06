@@ -236,7 +236,9 @@ class BaseEntityWithFileManager
         $fileDestinationName = preg_replace_callback(
             '#{slug::([^}-]+)}#i',
             function ($matches) use ($entity) {
-                return $this->slug($entity->get($matches[1]));
+                $str = strtolower(trim($entity->get($matches[1])));
+                $str = preg_replace('/[^a-z0-9-]/', '-', $str);
+                return preg_replace('/-+/', "-", $str);
             },
             $fileDestinationName);
 
@@ -292,22 +294,6 @@ class BaseEntityWithFileManager
         }
 
         return null;
-    }
-
-    /**
-     * Creates a slug from a string
-     *
-     * @param string $str The string to slug
-     *
-     * @return string The slugged string
-     */
-    public function slug($str)
-    {
-        $str = strtolower(trim($str));
-        $str = preg_replace('/[^a-z0-9-]/', '-', $str);
-        $str = preg_replace('/-+/', "-", $str);
-
-        return $str;
     }
 
     /**
