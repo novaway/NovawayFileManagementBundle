@@ -74,32 +74,6 @@ class BaseEntityWithFileManager
     }
 
     /**
-     * Build Getter string for a property
-     *
-     * @param string  $propertyName The property whose getter will bi return
-     * @param boolean $filenameOnly Set to TRUE to return the property filename getter
-     *                                  FALSE to return the getter for the property itself
-     * @return string The getter method
-     */
-    protected function getter($propertyName, $filenameOnly = false)
-    {
-        return sprintf('get%s%s', ucfirst($propertyName), $filenameOnly ? 'Filename' : '');
-    }
-
-    /**
-     * Build Setter string for a property
-     *
-     * @param string  $propertyName The property whose setter will bi return
-     * @param boolean $filenameOnly Set to TRUE to return the property filename setter
-     *                                  FALSE to return the setter for the property itself
-     * @return string The setter method
-     */
-    protected function setter($propertyName, $filenameOnly = false)
-    {
-        return sprintf('set%s%s', ucfirst($propertyName), $filenameOnly ? 'Filename' : '');
-    }
-
-    /**
      * Returns the absolute (root) filepath of a property for a specific entity
      *
      * @param BaseEntityWithFile $entity       The current entity
@@ -109,7 +83,7 @@ class BaseEntityWithFileManager
      */
     public function getFileAbsolutePath(BaseEntityWithFile $entity, $propertyName)
     {
-        $getter = $this->getter($propertyName, true);
+        $getter = $entity->getter($propertyName, true);
 
         try {
             $path = sprintf('%s%s', $this->rootPath, $entity->$getter());
@@ -130,7 +104,7 @@ class BaseEntityWithFileManager
      */
     public function getFileWebPath(BaseEntityWithFile $entity, $propertyName)
     {
-        $getter = $this->getter($propertyName, true);
+        $getter = $entity->getter($propertyName, true);
 
         try {
             $path = sprintf('%s%s', $this->webPath, $entity->$getter());
@@ -239,7 +213,7 @@ class BaseEntityWithFileManager
      */
     protected function buildDestination(BaseEntityWithFile $entity, $propertyName, $sourceFilepath = null)
     {
-        $propertyGetter = $this->getter($propertyName);
+        $propertyGetter = $entity->getter($propertyName);
         if (null === $sourceFilepath) {
             $sourceFilepath = $entity->$propertyGetter()->getClientOriginalName();
         }
@@ -296,9 +270,9 @@ class BaseEntityWithFileManager
      */
     protected function prepareFileMove(BaseEntityWithFile $entity, $propertyName, &$callbackElementArray)
     {
-        $propertyGetter = $this->getter($propertyName);
-        $propertyFileNameGetter = $this->getter($propertyName, true);
-        $propertyFileNameSetter = $this->setter($propertyName, true);
+        $propertyGetter = $entity->getter($propertyName);
+        $propertyFileNameGetter = $entity->getter($propertyName, true);
+        $propertyFileNameSetter = $entity->setter($propertyName, true);
 
         if (null !== $entity->$propertyGetter() && $entity->$propertyGetter()->getError() === UPLOAD_ERR_OK) {
 
@@ -347,8 +321,8 @@ class BaseEntityWithFileManager
      */
     protected function fileMove(BaseEntityWithFile $entity, $propertyName, $fileDestination)
     {
-        $propertyGetter = $this->getter($propertyName);
-        $propertySetter = $this->setter($propertyName);
+        $propertyGetter = $entity->getter($propertyName);
+        $propertySetter = $entity->setter($propertyName);
 
         // the file property can be empty if the field is not required
         if (null === $entity->$propertyGetter()) {
@@ -408,7 +382,7 @@ class BaseEntityWithFileManager
                 if ($doEraseFiles && is_file($path)) {
                     unlink($path);
                 }
-                $setter = $this->setter($propertyName, true);
+                $setter = $entity->setter($propertyName, true);
                 $entity->$setter(null);
             }
         }
@@ -435,7 +409,7 @@ class BaseEntityWithFileManager
             throw new \InvalidArgumentException(sprintf('$operation only accept "%s" or "%s" value', self::OPERATION_COPY, self::OPERATION_RENAME));
         }
 
-        $propertyFileNameSetter = $this->setter($propertyName, true);
+        $propertyFileNameSetter = $entity->setter($propertyName, true);
 
         if (is_file($sourceFilepath)) {
 

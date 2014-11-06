@@ -131,8 +131,8 @@ class BaseEntityWithImageManager extends BaseEntityWithFileManager
             return parent::fileMove($entity, $propertyName, $fileDestination);
         }
 
-        $propertyGetter = $this->getter($propertyName);
-        $propertySetter = $this->setter($propertyName);
+        $propertyGetter = $entity->getter($propertyName);
+        $propertySetter = $entity->setter($propertyName);
 
         // the file property can be empty if the field is not required
         if (null === $entity->$propertyGetter()) {
@@ -207,7 +207,7 @@ class BaseEntityWithImageManager extends BaseEntityWithFileManager
                     }
                 }
             }
-            $setter = $this->setter($propertyName, true);
+            $setter = $entity->setter($propertyName, true);
             $entity->$setter(null);
         }
 
@@ -233,7 +233,7 @@ class BaseEntityWithImageManager extends BaseEntityWithFileManager
             throw new \InvalidArgumentException(sprintf('$operation only accept "%s" or "%s" value', self::OPERATION_COPY, self::OPERATION_RENAME));
         }
 
-        $propertyFileNameSetter = $this->setter($propertyName, true);
+        $propertyFileNameSetter = $entity->setter($propertyName, true);
 
         if (is_file($sourceFilepath)) {
 

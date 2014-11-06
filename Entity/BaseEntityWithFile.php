@@ -10,6 +10,22 @@ namespace Novaway\Bundle\FileManagementBundle\Entity;
 abstract class BaseEntityWithFile implements BaseEntityWithFileInterface
 {
     /**
+     * {@inheritdoc}
+     */
+    public function getter($propertyName, $filenameOnly = false)
+    {
+        return sprintf('get%s%s', ucfirst($propertyName), $filenameOnly ? 'Filename' : '');
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function setter($propertyName, $filenameOnly = false)
+    {
+        return sprintf('set%s%s', ucfirst($propertyName), $filenameOnly ? 'Filename' : '');
+    }
+
+    /**
      * Magic method __call() override
      * Manages file properties getters and setters
      *
