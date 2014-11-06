@@ -26,13 +26,6 @@ class BaseEntityWithImageManager extends BaseEntityWithFileManager
     private $imageFormatChoices;
 
     /**
-     * Default manager configuration
-     *
-     * @var array $defaultConf
-     */
-    private $defaultConf;
-
-    /**
      * The manager constructor
      *
      * @param array $arrayFilepath         Associative array containing the file path for each property of the managed
@@ -46,24 +39,6 @@ class BaseEntityWithImageManager extends BaseEntityWithFileManager
         parent::__construct($arrayFilepath, $entityManager);
         $this->imageFormatDefinition = array_merge($imageFormatDefinition, array('original' => null));
         $this->imageFormatChoices = $imageFormatChoices;
-        $this->defaultConf = array(
-        'fallback' => array(                    // -- Default options when not overriden --
-            'size'             => 0,            // Square size (set to 0 if not square)
-            'width'            => 0,            // Width (if not square)
-            'height'           => 0,            // Height (if not square)
-            'max_size'         => 0,            // Resize to fit square at maximum
-            'max_width'        => 0,            // Resize to fit non square at maximum
-            'max_height'       => 0,            // Resize to fit non square at maximum
-            'crop'             => false,        // Crop image
-            'crop_position'    => 'MM',         // Crop image position (L = left, T = top, M = middle, B = bottom, R = right)
-            'quality'          => 85,           // Output image quality (from 0 to 100)
-            'enlarge'          => false,        // Enlarge image when source is smaller than output. Fill with bg_color when false
-            'trim_bg'          => false,        // Remove the background color when not enlarging
-            'keep_proportions' => true,         // Keep source image proportions (and fill with blank if needed)
-            'bg_color'         => '#FFFFFF',    // Background color when image does not fill expected output size
-        ),
-        'thumbnail' => array('size' => 100, 'crop' => true),
-        );
     }
 
     /**
@@ -194,32 +169,13 @@ class BaseEntityWithImageManager extends BaseEntityWithFileManager
      * @param string $sourcePath              The source image path
      * @param string $fileDestinationAbsolute The destination path ({-img-format-} placeholder will be updated if neeeded)
      * @param string $format                  The desired image format
-     *
-     * @return void
      */
     private function imageManipulation($sourcePath, $fileDestinationAbsolute, $format)
     {
-        $confPerso = isset($this->imageFormatDefinition[$format]) ? $this->imageFormatDefinition[$format] : null;
-        $confDefault = isset($this->defaultConf[$format]) ? $this->defaultConf[$format] : null;
-        $confFallback = $this->defaultConf['fallback'];
         $destPathWithFormat = $this->transformPathWithFormat($fileDestinationAbsolute, $format);
 
-        if ($format === 'original') {
-            copy($sourcePath, $destPathWithFormat);
-        } else {
-
-            $dim = array_merge(array('format_name' => $format),
-                               $confFallback,
-                               $confDefault ? $confDefault : array(),
-                               $confPerso ? $confPerso : array());
-
-            if (strpos($dim['bg_color'], '#') === 0) {
-                $dim['bg_color'] = substr($dim['bg_color'],1);
-            }
-
-            ResizeManager::resize($sourcePath, $destPathWithFormat, $dim);
-        }
-
+        $resizeManager = new ResizeManager($this->imageFormatDefinition);
+        $resizeManager->transform($sourcePath, $destPathWithFormat, $format);
     }
 
     /**
