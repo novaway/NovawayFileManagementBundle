@@ -83,9 +83,7 @@ class BaseEntityWithFileManager
      */
     protected function getter($propertyName, $filenameOnly = false)
     {
-        return sprintf('get%s%s',
-            ucfirst($propertyName),
-            $filenameOnly ? 'Filename' : '');
+        return sprintf('get%s%s', ucfirst($propertyName), $filenameOnly ? 'Filename' : '');
     }
 
     /**
@@ -98,9 +96,7 @@ class BaseEntityWithFileManager
      */
     protected function setter($propertyName, $filenameOnly = false)
     {
-        return sprintf('set%s%s',
-            ucfirst($propertyName),
-            $filenameOnly ? 'Filename' : '');
+        return sprintf('set%s%s', ucfirst($propertyName), $filenameOnly ? 'Filename' : '');
     }
 
     /**
@@ -196,8 +192,7 @@ class BaseEntityWithFileManager
      */
     public function saveWithFiles(BaseEntityWithFile $entity, $callback = null)
     {
-        $managedProperties = $this->arrayFilepath;
-        $managedProperties = array_keys($managedProperties);
+        $managedProperties = $this->getFileProperties();
 
         $entity = $this->save($entity);
         $fileAdded = false;
@@ -227,9 +222,7 @@ class BaseEntityWithFileManager
      */
     public function deleteWithFiles(BaseEntityWithFile $entity)
     {
-        $managedProperties = $this->arrayFilepath;
-        $managedProperties = array_keys($managedProperties);
-
+        $managedProperties = $this->getFileProperties();
         $this->removeFiles($entity, $managedProperties, true, false);
 
         return $this->delete($entity);
@@ -247,18 +240,14 @@ class BaseEntityWithFileManager
     protected function buildDestination(BaseEntityWithFile $entity, $propertyName, $sourceFilepath = null)
     {
         $propertyGetter = $this->getter($propertyName);
-
-        if ($sourceFilepath) {
-            $arrReplacement =  array(
-                    '{-ext-}' => pathinfo($sourceFilepath, PATHINFO_EXTENSION),
-                    '{-origin-}' => pathinfo($sourceFilepath, PATHINFO_FILENAME)
-                    );
-        } else {
-            $arrReplacement = array(
-                    '{-ext-}'    => pathinfo($entity->$propertyGetter()->getClientOriginalName(), PATHINFO_EXTENSION),
-                    '{-origin-}' => $this->slug(pathinfo($entity->$propertyGetter()->getClientOriginalName(), PATHINFO_FILENAME))
-                    );
+        if (null === $sourceFilepath) {
+            $sourceFilepath = $entity->$propertyGetter()->getClientOriginalName();
         }
+
+        $arrReplacement =  array(
+            '{-ext-}' => pathinfo($sourceFilepath, PATHINFO_EXTENSION),
+            '{-origin-}' => pathinfo($sourceFilepath, PATHINFO_FILENAME)
+        );
 
         if (method_exists($entity, 'getCustomPath')) {
             $arrReplacement['{-custom-}'] = $entity->getCustomPath($propertyName);
@@ -327,6 +316,8 @@ class BaseEntityWithFileManager
 
             return $fileDestinationName;
         }
+
+        return null;
     }
 
     /**
@@ -399,12 +390,12 @@ class BaseEntityWithFileManager
      */
     public function removeFiles(BaseEntityWithFile $entity, $properties = array(), $doEraseFiles = true, $doSave = true)
     {
+        if (is_string($properties)) {
+            $properties = array($properties);
+        }
+
         if (!is_array($properties)) {
-            if (is_string($properties)) {
-                $properties = array($properties);
-            } else {
-                throw new \InvalidArgumentException();
-            }
+            throw new \InvalidArgumentException();
         }
 
         if (count($properties) == 0) {

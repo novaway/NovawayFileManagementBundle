@@ -37,6 +37,7 @@ class BaseEntityWithImageManager extends BaseEntityWithFileManager
     public function __construct($arrayFilepath, $entityManager, $imageFormatDefinition, $imageFormatChoices)
     {
         parent::__construct($arrayFilepath, $entityManager);
+
         $this->imageFormatDefinition = array_merge($imageFormatDefinition, array('original' => null));
         $this->imageFormatChoices = $imageFormatChoices;
     }
@@ -68,13 +69,12 @@ class BaseEntityWithImageManager extends BaseEntityWithFileManager
      */
     public function getFileAbsolutePath(BaseEntityWithFile $entity, $propertyName, $format = null)
     {
-        if ($format) {
-            return $this->transformPathWithFormat(
-                parent::getFileAbsolutePath($entity, $propertyName),
-                $format);
-        } else {
-            return parent::getFileAbsolutePath($entity, $propertyName);
+        $path = parent::getFileAbsolutePath($entity, $propertyName);
+        if (null === $format) {
+            return $path;
         }
+
+        return $this->transformPathWithFormat($path, $format);
     }
 
     /**
@@ -88,13 +88,12 @@ class BaseEntityWithImageManager extends BaseEntityWithFileManager
      */
     public function getFileWebPath(BaseEntityWithFile $entity, $propertyName, $format = null)
     {
-        if ($format) {
-            return $this->transformPathWithFormat(
-                parent::getFileWebPath($entity, $propertyName),
-                $format);
-        } else {
-            return parent::getFileWebPath($entity, $propertyName);
+        $path = parent::getFileWebPath($entity, $propertyName);
+        if (null === $format) {
+            return $path;
         }
+
+        return $this->transformPathWithFormat($path, $format);
     }
 
     /**
@@ -109,13 +108,12 @@ class BaseEntityWithImageManager extends BaseEntityWithFileManager
      */
     protected function buildDestination(BaseEntityWithFile $entity, $propertyName, $sourceFilepath = null, $format = null)
     {
-        if ($format) {
-            return $this->transformPathWithFormat(
-                parent::buildDestination($entity, $propertyName, $sourceFilepath),
-                $format);
-        } else {
-            return parent::buildDestination($entity, $propertyName, $sourceFilepath);
+        $destination = parent::buildDestination($entity, $propertyName, $sourceFilepath);
+        if ($format === null) {
+            return $destination;
         }
+
+        return $this->transformPathWithFormat($destination, $format);
     }
 
     /**
@@ -188,12 +186,12 @@ class BaseEntityWithImageManager extends BaseEntityWithFileManager
      */
     public function removeFiles(BaseEntityWithFile $entity, $properties = array(), $doEraseFiles = true, $doSave = true)
     {
+        if (is_string($properties)) {
+            $properties = array($properties);
+        }
+
         if (!is_array($properties)) {
-            if (is_string($properties)) {
-                $properties = array($properties);
-            } else {
-                throw new \InvalidArgumentException();
-            }
+            throw new \InvalidArgumentException();
         }
 
         if (count($properties) == 0) {
