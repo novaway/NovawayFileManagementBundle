@@ -4,6 +4,7 @@ namespace Novaway\Bundle\FileManagementBundle\Manager;
 
 use Novaway\Bundle\FileManagementBundle\Entity\BaseEntityWithFile;
 use Novaway\Bundle\FileManagementBundle\Strategy\Factory\StrategyFactory;
+use Novaway\Bundle\FileManagementBundle\Strategy\Factory\StrategyFactoryInterface;
 
 /**
  * Extend your managers with this class to add File management.
@@ -44,6 +45,13 @@ class BaseEntityWithFileManager
     protected $entityManager;
 
     /**
+     * Factory for strategy
+     *
+     * @var StrategyFactoryInterface
+     */
+    protected $strategyFactory;
+
+    /**
      * The manager constructor
      *
      * @param array $arrayFilepath Associative array containing the file
@@ -52,8 +60,9 @@ class BaseEntityWithFileManager
      *                               'root' and a 'web' path.
      * @param mixed $entityManager The entity manager used to persist
      *                               and save data.
+     * @param StrategyFactoryInterface $strategyFactory
      */
-    public function __construct($arrayFilepath, $entityManager)
+    public function __construct($arrayFilepath, $entityManager, StrategyFactoryInterface $strategyFactory = null)
     {
         if (!isset($arrayFilepath['bundle.web'])) {
             throw new \InvalidArgumentException('$arrayFilepath must have a bundle.web key (even empty).');
@@ -72,6 +81,11 @@ class BaseEntityWithFileManager
             $this->rootPath  = $classDir.'/../../../../../../../web'.$this->webPath;
         }
         $this->arrayFilepath = $arrayFilepath;
+
+        $this->strategyFactory = $strategyFactory;
+        if (null === $this->strategyFactory) {
+            $this->strategyFactory = new StrategyFactory($this->rootPath, $this->arrayFilepath);
+        }
     }
 
     /**
@@ -173,9 +187,8 @@ class BaseEntityWithFileManager
 
         $entity = $this->save($entity);
 
-        $strategyFactory = new StrategyFactory($this->rootPath, $this->arrayFilepath);
         foreach ($managedProperties as $propertyName) {
-            $strategy = $strategyFactory->create($entity, $propertyName);
+            $strategy = $this->strategyFactory->create($entity, $propertyName);
             $strategy->process($entity);
 
             $callbackElementArray[$propertyName] = $strategy->getFileProperties();

@@ -10,14 +10,6 @@ use Novaway\Bundle\FileManagementBundle\Entity\BaseEntityWithFileInterface;
 interface StrategyFactoryInterface
 {
     /**
-     * Constructor
-     *
-     * @param string $rootPath
-     * @param array  $arrayFilepath
-     */
-    public function __construct($rootPath, array $arrayFilepath);
-
-    /**
      * Create a strategy by detecting entity field type
      *
      * @param BaseEntityWithFileInterface $entity

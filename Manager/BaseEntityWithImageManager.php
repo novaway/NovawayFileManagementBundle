@@ -3,6 +3,8 @@
 namespace Novaway\Bundle\FileManagementBundle\Manager;
 
 use Novaway\Bundle\FileManagementBundle\Entity\BaseEntityWithFile;
+use Novaway\Bundle\FileManagementBundle\Strategy\Factory\StrategyFactoryInterface;
+use Novaway\Bundle\FileManagementBundle\Strategy\Factory\StrategyImageFactory;
 
 /**
  * Novaway\Bundle\FileManagementBundle\Manager\BaseEntityWithFileManager
@@ -33,13 +35,18 @@ class BaseEntityWithImageManager extends BaseEntityWithFileManager
      * @param mixed $entityManager         The entity manager used to persist and save data.
      * @param array $imageFormatDefinition Associative array to define image properties which be stored on filesystem
      * @param array $imageFormatChoices    Associative array to apply some format definitions to an entity property
+     * @param StrategyFactoryInterface $strategyFactory
      */
-    public function __construct($arrayFilepath, $entityManager, $imageFormatDefinition, $imageFormatChoices)
+    public function __construct($arrayFilepath, $entityManager, $imageFormatDefinition, $imageFormatChoices, StrategyFactoryInterface $strategyFactory = null)
     {
-        parent::__construct($arrayFilepath, $entityManager);
+        parent::__construct($arrayFilepath, $entityManager, $strategyFactory);
 
         $this->imageFormatDefinition = array_merge($imageFormatDefinition, array('original' => null));
         $this->imageFormatChoices = $imageFormatChoices;
+
+        if (null === $strategyFactory) {
+            $this->strategyFactory = new StrategyImageFactory($this->rootPath, $this->arrayFilepath, $this->imageFormatDefinition, $this->imageFormatChoices);
+        }
     }
 
     /**
@@ -114,51 +121,6 @@ class BaseEntityWithImageManager extends BaseEntityWithFileManager
         }
 
         return $this->transformPathWithFormat($destination, $format);
-    }
-
-    /**
-     * Move the file from temp upload to expected path.
-     *
-     * @param BaseEntityWithFile $entity          The entity associated to the file
-     * @param string             $propertyName    The property associated to the file
-     * @param string             $fileDestination The relative directory where the file will be stored
-     *
-     * @return boolean TRUE if file move successfully, FALSE otherwise
-     */
-    protected function fileMove(BaseEntityWithFile $entity, $propertyName, $fileDestination)
-    {
-        if (!isset($this->imageFormatChoices[$propertyName])) {
-            return parent::fileMove($entity, $propertyName, $fileDestination);
-        }
-
-        $propertyGetter = $entity->getter($propertyName);
-        $propertySetter = $entity->setter($propertyName);
-
-        // the file property can be empty if the field is not required
-        if (null === $entity->$propertyGetter()) {
-            return false;
-        }
-
-        $fileDestinationAbsolute = sprintf('%s%s', $this->rootPath, $fileDestination);
-        if (preg_match('#(.+)/([^/.]+).([A-Z]{3,5})#i', $fileDestinationAbsolute, $destMatch)) {
-
-            $tmpDir = sprintf('%s%s', $this->rootPath, 'tmp');
-            $tmpName = uniqid().rand(0,999).'.'.$destMatch[3];
-            $tmpPath = $tmpDir.'/'.$tmpName;
-
-            $entity->$propertyGetter()->move($tmpDir,$tmpName);
-
-            foreach ($this->imageFormatChoices[$propertyName] as $format) {
-                $this->imageManipulation($tmpPath, $fileDestinationAbsolute, $format);
-            }
-
-            unlink($tmpPath);
-            $entity->$propertySetter(null);
-
-            return true;
-        }
-
-        return false;
     }
 
     /**

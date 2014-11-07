@@ -92,6 +92,11 @@ class CopyStrategy extends AbstractStrategy
             return $entity->get($matches[1]);
         }, $fileDestinationName);
 
+        // @TODO: potential risky
+        if (false !== strpos($fileDestinationName, '?')) {
+            $fileDestinationName = substr($fileDestinationName, 0, strpos($fileDestinationName, '?'));
+        }
+
         return $fileDestinationName;
     }
 
@@ -117,7 +122,7 @@ class CopyStrategy extends AbstractStrategy
         $destFullPath = sprintf('%s%s', $this->rootPath, $fileDestination);
         if (preg_match('#(.+)/([^/.]+).([A-Z]{3,5})#i', $destFullPath, $destMatch)) {
             if (false === @mkdir($destMatch[1], 0777, true)) {
-                throw new FileException(sprintf('Unable to create the "%s" directory', $destMatch[1]));
+                throw new \Exception(sprintf('Unable to create the "%s" directory', $destMatch[1]));
             }
 
             copy($entity->$propertyGetter(), $destFullPath);
