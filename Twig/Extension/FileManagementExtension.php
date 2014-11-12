@@ -24,6 +24,7 @@ class FileManagementExtension extends \Twig_Extension
             'filepath'  => new \Twig_Filter_Method($this, 'filepath'),
             'imagepath' => new \Twig_Filter_Method($this, 'imagepath'),
             'fileUrl'   => new \Twig_Filter_Method($this, 'fileUrl'),
+            'imageUrl'  => new \Twig_Filter_Method($this, 'imageUrl'),
         );
     }
 
