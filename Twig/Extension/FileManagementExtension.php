@@ -59,6 +59,24 @@ class FileManagementExtension extends \Twig_Extension
     public function fileUrl($entity, $propertyName)
     {
         $path = $this->filepath($entity, $propertyName);
+
+        return $this->getUrl($path);
+    }
+
+    public function imageUrl($entity, $propertyName, $format, $updateCache = true)
+    {
+        $path = $this->imagepath($entity, $propertyName, $format, $updateCache);
+
+        return $this->getUrl($path);
+    }
+
+    public function getName()
+    {
+        return 'twigextension';
+    }
+
+    private function getUrl($path)
+    {
         if (empty($path)) {
             return null;
         }
@@ -68,11 +86,6 @@ class FileManagementExtension extends \Twig_Extension
             $this->generator->getContext()->getHost(),
             $path
         );
-    }
-
-    public function getName()
-    {
-        return 'twigextension';
     }
 }
 
