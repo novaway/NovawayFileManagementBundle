@@ -134,6 +134,36 @@ class FileManagementExtension extends atoum\test
         ;
     }
 
+    public function testImageUrl()
+    {
+        $this
+            ->if($testedClass = $this->createTestedClassInstance())
+            ->given(
+                $myEntity = $this->createEntityMock(array(
+                        'nullPhotoFilename' => null,
+                        'photoFilename' => '/my-photo.png',
+                        'photoWithFormatFilename' => '/picture-{-imgformat-}.jpg',
+                    ))
+            )
+            ->then
+                ->variable($testedClass->imageUrl($myEntity, 'nullPhoto', 'mini', false))
+                    ->isNull()
+                ->string($testedClass->imageUrl($myEntity, 'photo', 'mini', false))
+                    ->isEqualTo('http://localhost/mydir/my-photo.png')
+                ->string($testedClass->imageUrl($myEntity, 'photoWithFormat', 'mini', false))
+                    ->isEqualTo('http://localhost/mydir/picture-mini.jpg')
+                ->string($testedClass->imageUrl($myEntity, 'photoWithFormat', 'normal', false))
+                    ->isEqualTo('http://localhost/mydir/picture-normal.jpg')
+                ->string($testedClass->imageUrl($myEntity, 'photo', 'mini'))
+                    ->match('#^http:\/\/localhost\/mydir\/my-photo.png\?v=\d+$#')
+                ->exception(function() use ($testedClass, $myEntity) {
+                    $testedClass->imageUrl($myEntity, 'undefinedField', 'photo');
+                })
+                    ->isInstanceOf('Symfony\Component\PropertyAccess\Exception\NoSuchPropertyException')
+                    ->hasCode(0)
+        ;
+    }
+
     private function createTestedClassInstance($webdir = '/mydir')
     {
         $controller = new \mageekguy\atoum\mock\controller();
