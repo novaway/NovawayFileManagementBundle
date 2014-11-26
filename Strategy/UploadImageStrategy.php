@@ -2,6 +2,7 @@
 
 namespace Novaway\Bundle\FileManagementBundle\Strategy;
 
+use Novaway\Bundle\FileManagementBundle\Entity\BaseEntityWithFileInterface;
 use Novaway\Bundle\FileManagementBundle\Manager\ResizeManager;
 
 class UploadImageStrategy extends UploadStrategy
@@ -32,7 +33,7 @@ class UploadImageStrategy extends UploadStrategy
      *
      * @return string The complete file path
      */
-    protected function buildDestination(BaseEntityWithFile $entity, $propertyName, $sourceFilepath = null, $format = null)
+    protected function buildDestination(BaseEntityWithFileInterface $entity, $propertyName, $sourceFilepath = null, $format = null)
     {
         $destination = parent::buildDestination($entity, $propertyName, $sourceFilepath);
         if ($format === null) {

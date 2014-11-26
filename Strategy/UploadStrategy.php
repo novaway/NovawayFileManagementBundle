@@ -72,7 +72,7 @@ class UploadStrategy extends AbstractStrategy
      *
      * @return string The complete file path
      */
-    protected function buildDestination(BaseEntityWithFileInterface $entity, $propertyName, $sourceFilepath = null)
+    protected function buildDestination(BaseEntityWithFileInterface $entity, $propertyName, $sourceFilepath = null, $format = null)
     {
         $propertyGetter = $entity->getter($propertyName);
         if (null === $sourceFilepath) {
