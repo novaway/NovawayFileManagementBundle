@@ -62,6 +62,11 @@ class ResizeManager
         $confFallback = $this->defaultConfiguration['fallback'];
 
         if ($format === 'original') {
+            $dir = dirname($destPathWithFormat);
+            if (!file_exists($dir)) {
+                mkdir($dir, 0777, true);
+            }
+
             copy($sourcePath, $destPathWithFormat);
             return;
         }
