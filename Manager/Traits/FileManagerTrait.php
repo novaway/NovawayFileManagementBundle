@@ -31,7 +31,8 @@ trait FileManagerTrait
     /**
      * Initialize trait properties
      *
-     * @param array $arrayFilepath
+     * @param array $arrayFilepath Associative array containing the file path for each property of the managed entity.
+     *                             This array must also contain a 'root' and a 'web' path.
      */
     protected function initialize($arrayFilepath)
     {
