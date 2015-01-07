@@ -19,7 +19,7 @@
         "sybio/image-workshop": "2.0.*@dev"
     },
     "require-dev": {
-        "atoum/atoum": "dev-master",
+        "atoum/atoum": "~1.2",
         "twig/extensions": "~1.0"
     },
     "autoload": {
