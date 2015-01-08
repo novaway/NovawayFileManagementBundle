@@ -8,6 +8,10 @@ php:
   - hhvm-nightly
   - hhvm
 
+env:
+  - SYMFONY_VERSION=2.6.*
+  - SYMFONY_VERSION=2.5.*
+
 matrix:
   allow_failures:
     - php: hhvm-nightly
@@ -15,7 +19,8 @@ matrix:
 
 before_script:
   - composer selfupdate
-  - composer install --dev --prefer-dist --no-interaction
+  - composer require symfony/framework-bundle:${SYMFONY_VERSION} --no-update
+  - composer update --dev
 
 script:
   - vendor/bin/atoum
