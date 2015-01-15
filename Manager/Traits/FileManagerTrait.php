@@ -68,12 +68,20 @@ trait FileManagerTrait
         $managedProperties = $this->arrayFilepath;
         $managedProperties = array_keys($managedProperties);
 
-        $entity = $this->save($entity);
-        $fileAdded = false;
-        $callbackElementArray = array();
-        foreach ($managedProperties as $propertyName) {
-            $fileDestination = $this->prepareFileMove($entity, $propertyName, $callbackElementArray);
-            $fileAdded = $this->fileMove($entity, $propertyName, $fileDestination) || $fileAdded;
+        try {
+            $entity = $this->save($entity);
+            $fileAdded = false;
+            $callbackElementArray = array();
+            foreach ($managedProperties as $propertyName) {
+                $fileDestination = $this->prepareFileMove($entity, $propertyName, $callbackElementArray);
+                $fileAdded = $this->fileMove($entity, $propertyName, $fileDestination) || $fileAdded;
+            }
+        } catch (\Exception $e) {
+            if (null !== $entity->getId()) {
+                $this->delete($entity);
+            }
+
+            throw $e;
         }
 
         if (is_callable($callback)) {
