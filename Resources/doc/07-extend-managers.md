@@ -3,7 +3,8 @@
 The bundle allow you to add file or image processing in your own managers easily.
 You just have to use `Novaway\Bundle\FileManagementBundle\Manager\Traits\FileManagerTrait`
 or `Novaway\Bundle\FileManagementBundle\Manager\Traits\ImageManagerTrait` in your own
-manager class and implement `Novaway\Bundle\FileManagementBundle\Manager\FileManagerInterface`.
+manager class and implement `Novaway\Bundle\FileManagementBundle\Manager\FileManagerInterface`
+or `Novaway\Bundle\FileManagementBundle\Manager\ImageManagerInterface`.
 
 These traits have 2 abstracts methods you have to implement :
 * `public function save(BaseEntityWithFile $entity)` to save an entity in your database
@@ -54,8 +55,9 @@ to add a `getCustomPath` method to your entity
 
 ```php
 use Novaway\Bundle\FileManagementBundle\Manager\Traits\FileManagerTrait;
+use Novaway\Bundle\FileManagementBundle\Manager\FileManagerInterface;
 
-class MyEntityCustomManager
+class MyEntityCustomManager implements FileManagerInterface
 {
     use FileManagerTrait;
 
