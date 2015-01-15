@@ -3,7 +3,7 @@
 The bundle allow you to add file or image processing in your own managers easily.
 You just have to use `Novaway\Bundle\FileManagementBundle\Manager\Traits\FileManagerTrait`
 or `Novaway\Bundle\FileManagementBundle\Manager\Traits\ImageManagerTrait` in your own
-manager class.
+manager class and implement `Novaway\Bundle\FileManagementBundle\Manager\FileManagerInterface`.
 
 These traits have 2 abstracts methods you have to implement :
 * `public function save(BaseEntityWithFile $entity)` to save an entity in your database
