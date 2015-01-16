@@ -2,6 +2,7 @@
 
 namespace Novaway\Bundle\FileManagementBundle\Manager;
 
+use Novaway\Bundle\FileManagementBundle\Entity\BaseEntityWithFile;
 use Novaway\Bundle\FileManagementBundle\Manager\Traits\ImageManagerTrait;
 
 /**
@@ -9,9 +10,18 @@ use Novaway\Bundle\FileManagementBundle\Manager\Traits\ImageManagerTrait;
  *
  * Extend your managers with this class to add File management.
  */
-class BaseEntityWithImageManager extends BaseEntityWithFileManager
+class BaseEntityWithImageManager implements FileManagerInterface
 {
     use ImageManagerTrait;
+
+    /**
+     * The entity manager used to persist and flush entities
+     * Doctrine\ORM\EntityManager by default, but it can be replaced
+     * (overwritting the save method might be required then)
+     *
+     * @var mixed $entityManager
+     */
+    protected $entityManager;
 
     /**
      * The manager constructor
@@ -27,5 +37,27 @@ class BaseEntityWithImageManager extends BaseEntityWithFileManager
         $this->initialize($arrayFilepath, $imageFormatDefinition, $imageFormatChoices);
 
         $this->entityManager = $entityManager;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function save(BaseEntityWithFile $entity)
+    {
+        $this->entityManager->persist($entity);
+        $this->entityManager->flush();
+
+        return $entity;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function delete(BaseEntityWithFile $entity)
+    {
+        $this->entityManager->remove($entity);
+        $this->entityManager->flush();
+
+        return $entity;
     }
 }

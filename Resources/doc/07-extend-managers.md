@@ -24,7 +24,7 @@ uploaded :
     * *{-custom-}* : Allow you to set a custom string to append to the uploaded filename. To get this custom string, you need
 to add a `getCustomPath` method to your entity
 
-`FileManagerTrait::initialize` method require 3 parameters :
+`ImageManagerTrait::initialize` method require 3 parameters :
 
 * *$arrayFilepath*: Associative array containing the file path for each property of the managed entity. This array must
 also contain a 'root' (optional) and a 'web' path. You can use some variables to setup a dynamic name to the file that is
@@ -65,7 +65,7 @@ class MyEntityCustomManager implements FileManagerInterface
 
     public function __construct($arrayFilepath, $entityManager)
     {
-        $this->initialize($arrayFilepath);
+        $this->initializeFileManager($arrayFilepath);
 
         $this->ormEntityManager = $entityManager;
     }

@@ -7,7 +7,13 @@ use Novaway\Bundle\FileManagementBundle\Manager\ResizeManager;
 
 trait ImageManagerTrait
 {
-    use FileManagerTrait;
+    use FileManagerTrait {
+        buildDestination as private parentBuildDestination;
+        fileMove as private parentFileMove;
+        getFileAbsolutePath as private parentFileAbsolutePath;
+        getFileWebPath as private parentGetFileWebPath;
+        initialize as private parentInitialize;
+    }
 
     /**
      * Associative array to define image properties which be stored on filesystem
@@ -33,7 +39,7 @@ trait ImageManagerTrait
      */
     protected function initialize($arrayFilepath, $imageFormatDefinition, $imageFormatChoices)
     {
-        parent::initialize($arrayFilepath);
+        $this->parentInitialize($arrayFilepath);
 
         $this->imageFormatDefinition = array_merge($imageFormatDefinition, array('original' => null));
         $this->imageFormatChoices = $imageFormatChoices;
@@ -51,10 +57,10 @@ trait ImageManagerTrait
     public function getFileAbsolutePath(BaseEntityWithFile $entity, $propertyName, $format = null)
     {
         if (!$format) {
-            return parent::getFileAbsolutePath($entity, $propertyName);
+            return $this->parentFileAbsolutePath($entity, $propertyName);
         }
 
-        return $this->transformPathWithFormat(parent::getFileAbsolutePath($entity, $propertyName), $format);
+        return $this->transformPathWithFormat($this->parentFileAbsolutePath($entity, $propertyName), $format);
     }
 
     /**
@@ -69,10 +75,10 @@ trait ImageManagerTrait
     public function getFileWebPath(BaseEntityWithFile $entity, $propertyName, $format = null)
     {
         if (!$format) {
-            return parent::getFileWebPath($entity, $propertyName);
+            return $this->parentGetFileWebPath($entity, $propertyName);
         }
 
-        return $this->transformPathWithFormat(parent::getFileWebPath($entity, $propertyName), $format);
+        return $this->transformPathWithFormat($this->parentGetFileWebPath($entity, $propertyName), $format);
     }
 
     /**
@@ -217,10 +223,10 @@ trait ImageManagerTrait
     protected function buildDestination(BaseEntityWithFile $entity, $propertyName, $sourceFilepath = null, $format = null)
     {
         if (!$format) {
-            return parent::buildDestination($entity, $propertyName, $sourceFilepath);
+            return $this->parentBuildDestination($entity, $propertyName, $sourceFilepath);
         }
 
-        return $this->transformPathWithFormat(parent::buildDestination($entity, $propertyName, $sourceFilepath), $format);
+        return $this->transformPathWithFormat($this->parentBuildDestination($entity, $propertyName, $sourceFilepath), $format);
     }
 
     /**
@@ -235,7 +241,7 @@ trait ImageManagerTrait
     protected function fileMove(BaseEntityWithFile $entity, $propertyName, $fileDestination)
     {
         if (!isset($this->imageFormatChoices[$propertyName])) {
-            return parent::fileMove($entity, $propertyName, $fileDestination);
+            return $this->parentFileMove($entity, $propertyName, $fileDestination);
         }
 
         $propertyGetter = $this->getter($propertyName);
