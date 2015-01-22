@@ -26,15 +26,15 @@ class ImageType extends BaseManagerTestCase{
             )
             ->mock($resolver)
                 ->call('setOptional')
-                    ->withArguments(array('format', 'update_cache', 'preview'))
+                    ->withArguments(['format', 'update_cache', 'preview', 'web_directory'])
                     ->once()
                 ->call('setDefaults')
-                    ->withArguments(
-                        array(
-                            'format'       => 'thumbnail',
-                            'update_cache' => true,
-                            'preview'      => true
-                        ))
+                    ->withArguments([
+                        'format'        => 'thumbnail',
+                        'update_cache'  => true,
+                        'preview'       => true,
+                        'web_directory' => '/mydir/',
+                    ])
                     ->once()
         ;
     }
@@ -47,7 +47,7 @@ class ImageType extends BaseManagerTestCase{
         $this
             ->if(
                 $testedClass = $this->createTestedClassInstance(),
-                $testedClass->buildView($view, $form, array('preview' => false))
+                $testedClass->buildView($view, $form, ['preview' => false])
             )
             ->array($view->vars)
                 ->hasKey('image_url')
@@ -74,12 +74,13 @@ class ImageType extends BaseManagerTestCase{
 
         $this
             ->if(
-                $testedClass = $this->createTestedClassInstance(),
-                $testedClass->buildView($view, $form, array(
-                    'preview'      => true,
-                    'format'       => $format,
-                    'update_cache' => $updateCache
-                ))
+                $testedClass = $this->createTestedClassInstance('/path/'),
+                $testedClass->buildView($view, $form, [
+                    'preview'       => true,
+                    'format'        => $format,
+                    'update_cache'  => $updateCache,
+                    'web_directory' => '/mydir/',
+                ])
             )
             ->array($view->vars)
                 ->hasKey('image_url')

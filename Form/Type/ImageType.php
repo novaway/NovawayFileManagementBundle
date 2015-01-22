@@ -45,11 +45,12 @@ class ImageType extends AbstractType
      */
     public function setDefaultOptions(OptionsResolverInterface $resolver)
     {
-        $resolver->setOptional(['format', 'update_cache', 'preview']);
+        $resolver->setOptional(['format', 'update_cache', 'preview', 'web_directory']);
         $resolver->setDefaults([
-            'format'       => 'thumbnail',
-            'update_cache' => true,
-            'preview'      => true
+            'format'        => 'thumbnail',
+            'update_cache'  => true,
+            'preview'       => true,
+            'web_directory' => $this->webDirectory
         ]);
     }
 
@@ -88,7 +89,7 @@ class ImageType extends AbstractType
             $imagePath .= sprintf('?v=%d', $this->generateTimestamp($accessor, $parentData));
         }
 
-        return str_replace('{-imgformat-}', $options['format'], $this->webDirectory.$imagePath);
+        return str_replace('{-imgformat-}', $options['format'], $options['web_directory'].$imagePath);
     }
 
     /**
