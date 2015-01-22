@@ -32,7 +32,8 @@ It adds several new options :
  + **preview** (Default ```true```) : Hide the image display if set to false ;
  + **format** (Default ```'thumbnail'```) : The image format (must be existing for this property) ;
  + **update_cache** (Default ```true```) : Adds a version timestamp to the file name in HTML output.
-
+ + **web_directory** (Default _novaway.fmb.webdir_ parameter value) : Web directory path
+ 
  Here is an example of how to use these options:
  ``` php
  $builder

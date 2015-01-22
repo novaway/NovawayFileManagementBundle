@@ -7,71 +7,105 @@ use Symfony\Component\Form\FormView;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
+use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 
 class ImageType extends AbstractType
 {
+    /** @var string */
     private $webDirectory;
 
+    /**
+     * Constructor
+     *
+     * @param string $webDirectory
+     */
     public function __construct($webDirectory)
     {
         $this->webDirectory = $webDirectory;
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function getParent()
     {
         return 'file';
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function getName()
     {
         return 'image';
     }
 
     /**
-     * Add the image_path option
-     *
-     * @param OptionsResolverInterface $resolver
+     * {@inheritdoc}
      */
     public function setDefaultOptions(OptionsResolverInterface $resolver)
     {
-        $resolver->setOptional(array('format', 'update_cache', 'preview'));
-        $resolver->setDefaults(array(
-            'format'       => 'thumbnail',
-            'update_cache' => true,
-            'preview'      => true
-            ));
+        $resolver->setOptional(['format', 'update_cache', 'preview', 'web_directory']);
+        $resolver->setDefaults([
+            'format'        => 'thumbnail',
+            'update_cache'  => true,
+            'preview'       => true,
+            'web_directory' => $this->webDirectory
+        ]);
     }
 
     /**
-     * Pass the image URL to the view
-     *
-     * @param FormView $view
-     * @param FormInterface $form
-     * @param array $options
+     * {@inheritdoc}
      */
     public function buildView(FormView $view, FormInterface $form, array $options)
     {
-        $view->vars['preview'] = $options['preview'];
-
+        $view->vars['preview']   = $options['preview'];
         $view->vars['image_url'] = null;
+
         if ($view->vars['preview']) {
-            $accessor = PropertyAccess::createPropertyAccessor();
-
-            $property = $form->getName().'Filename';
-            $parentData = $form->getParent()->getData();
-            $imagePath = $accessor->getValue($parentData, $property);
-
-            if ($options['update_cache'] === true) {
-                $imagePath .= sprintf('?v=%d',
-                    $accessor->isReadable($parentData, 'updatedAt') && $accessor->getValue($parentData, 'updatedAt') instanceof \DateTime ?
-                        $accessor->getValue($parentData, 'updatedAt')->format('U') :
-                        date('U')
-                );
-            }
-
-            $view->vars['image_url'] = $imagePath ?
-                str_replace('{-imgformat-}', $options['format'], $this->webDirectory.$imagePath) : null;
+            $view->vars['image_url'] = $this->getImagePath($form, $options);
         }
+    }
+
+    /**
+     * Build image path
+     *
+     * @param FormInterface $form
+     * @param array         $options
+     * @return string
+     */
+    private function getImagePath(FormInterface $form, array $options)
+    {
+        $accessor = PropertyAccess::createPropertyAccessor();
+
+        $property = $form->getName().'Filename';
+        $parentData = $form->getParent()->getData();
+        $imagePath = $accessor->getValue($parentData, $property);
+        if (empty($imagePath)) {
+            return null;
+        }
+
+        if (true === $options['update_cache']) {
+            $imagePath .= sprintf('?v=%d', $this->generateTimestamp($accessor, $parentData));
+        }
+
+        return str_replace('{-imgformat-}', $options['format'], $options['web_directory'].$imagePath);
+    }
+
+    /**
+     * Generate timestamp data used for cache management
+     *
+     * @param PropertyAccessorInterface $accessor
+     * @param mixed                     $parentData
+     * @return int
+     */
+    private function generateTimestamp(PropertyAccessorInterface $accessor, $parentData)
+    {
+        if ($accessor->isReadable($parentData, 'updatedAt') && $accessor->getValue($parentData, 'updatedAt') instanceof \DateTime) {
+            return $accessor->getValue($parentData, 'updatedAt')->format('U');
+        }
+
+        return date('U');
     }
 }
 
