@@ -67,10 +67,9 @@ class ResizeManager
         }
 
         if ($format === 'original') {
-            // @TODO: optimize
-            $pathinfo = pathinfo($destPathWithFormat);
-            if (!is_dir($pathinfo['dirname'])) {
-                @mkdir($pathinfo['dirname'], 0777, true);
+            $dir = dirname($destPathWithFormat);
+            if (!file_exists($dir)) {
+                mkdir($dir, 0777, true);
             }
 
             copy($sourcePath, $destPathWithFormat);
