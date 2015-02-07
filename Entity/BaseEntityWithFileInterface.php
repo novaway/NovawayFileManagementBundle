@@ -12,7 +12,7 @@ interface BaseEntityWithFileInterface
      *                                     FALSE to return the getter for the property itself
      * @return string The getter method
      */
-    public function getter($propertyName);
+    public function getter($propertyName, $filenameOnly = false);
 
     /**
      * Build Setter string for a property
@@ -22,5 +22,5 @@ interface BaseEntityWithFileInterface
      *                                     FALSE to return the setter for the property itself
      * @return string The setter method
      */
-    public function setter($propertyName);
+    public function setter($propertyName, $filenameOnly = false);
 }
