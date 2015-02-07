@@ -69,7 +69,7 @@ abstract class BaseEntityWithFile implements BaseEntityWithFileInterface
             return call_user_func_array(array($this, $method), $arguments);
         }
 
-        throw new \BadMethodCallException();
+        throw new \BadMethodCallException(sprintf("BadMethodCallException: method (%s) doesn't exist for %s class", $method, get_class($this)));
     }
 }
 

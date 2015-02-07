@@ -3,7 +3,9 @@
 
     {{ block('form_widget') }}
     {% if preview and image_url is not null %}
-        <img src="{{ asset(image_url) }}"/>
+        <span class="fmb-form-preview">
+            <img src="{{ asset(image_url) }}"/>
+        </span>
     {% endif %}
 
     {% endspaceless %}
