@@ -3,6 +3,8 @@
 namespace Novaway\Bundle\FileManagementBundle\Manager\Traits;
 
 use Novaway\Bundle\FileManagementBundle\Entity\BaseEntityWithFile;
+use Novaway\Bundle\FileManagementBundle\Strategy\Factory\StrategyFactoryInterface;
+use Novaway\Bundle\FileManagementBundle\Strategy\Factory\StrategyFactory;
 
 trait FileManagerTrait
 {
@@ -27,14 +29,22 @@ trait FileManagerTrait
      */
     protected $webPath;
 
+    /**
+     * Factory for strategy
+     *
+     * @var StrategyFactoryInterface
+     */
+    protected $strategyFactory;
+
 
     /**
      * Initialize trait properties
      *
      * @param array $arrayFilepath Associative array containing the file path for each property of the managed entity.
      *                             This array must also contain a 'root' and a 'web' path.
+     * @param StrategyFactoryInterface $strategyFactory
      */
-    protected function initialize($arrayFilepath)
+    protected function initialize($arrayFilepath, StrategyFactoryInterface $strategyFactory = null)
     {
         if (!isset($arrayFilepath['bundle.web'])) {
             throw new \InvalidArgumentException('$arrayFilepath must have a bundle.web key (even empty).');
@@ -52,6 +62,11 @@ trait FileManagerTrait
             $this->rootPath  = $classDir.'/../../../../../../../web'.$this->webPath;
         }
         $this->arrayFilepath = $arrayFilepath;
+
+        $this->strategyFactory = $strategyFactory;
+        if (null === $this->strategyFactory) {
+            $this->strategyFactory = new StrategyFactory($this->rootPath, $this->arrayFilepath);
+        }
     }
 
     /**
@@ -73,8 +88,10 @@ trait FileManagerTrait
             $fileAdded = false;
             $callbackElementArray = array();
             foreach ($managedProperties as $propertyName) {
-                $fileDestination = $this->prepareFileMove($entity, $propertyName, $callbackElementArray);
-                $fileAdded = $this->fileMove($entity, $propertyName, $fileDestination) || $fileAdded;
+                $strategy = $this->strategyFactory->create($entity, $propertyName);
+                $strategy->process($entity);
+
+                $callbackElementArray[$propertyName] = $strategy->getFileProperties();
             }
         } catch (\Exception $e) {
             if (null !== $entity->getId()) {
@@ -83,6 +100,8 @@ trait FileManagerTrait
 
             throw $e;
         }
+
+        $fileAdded = true;
 
         if (is_callable($callback)) {
             call_user_func($callback, $entity, $callbackElementArray);
