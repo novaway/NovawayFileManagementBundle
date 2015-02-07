@@ -32,9 +32,7 @@ class StrategyFactory implements StrategyFactoryInterface
      */
     public function create(BaseEntityWithFileInterface $entity, $propertyName)
     {
-        $propertyGetter = $entity->getter($propertyName);
-        $property = $entity->$propertyGetter();
-        if (is_string($property)) {
+        if (null !== $entity->getPropertyPath($propertyName)) {
             return new CopyStrategy($this->rootPath, $propertyName, $this->arrayFilepath[$propertyName]);
         }
 

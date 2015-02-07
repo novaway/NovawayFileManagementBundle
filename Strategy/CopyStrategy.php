@@ -28,11 +28,10 @@ class CopyStrategy extends AbstractStrategy
 
     protected function prepareFileMove(BaseEntityWithFileInterface $entity, $propertyName)
     {
-        $propertyGetter = $entity->getter($propertyName);
         $propertyFileNameGetter = $entity->getter($propertyName, true);
         $propertyFileNameSetter = $entity->setter($propertyName, true);
 
-        $media = $entity->$propertyGetter();
+        $media = $entity->getPropertyPath($propertyName);
         if (is_string($media)) {
             $fileDestinationName = $this->buildDestination($entity, $propertyName);
 
@@ -58,9 +57,8 @@ class CopyStrategy extends AbstractStrategy
      */
     protected function buildDestination(BaseEntityWithFileInterface $entity, $propertyName, $sourceFilepath = null)
     {
-        $propertyGetter = $entity->getter($propertyName);
         if (null === $sourceFilepath) {
-            $sourceFilepath = $entity->$propertyGetter();
+            $sourceFilepath = $entity->getPropertyPath($propertyName);
         }
 
         $arrReplacement =  array(
@@ -111,11 +109,10 @@ class CopyStrategy extends AbstractStrategy
      */
     protected function fileMove(BaseEntityWithFileInterface $entity, $propertyName, $fileDestination)
     {
-        $propertyGetter = $entity->getter($propertyName);
         $propertySetter = $entity->setter($propertyName);
 
         // the file property can be empty if the field is not required
-        if (null === $entity->$propertyGetter()) {
+        if (null === ($value = $entity->getPropertyPath($propertyName))) {
             return false;
         }
 
@@ -125,13 +122,13 @@ class CopyStrategy extends AbstractStrategy
                 throw new \Exception(sprintf('Unable to create the "%s" directory', $destMatch[1]));
             }
 
-            copy($entity->$propertyGetter(), $destFullPath);
+            copy($value, $destFullPath);
             chmod($destFullPath, 0755);
 
             $finfo = finfo_open(FILEINFO_MIME_TYPE);
             $this->fileProcessed = array(
-                'extension' => pathinfo($entity->$propertyGetter(), PATHINFO_EXTENSION),
-                'original' => basename($entity->$propertyGetter()),
+                'extension' => pathinfo($value, PATHINFO_EXTENSION),
+                'original' => basename($value),
                 'size' => filesize($destFullPath),
                 'mime' => finfo_file($finfo, $destFullPath),
             );

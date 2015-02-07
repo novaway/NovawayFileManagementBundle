@@ -36,9 +36,7 @@ class StrategyImageFactory implements StrategyFactoryInterface
      */
     public function create(BaseEntityWithFileInterface $entity, $propertyName)
     {
-        $propertyGetter = $entity->getter($propertyName);
-        $property = $entity->$propertyGetter();
-        if (is_string($property)) {
+        if (null !== $entity->getPropertyPath($propertyName)) {
             return new CopyImageStrategy($this->rootPath, $propertyName, $this->arrayFilepath[$propertyName], $this->imageFormatDefinition, $this->imageFormatChoices);
         }
 

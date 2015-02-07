@@ -58,11 +58,10 @@ class CopyImageStrategy extends CopyStrategy
             return parent::fileMove($entity, $propertyName, $fileDestination);
         }
 
-        $propertyGetter = $entity->getter($propertyName);
         $propertySetter = $entity->setter($propertyName);
 
         // the file property can be empty if the field is not required
-        if (null === $entity->$propertyGetter()) {
+        if (null === ($value = $entity->getPropertyPath($propertyName))) {
             return false;
         }
 
@@ -77,7 +76,7 @@ class CopyImageStrategy extends CopyStrategy
                 throw new \Exception(sprintf('Unable to create the "%s" directory', $tmpDir));
             }
 
-            copy($entity->$propertyGetter(), $tmpPath);
+            copy($value, $tmpPath);
 
             foreach ($this->imageFormatChoices[$propertyName] as $format) {
                 $this->imageManipulation($tmpPath, $fileDestinationAbsolute, $format);

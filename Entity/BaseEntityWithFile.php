@@ -12,6 +12,19 @@ abstract class BaseEntityWithFile implements BaseEntityWithFileInterface
     /**
      * {@inheritdoc}
      */
+    public function getPropertyPath($propertyName)
+    {
+        $propertyGetter = sprintf('get%sPath', ucfirst($propertyName));
+        if (method_exists($this, $propertyGetter)) {
+            return $this->$propertyGetter();
+        }
+
+        return null;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function getter($propertyName, $filenameOnly = false)
     {
         return sprintf('get%s%s', ucfirst($propertyName), $filenameOnly ? 'Filename' : '');
