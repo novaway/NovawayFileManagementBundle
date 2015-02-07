@@ -73,10 +73,8 @@ class CopyImageStrategy extends CopyStrategy
             $tmpName = uniqid().rand(0,999).'.'.$destMatch[3];
             $tmpPath = $tmpDir.'/'.$tmpName;
 
-            if (!is_dir($tmpDir)) {
-                if (false === @mkdir($tmpDir, 0777, true)) {
-                    throw new \Exception(sprintf('Unable to create the "%s" directory', $tmpDir));
-                }
+            if (!is_dir($tmpDir) && false === @mkdir($tmpDir, 0777, true)) {
+                throw new \Exception(sprintf('Unable to create the "%s" directory', $tmpDir));
             }
 
             copy($entity->$propertyGetter(), $tmpPath);

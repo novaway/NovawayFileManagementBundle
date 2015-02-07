@@ -121,7 +121,7 @@ class CopyStrategy extends AbstractStrategy
 
         $destFullPath = sprintf('%s%s', $this->rootPath, $fileDestination);
         if (preg_match('#(.+)/([^/.]+).([A-Z]{3,5})#i', $destFullPath, $destMatch)) {
-            if (false === @mkdir($destMatch[1], 0777, true)) {
+            if (!is_dir($destMatch[1]) && false === @mkdir($destMatch[1], 0777, true)) {
                 throw new \Exception(sprintf('Unable to create the "%s" directory', $destMatch[1]));
             }
 
