@@ -189,7 +189,7 @@ class BaseEntityWithFileManager extends BaseManagerTestCase
                             ->never()
                     ->mock($entityManager)
                         ->call('persist')
-                            ->withArguments($entity)->once()
+                            ->withArguments($entity)->twice()
         ;
     }
 
