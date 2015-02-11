@@ -440,4 +440,20 @@ trait FileManagerTrait
 
         return false;
     }
+
+    /**
+     * Persist and flush the entity
+     *
+     * @param mixed $entity The entity to save
+     * @return mixed The saved entity
+     */
+    abstract public function save($entity);
+
+    /**
+     * Remove and flush the entity
+     *
+     * @param mixed $entity The entity to delete
+     * @return mixed The deleted entity
+     */
+    abstract public function delete($entity);
 }

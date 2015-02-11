@@ -42,7 +42,7 @@ class BaseEntityWithImageManager implements FileManagerInterface
     /**
      * {@inheritdoc}
      */
-    public function save(BaseEntityWithFile $entity)
+    public function save($entity)
     {
         $this->entityManager->persist($entity);
         $this->entityManager->flush();
@@ -53,7 +53,7 @@ class BaseEntityWithImageManager implements FileManagerInterface
     /**
      * {@inheritdoc}
      */
-    public function delete(BaseEntityWithFile $entity)
+    public function delete($entity)
     {
         $this->entityManager->remove($entity);
         $this->entityManager->flush();
