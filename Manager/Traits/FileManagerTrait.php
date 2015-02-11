@@ -440,22 +440,4 @@ trait FileManagerTrait
 
         return false;
     }
-
-    /**
-     * Persist and flush the entity
-     *
-     * @param BaseEntityWithFile $entity The entity to save
-     *
-     * @return BaseEntityWithFile The saved entity
-     */
-    abstract public function save(BaseEntityWithFile $entity);
-
-    /**
-     * Remove and flush the entity
-     *
-     * @param BaseEntityWithFile $entity The entity to delete
-     *
-     * @return BaseEntityWithFile The deleted entity
-     */
-    abstract public function delete(BaseEntityWithFile $entity);
 }
