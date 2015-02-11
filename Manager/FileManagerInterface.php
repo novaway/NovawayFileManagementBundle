@@ -16,7 +16,7 @@ interface FileManagerInterface
      *
      * @return BaseEntityWithFile The saved entity
      */
-    public function save(BaseEntityWithFile $entity);
+    public function save($entity);
 
     /**
      * Saves an entity and manages its file storage
@@ -36,7 +36,7 @@ interface FileManagerInterface
      *
      * @return BaseEntityWithFile The deleted entity
      */
-    public function delete(BaseEntityWithFile $entity);
+    public function delete($entity);
 
     /**
      * Deletes an entity and manages its file storage
