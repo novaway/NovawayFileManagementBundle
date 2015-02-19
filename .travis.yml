@@ -5,16 +5,15 @@ php:
   - 5.5
   - 5.4
   - hhvm-nightly
-  - hhvm
 
 env:
+  - SYMFONY_VERSION=2.7.*@dev
   - SYMFONY_VERSION=2.6.*
   - SYMFONY_VERSION=2.5.*
 
 matrix:
   allow_failures:
     - php: hhvm-nightly
-    - php: hhvm
 
 before_script:
   - composer selfupdate
