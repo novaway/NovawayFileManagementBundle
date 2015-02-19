@@ -19,7 +19,7 @@ matrix:
 before_script:
   - composer selfupdate
   - composer require symfony/symfony:${SYMFONY_VERSION} --no-update
-  - composer update --dev
+  - composer update
 
 script:
   - vendor/bin/atoum
