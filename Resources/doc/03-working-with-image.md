@@ -8,10 +8,11 @@ croping, compressing and more...) on the picture which is upload.
 ### Entity setup
 
 The entity setup is identical to [work with _commons_ files](02-working-with-file.md). You need to extend the
-`BaseEntityWithImage` and add 2 properties :
+`BaseEntityWithImage` and add somes properties :
 
-1. The picture property (correspond to the _file input_)
-2. The filename which will be store in the database. **This parameter should have the same name than the previous
+* The picture property (corresponding to the _file input_) and used by the upload strategy
+* The picture path property (corresponding to the external file location) and used by the copy strategy
+* The filename which will be store in the database. **This parameter should have the same name than the previous
 with `Filename` suffix**.
 
 ``` php
@@ -34,11 +35,16 @@ class MyUserEntity extends BaseEntityWithFile
     // ...
 
     /**
-     * @var \Symfony\Component\HttpFoundation\File\UploadedFile
+     * @var \Symfony\Component\HttpFoundation\File\UploadedFile This property is used by the upload strategy
      *
      * @Assert\File(maxSize="2M")
      */
     private $picture;
+
+    /**
+     * @var string This property is used by the copy strategy
+     */
+    private $picturePath;
 
     /**
      * @var string
@@ -70,6 +76,7 @@ class MyUserEntityType extends AbstractType
         $builder
             //->add(...)
             ->add('picture')
+            //->add('picturePath') => if you want user to input an URL for file copy
         ;
     }
 
@@ -116,6 +123,9 @@ to add a `getCustomPath` method to your entity
     * *size* : [Number - Default: 0] Square size (set to 0 if not square)
     * *trim_bg* : [Boolean - Default: false] Remove the background color when not enlarging
     * *width* : [Number - Default: 0] Width (if not square)
+
+Depending on the property which is filled (myFile or myFilePath) the manager will choose the right strategy to use.
+*Note* that if both properties are populated, the copy will be used.
 
 ``` php
 <?php

@@ -191,7 +191,7 @@ class BaseEntityWithFileManager extends BaseManagerTestCase
                             ->never()
                     ->mock($entityManager)
                         ->call('persist')
-                            ->withArguments($entity)->once()
+                            ->withArguments($entity)->twice()
         ;
     }
 
@@ -220,19 +220,6 @@ class BaseEntityWithFileManager extends BaseManagerTestCase
                 ->mock($entityManager)
                     ->call('remove')
                         ->withArguments($entity)->once()
-        ;
-    }
-
-    /**
-     * @dataProvider slugDataProvider
-     */
-    public function testSlug($managerConfiguration, $str, $result)
-    {
-        $this
-            ->if($testedClass = $this->createTestedClassInstance($managerConfiguration))
-            ->then
-                ->string($testedClass->slug($str))
-                    ->isEqualTo($result)
         ;
     }
 
@@ -466,23 +453,6 @@ class BaseEntityWithFileManager extends BaseManagerTestCase
                 array('bundle.web' => '', 'bundle.root' => '', 'userPhoto' => '', 'userCertificate' => ''),
                 array('bundle.root', 'userPhoto', 'userCertificate')
             ),
-        );
-    }
-
-    public function slugDataProvider()
-    {
-        $configuration = array(
-            'bundle.web' => '/bundle/web/',
-            'bundle.root' => '/bundle/root/',
-            'userPhoto' => '/uploads/',
-        );
-
-        return array(
-            array($configuration, 'slug', 'slug'),
-            array($configuration, 'test123', 'test123'),
-            array($configuration, 'test*125@home', 'test-125-home'),
-            array($configuration, 'TEST\\125#jk', 'test-125-jk'),
-            array($configuration, 'my-slug+string', 'my-slug-string'),
         );
     }
 

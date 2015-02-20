@@ -4,6 +4,7 @@ namespace Novaway\Bundle\FileManagementBundle\Manager\Traits;
 
 use Novaway\Bundle\FileManagementBundle\Entity\BaseEntityWithFile;
 use Novaway\Bundle\FileManagementBundle\Manager\ResizeManager;
+use Novaway\Bundle\FileManagementBundle\Strategy\Factory\StrategyImageFactory;
 
 trait ImageManagerTrait
 {
@@ -37,12 +38,16 @@ trait ImageManagerTrait
      * @param array $imageFormatDefinition Associative array to define image properties which be stored on filesystem
      * @param array $imageFormatChoices    Associative array to apply some format definitions to an entity property
      */
-    protected function initialize($arrayFilepath, $imageFormatDefinition, $imageFormatChoices)
+    protected function initialize($arrayFilepath, $imageFormatDefinition, $imageFormatChoices, StrategyFactoryInterface $strategyFactory = null)
     {
-        $this->parentInitialize($arrayFilepath);
+        $this->parentInitialize($arrayFilepath, $strategyFactory);
 
         $this->imageFormatDefinition = array_merge($imageFormatDefinition, array('original' => null));
         $this->imageFormatChoices = $imageFormatChoices;
+
+        if (null === $strategyFactory) {
+            $this->strategyFactory = new StrategyImageFactory($this->rootPath, $arrayFilepath, $imageFormatDefinition, $imageFormatChoices);
+        }
     }
 
     /**

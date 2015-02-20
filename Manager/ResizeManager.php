@@ -61,6 +61,11 @@ class ResizeManager
         $confDefault = isset($this->defaultConfiguration[$format]) ? $this->defaultConfiguration[$format] : array();
         $confFallback = $this->defaultConfiguration['fallback'];
 
+        // @TODO: potential risky + refactoring
+        if (false !== strpos($destPathWithFormat, '?')) {
+            $destPathWithFormat = substr($destPathWithFormat, 0, strpos($destPathWithFormat, '?'));
+        }
+
         if ($format === 'original') {
             $dir = dirname($destPathWithFormat);
             if (!file_exists($dir)) {
@@ -114,7 +119,7 @@ class ResizeManager
             'width'    => $layer->getWidth(),
             'height'   => $layer->getHeight(),
             'wh_ratio' => $layer->getWidth() / $layer->getHeight(),
-            );
+        );
 
         if ($dim['size'] > 0) {
             $dim['width']  = $dim['size'];
@@ -153,9 +158,9 @@ class ResizeManager
             } else {
 
                 if (!$dim['enlarge'] && $layer->getWidth() <= $dim['width'] && $layer->getHeight() <= $dim['height']) {
-                        $boxLayer = ImageWorkshop::initVirginLayer($dim['width'], $dim['height'], $dim['bg_color']);
-                        $boxLayer->addLayer(1, $layer, 0, 0, 'MM');
-                        $layer = $boxLayer;
+                    $boxLayer = ImageWorkshop::initVirginLayer($dim['width'], $dim['height'], $dim['bg_color']);
+                    $boxLayer->addLayer(1, $layer, 0, 0, 'MM');
+                    $layer = $boxLayer;
                 } else {
                     if ($dim['trim_bg']) {
                         $hratio = $dim['height'] / $layer->getHeight();
@@ -199,9 +204,8 @@ class ResizeManager
             true,
             null,
             $dim['quality']
-            );
+        );
 
         $layer = null;
     }
-
 }

@@ -2,11 +2,13 @@
 
 ### Entity setup
 
-To manage files in your entity, you just need to extend the `BaseEntityWithFile` class and add 2 properties :
+To manage files in your entity, you just need to extend the `BaseEntityWithFile` class and add some properties :
 
-* The first one for the file which is uploaded
-* The second is the filename which will be store in database. **This parameter should have the same name than the previous
+* If you want to use upload strategy (used to upload a file from your computer) you need to add a dedicated property
+* If you want to use copy strategy (used to retrieve an existing file from another location) you need to add a dedicated property
+* The last is the filename which will be store in database. **This parameter should have the same name than the previous
 with `Filename` suffix**.
+
 
 ``` php
 <?php
@@ -28,11 +30,16 @@ class MyEntity extends BaseEntityWithFile
     // ...
 
     /**
-     * @var \Symfony\Component\HttpFoundation\File\UploadedFile
+     * @var \Symfony\Component\HttpFoundation\File\UploadedFile This property is used by the upload strategy
      *
      * @Assert\File(maxSize="5M")
      */
     private $myFile;
+
+    /**
+     * @var string This property is used by the copy strategy
+     */
+    private $myFilePath;
 
     /**
      * @var string $myFileProperty
@@ -64,6 +71,7 @@ class MyEntityType extends AbstractType
         $builder
             //->add(...)
             ->add('myFile')
+            //->add('myFilePath') => if you want user to input an URL for file copy
         ;
     }
 
@@ -95,6 +103,9 @@ uploaded :
     * *{-custom-}* : Allow you to set a custom string to append to the uploaded filename. To get this custom string, you need
 to add a `getCustomPath` method to your entity
 * *$entityManager* : The entity manager used to persist and save data
+
+Depending on the property which is filled (myFile or myFilePath) the manager will choose the right strategy to use.
+*Note* that if both properties are populated, the copy will be used.
 
 ``` php
 <?php

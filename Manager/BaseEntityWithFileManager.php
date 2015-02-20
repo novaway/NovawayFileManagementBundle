@@ -4,6 +4,7 @@ namespace Novaway\Bundle\FileManagementBundle\Manager;
 
 use Novaway\Bundle\FileManagementBundle\Entity\BaseEntityWithFile;
 use Novaway\Bundle\FileManagementBundle\Manager\Traits\FileManagerTrait;
+use Novaway\Bundle\FileManagementBundle\Strategy\Factory\StrategyFactoryInterface;
 
 /**
  * Extend your managers with this class to add File management.
@@ -29,9 +30,9 @@ class BaseEntityWithFileManager implements FileManagerInterface
      *                             This array must also contain a 'root' and a 'web' path.
      * @param mixed $entityManager The entity manager used to persist and save data.
      */
-    public function __construct($arrayFilepath, $entityManager)
+    public function __construct($arrayFilepath, $entityManager, StrategyFactoryInterface $strategyFactory = null)
     {
-        $this->initialize($arrayFilepath);
+        $this->initialize($arrayFilepath, $strategyFactory);
 
         $this->entityManager = $entityManager;
     }

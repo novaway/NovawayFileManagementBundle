@@ -7,11 +7,38 @@ namespace Novaway\Bundle\FileManagementBundle\Entity;
  *
  * Extend your entities with this abstract class to add File management.
  */
-abstract class BaseEntityWithFile
+abstract class BaseEntityWithFile implements BaseEntityWithFileInterface
 {
+    /**
+     * {@inheritdoc}
+     */
+    public function getPropertyPath($propertyName)
+    {
+        $propertyGetter = sprintf('get%sPath', ucfirst($propertyName));
+        if (method_exists($this, $propertyGetter)) {
+            return $this->$propertyGetter();
+        }
+
+        return null;
+    }
 
     /**
-     *
+     * {@inheritdoc}
+     */
+    public function getter($propertyName, $filenameOnly = false)
+    {
+        return sprintf('get%s%s', ucfirst($propertyName), $filenameOnly ? 'Filename' : '');
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function setter($propertyName, $filenameOnly = false)
+    {
+        return sprintf('set%s%s', ucfirst($propertyName), $filenameOnly ? 'Filename' : '');
+    }
+
+    /**
      * Magic method __call() override
      * Manages file properties getters and setters
      *
@@ -26,33 +53,36 @@ abstract class BaseEntityWithFile
     public function __call($method, $arguments)
     {
         if ('get' === $method) {
-            if (count($arguments) == 1) {
-                $prop = $arguments[0];
-                if (property_exists($this, $prop)) {
-                    return $this->$prop;
-                } else {
-                    throw new \InvalidArgumentException();
-                }
-            } else {
+            if (count($arguments) !== 1) {
                 throw new \InvalidArgumentException();
             }
-        } elseif (!method_exists($this, $method) && preg_match('#^(get|set) {1}([a-z0-1]+)$#i',
-                $method, $match)) {
+
+            $prop = reset($arguments);
+            if (!property_exists($this, $prop)) {
+                throw new \InvalidArgumentException();
+            }
+
+            return $this->$prop;
+        }
+
+        if (!method_exists($this, $method) && preg_match('#^(get|set) {1}([a-z0-1]+)$#i', $method, $match)) {
             $property = lcfirst($match[2]);
             if ($match[1] === 'get') {
                 return $this->$property;
-            } else {
-                if (count($arguments) == 1) {
-                    $this->$property = $arguments[0];
-                } else {
-                    throw new \InvalidArgumentException();
-                }
             }
-        } elseif (method_exists($this, $method)) {
-            return call_user_func_array(array($this, $method), $arguments);
-        } else {
-            throw new \BadMethodCallException(sprintf("BadMethodCallException: method (%s) doesn't exist for %s class", $method, get_class($this)));
+
+            if (count($arguments) == 1) {
+                $this->$property = $arguments[0];
+            }
+
+            throw new \InvalidArgumentException();
         }
+
+        if (method_exists($this, $method)) {
+            return call_user_func_array(array($this, $method), $arguments);
+        }
+
+        throw new \BadMethodCallException(sprintf("BadMethodCallException: method (%s) doesn't exist for %s class", $method, get_class($this)));
     }
 }
 

@@ -4,6 +4,7 @@ namespace Novaway\Bundle\FileManagementBundle\Manager;
 
 use Novaway\Bundle\FileManagementBundle\Entity\BaseEntityWithFile;
 use Novaway\Bundle\FileManagementBundle\Manager\Traits\ImageManagerTrait;
+use Novaway\Bundle\FileManagementBundle\Strategy\Factory\StrategyFactoryInterface;
 
 /**
  * Novaway\Bundle\FileManagementBundle\Manager\BaseEntityWithFileManager
@@ -32,9 +33,9 @@ class BaseEntityWithImageManager implements FileManagerInterface
      * @param array $imageFormatDefinition Associative array to define image properties which be stored on filesystem
      * @param array $imageFormatChoices    Associative array to apply some format definitions to an entity property
      */
-    public function __construct($arrayFilepath, $entityManager, $imageFormatDefinition, $imageFormatChoices)
+    public function __construct($arrayFilepath, $entityManager, $imageFormatDefinition, $imageFormatChoices, StrategyFactoryInterface $strategyFactory = null)
     {
-        $this->initialize($arrayFilepath, $imageFormatDefinition, $imageFormatChoices);
+        $this->initialize($arrayFilepath, $imageFormatDefinition, $imageFormatChoices, $strategyFactory);
 
         $this->entityManager = $entityManager;
     }
