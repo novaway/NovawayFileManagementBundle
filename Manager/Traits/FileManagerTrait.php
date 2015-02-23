@@ -79,6 +79,8 @@ trait FileManagerTrait
         $managedProperties = $this->arrayFilepath;
         $managedProperties = array_keys($managedProperties);
 
+        $originalEntity = (null !== $entity->getId()) ? clone $entity : null;
+
         try {
             $entity = $this->save($entity);
             $fileAdded = false;
@@ -88,9 +90,7 @@ trait FileManagerTrait
                 $fileAdded = $this->fileMove($entity, $propertyName, $fileDestination) || $fileAdded;
             }
         } catch (\Exception $e) {
-            if (null !== $entity->getId()) {
-                $this->delete($entity);
-            }
+            $this->rollback($entity, $originalEntity);
 
             throw $e;
         }
@@ -454,6 +454,20 @@ trait FileManagerTrait
         }
 
         return false;
+    }
+
+    /**
+     * Manage entity rollback
+     *
+     * @param BaseEntityWithFile $current
+     * @param BaseEntityWithFile $original
+     */
+    protected function rollback(BaseEntityWithFile $current, BaseEntityWithFile $original = null)
+    {
+        // on create => remove element
+        if (null === $original) {
+            $this->delete($current);
+        }
     }
 
     /**

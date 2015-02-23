@@ -133,6 +133,7 @@ class BaseEntityWithFileManager extends BaseManagerTestCase
                     touch($this->workspace.'/my-file.txt'),
                     $entityManager = $this->createMockEntityManager(),
                     $entity = $this->createMockEntity(array(
+                        'id' => null,
                         'userPhoto' => $this->createMockFileType($this->workspace.'/my-file.txt'),
                         'userPhotoFilename' => '',
                     ))
@@ -169,6 +170,7 @@ class BaseEntityWithFileManager extends BaseManagerTestCase
             ->assert('BaseEntityWithFileManager::saveWithFiles with upload error')
                 ->given(
                     $entity = $this->createMockEntity(array(
+                        'id' => null,
                         'userPhoto' => $this->createMockFileType(),
                         'userPhotoFilename' => 'my-photo.png',
                     )),
