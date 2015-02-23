@@ -37,7 +37,7 @@ trait ImageManagerTrait
      * @param array $imageFormatDefinition Associative array to define image properties which be stored on filesystem
      * @param array $imageFormatChoices    Associative array to apply some format definitions to an entity property
      */
-    protected function initialize($arrayFilepath, $imageFormatDefinition, $imageFormatChoices)
+    protected function initialize(array $arrayFilepath, $imageFormatDefinition, $imageFormatChoices)
     {
         $this->parentInitialize($arrayFilepath);
 

@@ -39,7 +39,7 @@ trait FileManagerTrait
      * @param array $arrayFilepath Associative array containing the file path for each property of the managed entity.
      *                             This array must also contain a 'root' and a 'web' path.
      */
-    protected function initialize($arrayFilepath)
+    protected function initialize(array $arrayFilepath)
     {
         if (!isset($arrayFilepath['bundle.web'])) {
             throw new \InvalidArgumentException('$arrayFilepath must have a bundle.web key (even empty).');
