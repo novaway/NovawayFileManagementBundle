@@ -27,6 +27,11 @@ trait FileManagerTrait
      */
     protected $webPath;
 
+    /**
+     * @var bool
+     */
+    private $booted = false;
+
 
     /**
      * Initialize trait properties
@@ -52,6 +57,8 @@ trait FileManagerTrait
             $this->rootPath  = $classDir.'/../../../../../../../web'.$this->webPath;
         }
         $this->arrayFilepath = $arrayFilepath;
+
+        $this->booted = true;
     }
 
     /**
@@ -65,6 +72,10 @@ trait FileManagerTrait
      */
     public function saveWithFiles(BaseEntityWithFile $entity, $callback = null)
     {
+        if (!$this->booted) {
+            throw new \Exception('Manager has not been initialized');
+        }
+
         $managedProperties = $this->arrayFilepath;
         $managedProperties = array_keys($managedProperties);
 
@@ -104,6 +115,10 @@ trait FileManagerTrait
      */
     public function deleteWithFiles(BaseEntityWithFile $entity)
     {
+        if (!$this->booted) {
+            throw new \Exception('Manager has not been initialized');
+        }
+
         $managedProperties = $this->arrayFilepath;
         $managedProperties = array_keys($managedProperties);
 
