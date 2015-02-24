@@ -27,6 +27,11 @@ trait FileManagerTrait
      */
     protected $webPath;
 
+    /**
+     * @var bool
+     */
+    private $booted = false;
+
 
     /**
      * Initialize trait properties
@@ -34,7 +39,7 @@ trait FileManagerTrait
      * @param array $arrayFilepath Associative array containing the file path for each property of the managed entity.
      *                             This array must also contain a 'root' and a 'web' path.
      */
-    protected function initialize($arrayFilepath)
+    protected function initialize(array $arrayFilepath)
     {
         if (!isset($arrayFilepath['bundle.web'])) {
             throw new \InvalidArgumentException('$arrayFilepath must have a bundle.web key (even empty).');
@@ -52,6 +57,8 @@ trait FileManagerTrait
             $this->rootPath  = $classDir.'/../../../../../../../web'.$this->webPath;
         }
         $this->arrayFilepath = $arrayFilepath;
+
+        $this->booted = true;
     }
 
     /**
@@ -65,6 +72,10 @@ trait FileManagerTrait
      */
     public function saveWithFiles(BaseEntityWithFile $entity, $callback = null)
     {
+        if (!$this->booted) {
+            throw new \Exception('Manager has not been initialized');
+        }
+
         $managedProperties = $this->arrayFilepath;
         $managedProperties = array_keys($managedProperties);
 
@@ -104,6 +115,10 @@ trait FileManagerTrait
      */
     public function deleteWithFiles(BaseEntityWithFile $entity)
     {
+        if (!$this->booted) {
+            throw new \Exception('Manager has not been initialized');
+        }
+
         $managedProperties = $this->arrayFilepath;
         $managedProperties = array_keys($managedProperties);
 
