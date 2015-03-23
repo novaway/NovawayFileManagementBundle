@@ -107,6 +107,7 @@ to add a `getCustomPath` method to your entity
     * *crop_position* : [String - Default: 'MM'] Crop image position (L = left, T = top, M = middle, B = bottom, R = right)
     * *bg_color* : [String - Default: '#FFFFFF'] Background color when image does not fill expected output size
     * *enlarge* : [Boolean - Default: false] Enlarge image when source is smaller than output. Fill with bg_color when false
+    * *fix_orientation* : [Boolean - Default: false] Fix image orientation by reading orientation EXIFF data
     * *height* : [Number - Default: 0] Height (if not square)
     * *keep_proportions* : [Boolean - Default: true] Keep source image proportions (and fill with blank if needed)
     * *max_height* : [Number - Default: 0] Resize to fit non square at maximum
