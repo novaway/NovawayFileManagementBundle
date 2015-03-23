@@ -109,7 +109,9 @@ class ResizeManager
      */
     public static function resize($sourcePath, $destPathWithFormat, $dim)
     {
-        $layer = ImageWorkshop::initFromPath($sourcePath);
+        $fixOrientation = (isset($dim['fix_orientation'])) ? $dim['fix_orientation'] : false;
+
+        $layer = ImageWorkshop::initFromPath($sourcePath, $fixOrientation);
         $initSize = array(
             'width'    => $layer->getWidth(),
             'height'   => $layer->getHeight(),
@@ -199,7 +201,7 @@ class ResizeManager
             true,
             null,
             $dim['quality']
-            );
+        );
 
         $layer = null;
     }
