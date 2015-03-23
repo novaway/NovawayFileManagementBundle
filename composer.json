@@ -16,7 +16,7 @@
         "symfony/framework-bundle": ">=2.5.0",
         "symfony/form": ">=2.5.0",
         "symfony/property-access": ">=2.5.0",
-        "sybio/image-workshop": "2.0.*@dev"
+        "sybio/image-workshop": "~2.0"
     },
     "require-dev": {
         "atoum/atoum": "~1.2",
