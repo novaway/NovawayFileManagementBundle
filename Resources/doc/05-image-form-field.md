@@ -62,7 +62,7 @@ To display the form in a twig template, you will need to load the form theme.
 ```
 {% form_theme form 'NovawayFileManagementBundle:Form:fields.html.twig' %}
 
-{{ form(form) }}
+{{ form_widget(form) }}
 ```
 
 
