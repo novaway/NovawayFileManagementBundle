@@ -45,19 +45,17 @@ trait FileManagerTrait
             throw new \InvalidArgumentException('$arrayFilepath must have a bundle.web key (even empty).');
         }
 
-        $this->webPath = $arrayFilepath['bundle.web'];
-
-        unset($arrayFilepath['bundle.web']);
-        if (isset($arrayFilepath['bundle.root']) && $arrayFilepath['bundle.root'] != null) {
-            $this->rootPath = $arrayFilepath['bundle.root'];
-            unset($arrayFilepath['bundle.root']);
-        } else {
-            $reflexionObject = new \ReflectionObject($this);
-            $classDir        = dirname($reflexionObject->getFileName());
-            $this->rootPath  = $classDir.'/../../../../../../../web'.$this->webPath;
+        if (empty($arrayFilepath['bundle.root'])) {
+            throw new \InvalidArgumentException('$arrayFilepath must have a bundle.root key.');
         }
-        $this->arrayFilepath = $arrayFilepath;
 
+        $this->webPath = $arrayFilepath['bundle.web'];
+        unset($arrayFilepath['bundle.web']);
+
+        $this->rootPath = $arrayFilepath['bundle.root'];
+        unset($arrayFilepath['bundle.root']);
+
+        $this->arrayFilepath = $arrayFilepath;
         $this->booted = true;
     }
 

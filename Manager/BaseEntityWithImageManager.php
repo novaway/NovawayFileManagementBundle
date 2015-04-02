@@ -34,6 +34,14 @@ class BaseEntityWithImageManager implements FileManagerInterface
      */
     public function __construct($arrayFilepath, $entityManager, $imageFormatDefinition, $imageFormatChoices)
     {
+        if (empty($arrayFilepath['bundle.root'])) {
+            $bundleWeb = (isset($arrayFilepath['bundle.web'])) ? $arrayFilepath['bundle.web'] : '';
+
+            $reflexionObject = new \ReflectionObject($this);
+            $classDir        = dirname($reflexionObject->getFileName());
+            $arrayFilepath['bundle.root'] = $classDir.'/../../../../../../../web'.$bundleWeb;
+        }
+
         $this->initialize($arrayFilepath, $imageFormatDefinition, $imageFormatChoices);
 
         $this->entityManager = $entityManager;
