@@ -455,16 +455,12 @@ class BaseEntityWithFileManager extends BaseManagerTestCase
     {
         return array(
             array(
-                array('bundle.web' => '', 'userPhoto' => ''),
+                array('bundle.web' => '', 'bundle.root' => '/tmp/root', 'userPhoto' => ''),
                 array('userPhoto')
             ),
             array(
-                array('bundle.web' => '', 'bundle.root' => '', 'userPhoto' => ''),
-                array('bundle.root', 'userPhoto')
-            ),
-            array(
-                array('bundle.web' => '', 'bundle.root' => '', 'userPhoto' => '', 'userCertificate' => ''),
-                array('bundle.root', 'userPhoto', 'userCertificate')
+                array('bundle.web' => '', 'bundle.root' => '/tmp/root', 'userPhoto' => '', 'userCertificate' => ''),
+                array('userPhoto', 'userCertificate')
             ),
         );
     }
