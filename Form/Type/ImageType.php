@@ -61,9 +61,14 @@ class ImageType extends AbstractType
     {
         $view->vars['preview']   = $options['preview'];
         $view->vars['image_url'] = null;
+        $view->vars['assets_version'] = null;
 
         if ($view->vars['preview']) {
             $view->vars['image_url'] = $this->getImagePath($form, $options);
+
+            $accessor = PropertyAccess::createPropertyAccessor();
+            $parentData = $form->getParent()->getData();
+            $view->vars['assets_version'] = $this->generateTimestamp($accessor, $parentData);
         }
     }
 
