@@ -52,9 +52,7 @@ trait FileManagerTrait
             $this->rootPath = $arrayFilepath['bundle.root'];
             unset($arrayFilepath['bundle.root']);
         } else {
-            $reflexionObject = new \ReflectionObject($this);
-            $classDir        = dirname($reflexionObject->getFileName());
-            $this->rootPath  = $classDir.'/../../../../../../../web'.$this->webPath;
+            $this->rootPath = __DIR__.'/../../../../../../../../web'.$this->webPath;
         }
         $this->arrayFilepath = $arrayFilepath;
 
