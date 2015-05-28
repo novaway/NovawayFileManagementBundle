@@ -419,7 +419,7 @@ class BaseEntityWithFileManager extends BaseManagerTestCase
 
     public function getFileAbsolutePathDataProvider()
     {
-        $managerDirPath = realpath(__DIR__.'/../../../Manager');
+        $managerDirPath = realpath(__DIR__.'/../../../Manager/Traits');
 
         return array(
             array(
@@ -430,7 +430,7 @@ class BaseEntityWithFileManager extends BaseManagerTestCase
             array(
                 array('bundle.web' => '/bundle/dir/', 'userPhoto' => '/uploads/'),
                 'userPhoto',
-                $managerDirPath.'/../../../../../../../web/bundle/dir/my-photo.png',
+                $managerDirPath.'/../../../../../../../../web/bundle/dir/my-photo.png',
             ),
         );
     }
