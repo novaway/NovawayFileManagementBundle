@@ -8,7 +8,9 @@ php:
   - hhvm-nightly
 
 env:
-  - SYMFONY_VERSION=2.7.*@dev
+  - SYMFONY_VERSION=3.0.*@dev
+  - SYMFONY_VERSION=2.8.*@dev
+  - SYMFONY_VERSION=2.7.*
   - SYMFONY_VERSION=2.6.*
   - SYMFONY_VERSION=2.5.*
 
