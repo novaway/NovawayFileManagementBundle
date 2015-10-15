@@ -8,12 +8,12 @@ use Novaway\Bundle\FileManagementBundle\Manager\ResizeManager;
 trait ImageManagerTrait
 {
     use FileManagerTrait {
-        buildDestination as private parentBuildDestination;
-        fileMove as private parentFileMove;
-        getFileAbsolutePath as private parentFileAbsolutePath;
-        getFileWebPath as private parentGetFileWebPath;
-        initialize as private parentInitialize;
-        replaceFile as private parentReplaceFile;
+        buildDestination as protected parentBuildDestination;
+        fileMove as protected parentFileMove;
+        getFileAbsolutePath as protected parentFileAbsolutePath;
+        getFileWebPath as protected parentGetFileWebPath;
+        initialize as protected parentInitialize;
+        replaceFile as protected parentReplaceFile;
     }
 
     /**
