@@ -13,6 +13,7 @@ trait ImageManagerTrait
         getFileAbsolutePath as private parentFileAbsolutePath;
         getFileWebPath as private parentGetFileWebPath;
         initialize as private parentInitialize;
+        replaceFile as private parentReplaceFile;
     }
 
     /**
