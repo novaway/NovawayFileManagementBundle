@@ -130,10 +130,11 @@ trait ImageManagerTrait
      * @param string             $sourceFilepath The image source folder
      * @param string|null        $destFilepath   The image destination folder
      * @param string             $operation      'copy' or 'rename'
+     * @param array              $formatList     Format to override, all if left null (recommended)
      *
      * @return array|null An array containing informations about the copied file
      */
-    public function replaceFile(BaseEntityWithFile $entity, $propertyName, $sourceFilepath, $destFilepath = null, $operation = self::OPERATION_COPY)
+    public function replaceFile(BaseEntityWithFile $entity, $propertyName, $sourceFilepath, $destFilepath = null, $operation = self::OPERATION_COPY, array $formatList = null)
     {
         if (!in_array($operation, array(self::OPERATION_COPY, self::OPERATION_RENAME))) {
             throw new \InvalidArgumentException(sprintf('$operation only accept "%s" or "%s" value', self::OPERATION_COPY, self::OPERATION_RENAME));
@@ -150,7 +151,11 @@ trait ImageManagerTrait
                 $entity->$propertyFileNameSetter($this->buildDestination($entity, $propertyName, $sourceFilepath, null));
             }
 
-            foreach ($this->imageFormatChoices[$propertyName] as $format) {
+            if (null === $formatList) {
+                $formatList = $this->imageFormatChoices[$propertyName];    
+            }
+            
+            foreach ($formatList as $format) {
 
                 $oldDestPath = $this->transformPathWithFormat($oldDestPathPattern, $format);
                 if (is_file($oldDestPath)) {
