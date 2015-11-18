@@ -151,7 +151,10 @@ trait ImageManagerTrait
                 $entity->$propertyFileNameSetter($this->buildDestination($entity, $propertyName, $sourceFilepath, null));
             }
 
-            $formatList = $formatList ? $formatList : $this->imageFormatChoices[$propertyName];
+            if (null === $formatList) {
+                $formatList = $this->imageFormatChoices[$propertyName];    
+            }
+            
             foreach ($formatList as $format) {
 
                 $oldDestPath = $this->transformPathWithFormat($oldDestPathPattern, $format);
