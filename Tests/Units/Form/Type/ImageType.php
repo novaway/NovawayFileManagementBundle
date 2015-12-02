@@ -16,16 +16,21 @@ class ImageType extends BaseManagerTestCase{
 
     public function testSetDefaultOptions()
     {
+        $isSymfonyHigherThan26 = method_exists('\Symfony\Component\Form\AbstractType', 'configureOptions');
+
+        $configurationMethod  = $isSymfonyHigherThan26 ? 'configureOptions' : 'setDefaultOptions';
+        $optionalConfigMethod = $isSymfonyHigherThan26 ? 'setDefined' : 'setOptional';
+        $resolver             = $isSymfonyHigherThan26 ?
+            new \mock\Symfony\Component\OptionsResolver\OptionsResolver() :
+            new \mock\Symfony\Component\OptionsResolver\OptionsResolverInterface();
+
         $this
-            ->given(
-                $resolver = new \mock\Symfony\Component\OptionsResolver\OptionsResolverInterface()
-            )
             ->if(
                 $testedClass = $this->createTestedClassInstance(),
-                $testedClass->setDefaultOptions($resolver)
+                $testedClass->$configurationMethod($resolver)
             )
             ->mock($resolver)
-                ->call('setOptional')
+                ->call($optionalConfigMethod)
                     ->withArguments(['format', 'update_cache', 'preview', 'web_directory'])
                     ->once()
                 ->call('setDefaults')
