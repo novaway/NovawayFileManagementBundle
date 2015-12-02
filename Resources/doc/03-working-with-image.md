@@ -73,7 +73,7 @@ class MyUserEntityType extends AbstractType
         ;
     }
 
-    public function setDefaultOptions(OptionsResolverInterface $resolver)
+    public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults(array(
             'data_class' => 'Novaway\Bundle\MyBundle\Entity\MyUserEntity',

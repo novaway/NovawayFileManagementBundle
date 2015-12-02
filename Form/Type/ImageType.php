@@ -7,6 +7,7 @@ use Symfony\Component\Form\FormView;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 
 class ImageType extends AbstractType
@@ -41,11 +42,26 @@ class ImageType extends AbstractType
     }
 
     /**
+     * @deprecated The fonction is here to keep compatibility with Symfony < 2.6
      * {@inheritdoc}
      */
     public function setDefaultOptions(OptionsResolverInterface $resolver)
     {
         $resolver->setOptional(['format', 'update_cache', 'preview', 'web_directory']);
+        $resolver->setDefaults([
+            'format'        => 'thumbnail',
+            'update_cache'  => true,
+            'preview'       => true,
+            'web_directory' => $this->webDirectory
+        ]);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function configureOptions(OptionsResolver $resolver)
+    {
+        $resolver->setDefined(['format', 'update_cache', 'preview', 'web_directory']);
         $resolver->setDefaults([
             'format'        => 'thumbnail',
             'update_cache'  => true,
