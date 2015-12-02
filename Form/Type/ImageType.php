@@ -41,7 +41,7 @@ class ImageType extends AbstractType
         return 'image';
     }
 
-    /** 
+    /**
      * @deprecated The fonction is here to keep compatibility with Symfony < 2.6
      * {@inheritdoc}
      */
