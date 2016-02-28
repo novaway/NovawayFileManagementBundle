@@ -258,10 +258,17 @@ trait ImageManagerTrait
             return false;
         }
 
-        $fileDestinationAbsolute = sprintf('%s%s', $this->rootPath, $fileDestination);
+        $fileDestinationAbsolute = sprintf('%s/%s',
+            rtrim($this->rootPath, '/'),
+            ltrim($fileDestination, '/')
+        );
+
         if (preg_match('#(.+)/([^/.]+).([A-Z]{3,5})#i', $fileDestinationAbsolute, $destMatch)) {
 
-            $tmpDir = sprintf('%s%s', $this->rootPath, 'tmp');
+            $tmpDir = sprintf('%s/%s',
+                rtrim($this->rootPath, '/'),
+                ltrim('tmp', '/')
+            );
             $tmpName = uniqid().rand(0,999).'.'.$destMatch[3];
             $tmpPath = $tmpDir.'/'.$tmpName;
 
