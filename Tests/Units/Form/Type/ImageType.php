@@ -14,8 +14,38 @@ use Novaway\Bundle\FileManagementBundle\Tests\Helper\BaseManagerTestCase;
 
 class ImageType extends BaseManagerTestCase{
 
+    public function testConfigureOptions()
+    {
+        if (!method_exists('Symfony\Component\Form\AbstractType', 'configureOptions')) {
+            $this->skip('Form type `configureOptions` method not exists.');
+        }
+
+        $this
+            ->given(
+                $resolver = new \mock\Symfony\Component\OptionsResolver\OptionsResolver()
+            )
+            ->if(
+                $testedClass = $this->createTestedClassInstance(),
+                $testedClass->configureOptions($resolver)
+            )
+            ->mock($resolver)
+                ->call('setDefaults')
+                    ->withArguments([
+                        'format'        => 'thumbnail',
+                        'update_cache'  => true,
+                        'preview'       => true,
+                        'web_directory' => '/mydir/',
+                    ])
+                    ->once()
+        ;
+    }
+
     public function testSetDefaultOptions()
     {
+        if (!class_exists('Symfony\Component\OptionsResolver\OptionsResolverInterface')) {
+            $this->skip('Must be in SF3: `setDefaultOptions` is not used anymore.');
+        }
+
         $this
             ->given(
                 $resolver = new \mock\Symfony\Component\OptionsResolver\OptionsResolverInterface()
