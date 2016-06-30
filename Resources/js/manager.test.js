@@ -30,13 +30,7 @@ function testTransformPathWithFormat() {
 
     assertEquals('http://cdn.com/file_original.png', manager.transformPathWithFormat('http://cdn.com/file_{-imgformat-}.png', 'original'));
     assertEquals('http://cdn.com/file_thumb.png', manager.transformPathWithFormat('http://cdn.com/file_{-imgformat-}.png', 'thumb'));
-
-    try {
-        manager.transformPathWithFormat('http://cdn.com/file_{-imgformat-}.png', 'unknow');
-        fail('Unexpected success imanager.transformPathWithFormat() with unknow image format');
-    } catch(e) {
-        assertEquals('Error', e.name);
-    }
+    assertEquals('http://cdn.com/file_unknow.png', manager.transformPathWithFormat('http://cdn.com/file_{-imgformat-}.png', 'unknow'));
 }
 
 function testGetFilePath() {
