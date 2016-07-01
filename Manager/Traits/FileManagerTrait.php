@@ -52,9 +52,10 @@ trait FileManagerTrait
             $this->rootPath = $arrayFilepath['bundle.root'];
             unset($arrayFilepath['bundle.root']);
         } else {
-            $reflexionObject = new \ReflectionObject($this);
-            $classDir        = dirname($reflexionObject->getFileName());
-            $this->rootPath  = $classDir.'/../../../../../../../web'.$this->webPath;
+            $this->rootPath = sprintf('%s/../../../../../../../../web/%s',
+                __DIR__,
+                ltrim($this->webPath, '/')
+            );
         }
         $this->arrayFilepath = $arrayFilepath;
 
@@ -140,7 +141,10 @@ trait FileManagerTrait
         $getter = $this->getter($propertyName, true);
 
         try {
-            $path = sprintf('%s%s', $this->rootPath, $entity->$getter());
+            $path = sprintf('%s/%s',
+                rtrim($this->rootPath, '/') ,
+                ltrim($entity->$getter(), '/')
+            );
         } catch (\Exception $e) {
             throw new \UnexpectedValueException();
         }
@@ -161,7 +165,10 @@ trait FileManagerTrait
         $getter = $this->getter($propertyName, true);
 
         try {
-            $path = sprintf('%s%s', $this->webPath, $entity->$getter());
+            $path = sprintf('%s/%s',
+                rtrim($this->webPath, '/'),
+                ltrim($entity->$getter(), '/')
+            );
         } catch (\Exception $e) {
             throw new \UnexpectedValueException();
         }
@@ -400,8 +407,12 @@ trait FileManagerTrait
 
             $fileDestinationName = $this->buildDestination($entity, $propertyName);
 
-            if (is_file($this->rootPath.$entity->$propertyFileNameGetter())) {
-                unlink($this->rootPath.$entity->$propertyFileNameGetter());
+            $oldFile = sprintf('%s/%',
+                rtrim($this->rootPath, '/'),
+                ltrim($entity->$propertyFileNameGetter(), '/')
+            );
+            if (is_file($oldFile)) {
+                unlink($oldFile);
             }
             $entity->$propertyFileNameSetter($fileDestinationName);
 
@@ -433,7 +444,11 @@ trait FileManagerTrait
             return false;
         }
 
-        $destFullPath = sprintf('%s%s', $this->rootPath, $fileDestination);
+        $destFullPath = sprintf('%s/%s',
+            rtrim($this->rootPath, '/'),
+            ltrim($fileDestination, '/')
+        );
+
         if (preg_match(
             '#(.+)/([^/.]+).([A-Z]{3,5})#i',
             $destFullPath,

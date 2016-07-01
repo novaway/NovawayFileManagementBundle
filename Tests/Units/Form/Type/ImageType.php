@@ -1,18 +1,11 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: skwi
- * Date: 19/08/2014
- * Time: 14:25
- */
 
 namespace Novaway\Bundle\FileManagementBundle\Tests\Units\Form\Type;
 
-use mageekguy\atoum;
 use Novaway\Bundle\FileManagementBundle\Form\Type;
 use Novaway\Bundle\FileManagementBundle\Tests\Helper\BaseManagerTestCase;
 
-class ImageType extends BaseManagerTestCase{
+class ImageType extends BaseManagerTestCase {
 
     public function testConfigureOptions()
     {

@@ -354,7 +354,7 @@ class BaseEntityWithImageManager extends BaseManagerTestCase
 
     public function getFileAbsolutePathDataProvider()
     {
-        $managerDirPath = realpath(__DIR__.'/../../../Manager');
+        $managerDirPath = realpath(__DIR__.'/../../../Manager/Traits');
         $filePaths = array(
             'bundle.web' => '/bundle/dir/',
             'bundle.root' => '/bundle/root/',
@@ -367,9 +367,9 @@ class BaseEntityWithImageManager extends BaseManagerTestCase
             array($filePaths, 'userPhoto', null, '/bundle/root/my-photo_{-imgformat-}.png'),
             array($filePaths, 'userPhoto', 'original', '/bundle/root/my-photo_original.png'),
             array($filePaths, 'userPhoto', 'format1Definition', '/bundle/root/my-photo_format1Definition.png'),
-            array($filePathsWithoutRoot, 'userPhoto', null, $managerDirPath.'/../../../../../../../web/bundle/dir/my-photo_{-imgformat-}.png'),
-            array($filePathsWithoutRoot, 'userPhoto', 'original', $managerDirPath.'/../../../../../../../web/bundle/dir/my-photo_original.png'),
-            array($filePathsWithoutRoot, 'userPhoto', 'format1Definition', $managerDirPath.'/../../../../../../../web/bundle/dir/my-photo_format1Definition.png'),
+            array($filePathsWithoutRoot, 'userPhoto', null, $managerDirPath.'/../../../../../../../../web/bundle/dir/my-photo_{-imgformat-}.png'),
+            array($filePathsWithoutRoot, 'userPhoto', 'original', $managerDirPath.'/../../../../../../../../web/bundle/dir/my-photo_original.png'),
+            array($filePathsWithoutRoot, 'userPhoto', 'format1Definition', $managerDirPath.'/../../../../../../../../web/bundle/dir/my-photo_format1Definition.png'),
         );
     }
 

@@ -42,6 +42,7 @@ class ImageType extends AbstractType
     }
 
     /**
+     * @deprecated The fonction is here to keep compatibility with Symfony < 2.6
      * {@inheritdoc}
      */
     public function configureOptions(OptionsResolver $resolver)

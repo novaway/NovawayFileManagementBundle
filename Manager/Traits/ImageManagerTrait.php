@@ -8,11 +8,12 @@ use Novaway\Bundle\FileManagementBundle\Manager\ResizeManager;
 trait ImageManagerTrait
 {
     use FileManagerTrait {
-        buildDestination as private parentBuildDestination;
-        fileMove as private parentFileMove;
-        getFileAbsolutePath as private parentFileAbsolutePath;
-        getFileWebPath as private parentGetFileWebPath;
-        initialize as private parentInitialize;
+        buildDestination as protected parentBuildDestination;
+        fileMove as protected parentFileMove;
+        getFileAbsolutePath as protected parentFileAbsolutePath;
+        getFileWebPath as protected parentGetFileWebPath;
+        initialize as protected parentInitialize;
+        replaceFile as protected parentReplaceFile;
     }
 
     /**
@@ -257,10 +258,17 @@ trait ImageManagerTrait
             return false;
         }
 
-        $fileDestinationAbsolute = sprintf('%s%s', $this->rootPath, $fileDestination);
+        $fileDestinationAbsolute = sprintf('%s/%s',
+            rtrim($this->rootPath, '/'),
+            ltrim($fileDestination, '/')
+        );
+
         if (preg_match('#(.+)/([^/.]+).([A-Z]{3,5})#i', $fileDestinationAbsolute, $destMatch)) {
 
-            $tmpDir = sprintf('%s%s', $this->rootPath, 'tmp');
+            $tmpDir = sprintf('%s/%s',
+                rtrim($this->rootPath, '/'),
+                ltrim('tmp', '/')
+            );
             $tmpName = uniqid().rand(0,999).'.'.$destMatch[3];
             $tmpPath = $tmpDir.'/'.$tmpName;
 

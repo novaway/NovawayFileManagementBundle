@@ -19,6 +19,7 @@ matrix:
   fast_finish: true
 
 before_script:
+  - phpenv config-rm xdebug.ini
   - composer selfupdate
   - composer require symfony/symfony:${SYMFONY_VERSION} --no-update
   - composer update
