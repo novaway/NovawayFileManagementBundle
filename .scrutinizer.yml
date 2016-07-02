@@ -1,0 +1,7 @@
+filter:
+    paths:
+        - "*"
+
+    excluded_paths:
+        - "Tests/*"
+        - "vendor/*"
