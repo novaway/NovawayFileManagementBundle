@@ -36,7 +36,10 @@ class FileManagementExtension extends \Twig_Extension
             return null;
         }
 
-        return $this->webDirectory.$filePath;
+        return sprintf('%s/%s',
+            rtrim($this->webDirectory, '/'),
+            ltrim($filePath, '/')
+        );
     }
 
     public function imagepath($entity, $propertyName, $format, $updateCache = true)
@@ -82,10 +85,10 @@ class FileManagementExtension extends \Twig_Extension
             return null;
         }
 
-        return sprintf('%s://%s%s',
+        return sprintf('%s://%s/%s',
             $this->generator->getContext()->getScheme(),
-            $this->generator->getContext()->getHost(),
-            $path
+            rtrim($this->generator->getContext()->getHost(), '/'),
+            ltrim($path, '/')
         );
     }
 }
