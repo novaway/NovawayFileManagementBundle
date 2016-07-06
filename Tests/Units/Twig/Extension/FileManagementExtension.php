@@ -131,6 +131,37 @@ class FileManagementExtension extends atoum\test
                 })
                     ->isInstanceOf('Symfony\Component\PropertyAccess\Exception\NoSuchPropertyException')
                     ->hasCode(0)
+
+            ->given(
+                $context = new \mock\Symfony\Component\Routing\RequestContext(),
+                $context->getMockController()->getScheme = function() { return 'http'; },
+                $context->getMockController()->getHttpPort = function() { return 8000; }
+            )
+            ->if($testedClass = $this->createTestedClassInstance('/mydir/', $context))
+            ->then
+                ->string($testedClass->fileUrl($myEntity, 'photo', 'mini'))
+                    ->isEqualTo('http://localhost:8000/mydir/my-photo.png')
+
+            ->given(
+                $context = new \mock\Symfony\Component\Routing\RequestContext(),
+                $context->getMockController()->getScheme = function() { return 'https'; },
+                $context->getMockController()->getHttpsPort = function() { return 443; }
+            )
+            ->if($testedClass = $this->createTestedClassInstance('/mydir/', $context))
+            ->then
+                ->string($testedClass->fileUrl($myEntity, 'photo', 'mini'))
+                    ->isEqualTo('https://localhost/mydir/my-photo.png')
+
+
+            ->given(
+                $context = new \mock\Symfony\Component\Routing\RequestContext(),
+                $context->getMockController()->getScheme = function() { return 'https'; },
+                $context->getMockController()->getHttpsPort = function() { return 8000; }
+            )
+            ->if($testedClass = $this->createTestedClassInstance('/mydir/', $context))
+            ->then
+                ->string($testedClass->fileUrl($myEntity, 'photo', 'mini'))
+                    ->isEqualTo('https://localhost:8000/mydir/my-photo.png')
         ;
     }
 
@@ -161,17 +192,53 @@ class FileManagementExtension extends atoum\test
                 })
                     ->isInstanceOf('Symfony\Component\PropertyAccess\Exception\NoSuchPropertyException')
                     ->hasCode(0)
+
+
+            ->given(
+                $context = new \mock\Symfony\Component\Routing\RequestContext(),
+                $context->getMockController()->getScheme = function() { return 'http'; },
+                $context->getMockController()->getHttpPort = function() { return 8000; }
+            )
+            ->if($testedClass = $this->createTestedClassInstance('/mydir/', $context))
+            ->then
+                ->string($testedClass->fileUrl($myEntity, 'photo', 'mini'))
+                    ->isEqualTo('http://localhost:8000/mydir/my-photo.png')
+
+            ->given(
+                $context = new \mock\Symfony\Component\Routing\RequestContext(),
+                $context->getMockController()->getScheme = function() { return 'https'; },
+                $context->getMockController()->getHttpsPort = function() { return 443; }
+            )
+            ->if($testedClass = $this->createTestedClassInstance('/mydir/', $context))
+            ->then
+                ->string($testedClass->fileUrl($myEntity, 'photo', 'mini'))
+                    ->isEqualTo('https://localhost/mydir/my-photo.png')
+
+
+            ->given(
+                $context = new \mock\Symfony\Component\Routing\RequestContext(),
+                $context->getMockController()->getScheme = function() { return 'https'; },
+                $context->getMockController()->getHttpsPort = function() { return 8000; }
+            )
+            ->if($testedClass = $this->createTestedClassInstance('/mydir/', $context))
+            ->then
+                ->string($testedClass->fileUrl($myEntity, 'photo', 'mini'))
+                    ->isEqualTo('https://localhost:8000/mydir/my-photo.png')
         ;
     }
 
-    private function createTestedClassInstance($webdir = '/mydir')
+    private function createTestedClassInstance($webdir = '/mydir', $requestContext = null)
     {
+        if (null === $requestContext) {
+            $requestContext = new \mock\Symfony\Component\Routing\RequestContext();
+        }
+
         $controller = new \mageekguy\atoum\mock\controller();
         $controller->__construct = function() {};
 
         $urlGenerator = new \mock\Symfony\Component\Routing\Generator\UrlGenerator(
             new \mock\Symfony\Component\Routing\RouteCollection(),
-            new \mock\Symfony\Component\Routing\RequestContext(),
+            $requestContext,
             null,
             $controller
         );
