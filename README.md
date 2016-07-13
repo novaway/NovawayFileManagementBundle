@@ -1,3 +1,7 @@
+# Deprecated
+
+This project is no longer actively maintained.
+
 # Novaway FileManagementBundle
 
 [![Build Status](https://travis-ci.org/novaway/NovawayFileManagementBundle.svg)](https://travis-ci.org/novaway/NovawayFileManagementBundle)
