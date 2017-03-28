@@ -5,18 +5,18 @@ parameters:
 
 services:
     novaway.fmb.form.type.image:
-        class: %novaway.fmb.form.type.image.class%
-        arguments: [%novaway.fmb.webdir%]
+        class: "%novaway.fmb.form.type.image.class%"
+        arguments: ["%novaway.fmb.webdir%"]
         tags:
             - { name: form.type, alias: image }
 
     novaway.fmb.form.type.image.extension:
-        class: %novaway.fmb.form.type.image.extension.class%
+        class: "%novaway.fmb.form.type.image.extension.class%"
         tags:
-            - { name: form.type_extension, alias: image }
+            - { name: form.type_extension, alias: image, extended_type: Symfony\Component\Form\Extension\Core\Type\FileType }
 
     novaway.fmb.twig_extension:
-        class : %novaway.fmb.twigextension.class%
-        arguments : [@router, %novaway.fmb.webdir%]
+        class : "%novaway.fmb.twigextension.class%"
+        arguments : ["@router", "%novaway.fmb.webdir%"]
         tags:
             - { name: twig.extension }
