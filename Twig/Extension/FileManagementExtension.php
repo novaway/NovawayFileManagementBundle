@@ -29,10 +29,10 @@ class FileManagementExtension extends \Twig_Extension
     public function getFilters()
     {
         return [
-            new \Twig_SimpleFilter('filepath', array($this, 'filepath')),
-            new \Twig_SimpleFilter('imagepath', array($this, 'imagepath')),
-            new \Twig_SimpleFilter('fileUrl', array($this, 'fileUrl')),
-            new \Twig_SimpleFilter('imageUrl', array($this, 'imageUrl')),
+            new \Twig_SimpleFilter('filepath', [$this, 'filepath']),
+            new \Twig_SimpleFilter('imagepath', [$this, 'imagepath']),
+            new \Twig_SimpleFilter('fileUrl', [$this, 'fileUrl']),
+            new \Twig_SimpleFilter('imageUrl', [$this, 'imageUrl']),
         ];
     }
 
@@ -93,9 +93,19 @@ class FileManagementExtension extends \Twig_Extension
             return null;
         }
 
-        return sprintf('%s://%s/%s',
-            $this->generator->getContext()->getScheme(),
-            rtrim($this->generator->getContext()->getHost(), '/'),
+        $context = $this->generator->getContext();
+        $port    = '';
+
+        if ('http' === $context->getScheme() && 80 !== $context->getHttpPort()) {
+            $port = sprintf(':%d', $context->getHttpPort());
+        } elseif ('https' === $context->getScheme() && 443 !== $context->getHttpsPort()) {
+            $port = sprintf(':%d', $context->getHttpsPort());
+        }
+
+        return sprintf('%s://%s%s/%s',
+            $context->getScheme(),
+            rtrim($context->getHost(), '/'),
+            $port,
             ltrim($path, '/')
         );
     }
