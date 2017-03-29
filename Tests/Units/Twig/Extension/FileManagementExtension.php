@@ -23,9 +23,7 @@ class FileManagementExtension extends atoum\test
             ->if($testedClass = $this->createTestedClassInstance())
             ->then
                 ->array($testedClass->getFilters())
-                    ->hasKey('filepath')
-                    ->hasKey('imagepath')
-                    ->hasKey('fileUrl')
+                    ->hasSize(4)
         ;
     }
 

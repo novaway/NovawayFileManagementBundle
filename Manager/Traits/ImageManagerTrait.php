@@ -164,6 +164,7 @@ trait ImageManagerTrait
 
                 $absoluteDestFilepath = $this->getFileAbsolutePath($entity, $propertyName, $format);
                 $absoluteDestDir = substr($absoluteDestFilepath, 0, strrpos($absoluteDestFilepath, '/'));
+
                 if (!is_dir($absoluteDestDir)) {
                     mkdir($absoluteDestDir, 0777, true);
                 }
