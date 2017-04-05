@@ -8,9 +8,17 @@ use Symfony\Component\PropertyAccess\PropertyAccess;
 class FileManagementExtension extends \Twig_Extension
 {
     private $generator;
+
     private $webDirectory;
+
     private $accessor;
 
+    /**
+     * FileManagementExtension constructor.
+     *
+     * @param UrlGeneratorInterface $generator
+     * @param string                $webDirectory
+     */
     public function __construct(UrlGeneratorInterface $generator, $webDirectory)
     {
         $this->generator    = $generator;
@@ -20,12 +28,12 @@ class FileManagementExtension extends \Twig_Extension
 
     public function getFilters()
     {
-        return array(
-            'filepath'  => new \Twig_Filter_Method($this, 'filepath'),
-            'imagepath' => new \Twig_Filter_Method($this, 'imagepath'),
-            'fileUrl'   => new \Twig_Filter_Method($this, 'fileUrl'),
-            'imageUrl'  => new \Twig_Filter_Method($this, 'imageUrl'),
-        );
+        return [
+            new \Twig_SimpleFilter('filepath', [$this, 'filepath']),
+            new \Twig_SimpleFilter('imagepath', [$this, 'imagepath']),
+            new \Twig_SimpleFilter('fileUrl', [$this, 'fileUrl']),
+            new \Twig_SimpleFilter('imageUrl', [$this, 'imageUrl']),
+        ];
     }
 
     public function filepath($entity, $propertyName)
@@ -86,11 +94,11 @@ class FileManagementExtension extends \Twig_Extension
         }
 
         $context = $this->generator->getContext();
+        $port    = '';
 
-        $port = '';
         if ('http' === $context->getScheme() && 80 !== $context->getHttpPort()) {
             $port = sprintf(':%d', $context->getHttpPort());
-        } else if('https' === $context->getScheme() && 443 !== $context->getHttpsPort()) {
+        } elseif ('https' === $context->getScheme() && 443 !== $context->getHttpsPort()) {
             $port = sprintf(':%d', $context->getHttpsPort());
         }
 

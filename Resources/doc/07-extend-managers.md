@@ -103,7 +103,7 @@ class DefaultController extends Controller
 
         if ('POST' === $request->getMethod()) {
             $form->handleRequest($request);
-            if ($form->isValid()) {
+            if ($form->isSubmitted() && $form->isValid()) {
                 $manager = new MyEntityCustomManager(array(
                     'bundle.web' => '/',
                     'item' => '/uploads/{id}.{-ext-}',

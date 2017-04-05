@@ -21,7 +21,7 @@ class MyUserEntityType extends AbstractType
     {
         $builder
             //->add(...)
-            ->add('picture', 'image')
+            ->add('picture', FileType::class)
         ;
     }
 }
@@ -38,7 +38,7 @@ It adds several new options :
  ``` php
  $builder
      //->add(...)
-     ->add('picture', 'image', array(
+     ->add('picture', FileType::class, array(
         'format'       => 'original',
         'update_cache' => false
      ))
