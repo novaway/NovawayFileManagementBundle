@@ -138,7 +138,7 @@ class DefaultController extends Controller
 
         if ('POST' === $request->getMethod()) {
             $form->handleRequest($request);
-            if ($form->isValid()) {
+            if ($form->isSubmitted() && $form->isValid()) {
                 $filePath = array(
                     'bundle.web' => '/',
                     'picture' => '/uploads/{id}-{-imgformat-}.{-ext-}',

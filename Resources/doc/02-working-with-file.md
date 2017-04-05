@@ -96,7 +96,7 @@ uploaded :
 to add a `getCustomPath` method to your entity
 * *$entityManager* : The entity manager used to persist and save data
 
-``` php
+```php
 <?php
 // src/Novaway/Bundle/MyBundle/Controller/DefaultController.php
 
@@ -116,7 +116,7 @@ class DefaultController extends Controller
 
         if ('POST' === $request->getMethod()) {
             $form->handleRequest($request);
-            if ($form->isValid()) {
+            if ($form->isSubmitted() && $form->isValid()) {
                 $manager = new BaseEntityWithFileManager(array(
                     'bundle.web' => '/',
                     'item' => '/uploads/{id}.{-ext-}',
