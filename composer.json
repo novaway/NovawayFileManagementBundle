@@ -1,7 +1,7 @@
 {
     "name": "novaway/filemanagementbundle",
     "type": "symfony-bundle",
-    "description": "Bundle for File and Image management in Symfony 3",
+    "description": "Bundle for File and Image management in Symfony",
     "keywords": ["file", "image", "bundle", "symfony"],
     "homepage": "https://github.com/novaway/NovawayFileManagementBundle",
     "license": "MIT",
